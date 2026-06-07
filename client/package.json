@@ -9,10 +9,22 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@hookform/resolvers": "^5.4.0",
+    "@mui/material": "^9.0.1",
+    "@tanstack/react-query": "^5.101.0",
+    "axios": "^1.17.0",
+    "date-fns": "^4.4.0",
     "next": "16.2.6",
+    "next-intl": "^4.13.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "sass": "^1.99.0"
+    "react-hook-form": "^7.77.0",
+    "sass": "^1.99.0",
+    "sonner": "^2.0.7",
+    "zod": "^4.4.3",
+    "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
