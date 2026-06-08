@@ -1,11 +1,11 @@
 import { useTranslations } from "next-intl";
 
 export default function Home() {
-  const t = useTranslations("HomePage");
+  const t = useTranslations("Home");
 
   return (
-    <main>
-      <h1>{t("title")}</h1>;
+    <main className="bg-primary">
+      <h1>{t("title")}</h1>
     </main>
   );
 }
