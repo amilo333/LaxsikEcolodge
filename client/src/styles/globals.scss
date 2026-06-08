@@ -1,12 +1,7 @@
 @use "tailwindcss";
-
-@theme {
-  --color-light: #FFFFFF;
-  --color-dark: #000000;
-  --color-primary: #0D4949;
-}
+@use "./_theme";
 
 body {
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--color-dark);
+  font-size: 16px;
 }
