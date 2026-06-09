@@ -1,7 +1,9 @@
-import React from 'react'
+import { Input } from '@/components/core';
 
 export default function Test() {
   return (
-    <div>Test</div>
-  )
+    <div>
+      <Input label="Name" />
+    </div>
+  );
 }

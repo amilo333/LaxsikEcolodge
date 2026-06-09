@@ -1,15 +1,27 @@
-export default function Input( ) {
+'use client';
+
+import TextField from '@mui/material/TextField';
+import { TInputProps } from './type';
+
+export default function Input({ label }: TInputProps) {
   return (
-    <div className="flex flex-col gap-2">
-      <label htmlFor="fname" className="font-bold text-[16px]">
-        Name
-      </label>
-      <input
-        type="text"
-        id="fname"
-        name="fname"
-        placeholder="Enter your name"
-        className="w-[320px] h-12 pl-2 border-[2px] border-white/30 placeholder:text-white/30"
+    <div className="flex flex-col gap-1">
+      <label className="text-sm font-semibold">{label}</label>
+
+      <TextField
+        placeholder="Enter Code"
+        variant="outlined"
+        fullWidth
+        slotProps={{
+          input: {
+            className: 'bg-gray-100 h-12 text-sm',
+          },
+        }}
+        className="
+          [&_.MuiOutlinedInput-root]:bg-white
+          [&_.MuiOutlinedInput-input]:py-3
+          [&_.MuiOutlinedInput-notchedOutline]:border-gray-300
+        "
       />
     </div>
   );
