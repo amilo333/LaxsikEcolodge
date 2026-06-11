@@ -1,9 +1,10 @@
-import { Input, TextArea } from '@/components/core';
+import { Input, Textfield } from '@/components/core';
 
 export default function Test() {
   return (
     <div>
-      <TextArea label="Message" />
+      <Input label="Name" />
+      <Textfield label="Email" />
     </div>
   );
 }
