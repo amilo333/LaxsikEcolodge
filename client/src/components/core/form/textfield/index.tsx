@@ -17,6 +17,7 @@ export default function Textfield(props: TTextfieldProps) {
           'bg-input-background border-input-border hover:border-input-border-hover focus:border-input-border-focus h-12 rounded-none border shadow-none focus:ring-0'
         )}
       />
+
       {error && <small className='text-error'>{error}</small>}
     </div>
   );
