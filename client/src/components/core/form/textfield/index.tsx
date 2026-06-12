@@ -8,17 +8,16 @@ export default function Textfield(props: TTextfieldProps) {
 
   return (
     <div
-      className={clsx('c_textfield-container', 'flex flex-col gap-1.5 w-full')}
-    >
+      className={clsx('c_textfield-container', 'flex w-full flex-col gap-1.5')}>
       <Label required={required}>{label}</Label>
       <Input
         {...field}
         {...rest}
         className={clsx(
-          'bg-light border border-input-border rounded-none shadow-none focus:ring-0 hover:border-input-border-hover focus:border-input-border-focus',
+          'bg-input-background border-input-border hover:border-input-border-hover focus:border-input-border-focus h-12 rounded-none border shadow-none focus:ring-0'
         )}
       />
-      {error && <small className="text-error">{error}</small>}
+      {error && <small className='text-error'>{error}</small>}
     </div>
   );
 }

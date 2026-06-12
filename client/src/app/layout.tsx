@@ -21,10 +21,10 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang='en'
       className={`${monserrat.className} ${monserrat.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">
+      data-mode='light'>
+      <body className='flex min-h-full flex-col'>
         <Providers>{children}</Providers>
       </body>
     </html>

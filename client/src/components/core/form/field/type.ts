@@ -1,4 +1,4 @@
-import type React from "react";
+import type React from 'react';
 import type {
   Control,
   ControllerFieldState,
@@ -7,12 +7,12 @@ import type {
   FieldValues,
   PathValue,
   UseFormStateReturn,
-} from "react-hook-form";
+} from 'react-hook-form';
 
 // [Type] Field Component Props
 export type TFieldProps<
   TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > = {
   // Control object from react-hook-form
   control: Control<TFieldValues>;
@@ -31,18 +31,18 @@ export type TFieldProps<
 // [Type] Function to render field
 export type TRenderFieldFunction<
   TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > = (form: TFieldState<TFieldValues, TName>) => React.ReactElement;
 
 // [Type] Field state passed to render function
 export type TFieldState<
   TFieldValues extends FieldValues = FieldValues,
-  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > = {
   // Field props from react-hook-form Controller
   field?: ControllerRenderProps<TFieldValues, TName>;
   // Field state from react-hook-form Controller
-  fieldState?: Omit<ControllerFieldState, "error">;
+  fieldState?: Omit<ControllerFieldState, 'error'>;
   // Form state from react-hook-form
   formState?: UseFormStateReturn<TFieldValues>;
 };

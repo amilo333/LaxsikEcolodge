@@ -7,7 +7,7 @@ export default function Label(props: TLabelProps) {
   //! [JSX Section]
   return (
     <div className={clsx('c_label-container', 'flex gap-1', className)}>
-      <span className='font-semibold text-sm'>{children}</span>
+      <span className='text-sm font-semibold'>{children}</span>
       {required && <span className='text-error'>*</span>}
     </div>
   );
