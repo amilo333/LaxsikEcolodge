@@ -1,32 +1,26 @@
 'use client';
 
-import TextField from '@mui/material/TextField';
+import { TextArea } from '@heroui/react';
+import clsx from 'clsx';
+import Label from '../../label';
 import { TTextAreaProps } from './type';
 
-export default function TextArea(props: TTextAreaProps) {
-  const { label } = props;
+export default function Textarea(props: TTextAreaProps) {
+  const { label, error, field, required, ...rest } = props;
 
   return (
-    <div className="flex flex-col gap-1">
-      <label className="text-sm font-semibold">{label}</label>
-
-      <TextField
-        placeholder="Enter your message"
-        variant="outlined"
-        fullWidth
-        slotProps={{
-          input: {
-            className: 'bg-gray-100  text-sm',
-          },
-        }}
-        className="
-              [&_.MuiOutlinedInput-root]:bg-white
-              [&_.MuiOutlinedInput-input]:py-3
-              [&_.MuiOutlinedInput-notchedOutline]:border-gray-300
-              [&_.MuiOutlinedInput-root]:h-[230px]
-              [&_.MuiOutlinedInput-root]:items-start!
-            "
+    <div
+      className={clsx('c_textfield-container', 'flex flex-col gap-1.5 w-full')}
+    >
+      <Label required={required}>{label}</Label>
+      <TextArea
+        {...field}
+        {...rest}
+        className={clsx(
+          'bg-light h-50  border border-input-border rounded-none shadow-none focus:ring-0 hover:border-input-border-hover focus:border-input-border-focus',
+        )}
       />
+      {error && <small className="text-error">{error}</small>}
     </div>
   );
 }
