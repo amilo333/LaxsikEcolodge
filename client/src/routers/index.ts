@@ -1,9 +1,9 @@
 export const ROUTERS = {
-  HOME: "/",
-  ABOUT: "/about",
-  CONTACT: "/contact",
+  HOME: '/',
+  ABOUT: '/about',
+  CONTACT: '/contact',
   ROOM: {
-    LIST: "/rooms",
+    LIST: '/rooms',
     DETAIL: (id: string) => `/rooms/${id}`,
   },
 };

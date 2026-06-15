@@ -1,9 +1,4 @@
 @use 'tailwindcss';
 @use './_variants';
-@use './_theme';
-
-body {
-  font-size: 16px;
-  background-color: var(--background);
-}
-
+@use './_theme.t';
+@use './_default.t';
