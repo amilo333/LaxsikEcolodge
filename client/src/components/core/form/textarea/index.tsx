@@ -10,17 +10,16 @@ export default function Textarea(props: TTextAreaProps) {
 
   return (
     <div
-      className={clsx('c_textfield-container', 'flex flex-col gap-1.5 w-full')}
-    >
+      className={clsx('c_textfield-container', 'flex w-full flex-col gap-1.5')}>
       <Label required={required}>{label}</Label>
       <TextArea
         {...field}
         {...rest}
         className={clsx(
-          'bg-light h-50  border border-input-border rounded-none shadow-none focus:ring-0 hover:border-input-border-hover focus:border-input-border-focus',
+          'bg-light border-input-border hover:border-input-border-hover focus:border-input-border-focus h-50 rounded-none border shadow-none focus:ring-0'
         )}
       />
-      {error && <small className="text-error">{error}</small>}
+      {error && <small className='text-error'>{error}</small>}
     </div>
   );
 }
