@@ -1,9 +1,9 @@
-import { Input, ButtonF } from '@/components/core';
+import { Button } from '@/components/core';
 
 export default function Test() {
   return (
     <div>
-      <ButtonF text='FIND NOW' />
+      <Button>FIND NOW</Button>
     </div>
   );
 }

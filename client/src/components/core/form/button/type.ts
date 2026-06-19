@@ -1,3 +1,3 @@
 export type TButtonProps = {
-  text?: string;
+  children?: React.ReactNode;
 };
