@@ -1,0 +1,174 @@
+    1  rpm -q centos-release
+    2  yum -y update
+    3  yum -y install httpd
+    4  rpm --import /etc/pki/rpm-gpg/RPM-GPG-KEY*
+    5  yum -y install epel-release
+    6  firewall-cmd --permanent --zone=public --add-service=http
+    7  systemctl start httpd.service
+    8  firewall-cmd --permanent --zone=public --add-service=https
+    9  firewall-cmd --reload
+   10  systemctl enable httpd.service
+   11  yum-config-manager --enable remi-php73
+   12  rpm -Uvh http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+   13  yum -y install yum-utils
+   14  yum-config-manager --enable remi-php73
+   15  yum -y install php php-opcache
+   16  systemctl restart httpd.service
+   17  php -v
+   18  clear
+   19  mkdir -p /var/www/resource/html
+   20  mkdir -p /var/www/resource/log
+   21  chown -R $USER:$USER /var/www/resource/html/
+   22  chmod -R 755 /var/www
+   23  yum install unzip zip git
+   24  cd /var/www/resource/html/
+   25  ll
+   26  unzip minigameconf.zip 
+   27  mkdir /etc/httpd/sites-available /etc/httpd/sites-enabled
+   28  nano /etc/httpd/conf/httpd.conf
+   29  cd /etc/httpd/sites-available/
+   30  nano resource.conf
+   31  history
+   32  nano resource.conf
+   33  ln -s /etc/httpd/sites-available/resource.conf /etc/httpd/sites-enabled/resource.conf
+   34  systemctl restart httpd
+   35  yum install epel-release
+   36  yum install certbot python2-certbot-apache mod_ssl
+   37  certbot --apache -d res.helitech-solutions.com
+   38  crontab -e
+   39  crontab -l
+   40  yum -y install mariadb-server mariadb
+   41  systemctl start mariadb.service
+   42  systemctl enable mariadb.service
+   43  mysql_secure_installation
+   44  yum install php-mysqli
+   45  systemctl restart httpd
+   46  php -i | grep "sql"
+   47  cd /var/www/resource/html/
+   48  ll
+   49  cd Resource/
+   50  ll
+   51  cd Dragon/100/AssetBundles/
+   52  ll
+   53  rm -rf *
+   54  unzip Android.zip 
+   55  cd /var/www/resource/html/
+   56  ll
+   57  cd Resource/
+   58  ll
+   59  cd Dragon/100/
+   60  ll
+   61  cd AssetBundles/
+   62  ll
+   63  rm -rf *
+   64  unzip Android.zip 
+   65  cd /var/www/resource/html/
+   66  ll
+   67  cd Resource/
+   68  ll
+   69  cd Dragon/100/AssetBundles/
+   70  ll
+   71  rm -rf *
+   72  unzip Android.zip 
+   73  cd /var/www/resource/html/
+   74  cd Resource/Dragon/100/AssetBundles/
+   75  ll
+   76  rm -rf
+   77  rm -rf *
+   78  unzip Android.zip 
+   79  rm -rf *
+   80  unzip Android.zip 
+   81  cd /var/www/resource/html/Resource/Dragon/100/AssetBundles/
+   82  ll
+   83  rm -rf *
+   84  unzip Android.zip 
+   85  cd /var/www/resource/html/Resource/Dragon/100/AssetBundles/
+   86  ll
+   87  rm -rf *
+   88  ll
+   89  unzip Android.zip 
+   90  ll
+   91  rm -rf *
+   92  clear
+   93  unzip Android.zip 
+   94  systemctl status httpd
+   95  httpd -S
+   96  systemctl restart httpd
+   97  ping res.helitech-solutions.com
+   98  systemctl restart httpd
+   99  systemctl status httpd
+  100  apachectl configtest
+  101  cat /etc/hosts
+  102  nano /etc/httpd/conf/httpd.conf 
+  103  systemctl restart httpd
+  104  apachectl configtest
+  105  httpd -S
+  106  nano /etc/httpd/sites-available/resource-le-ssl.conf
+  107  httpd -S
+  108  nano /etc/httpd/conf.d/ssl.conf
+  109  httpd -S
+  110  ping res.helitech-solutions.com
+  111  cd /var/www/resource/html/Resource/Dragon/100/AssetBundles/
+  112  ll
+  113  rm -rf *
+  114  ll
+  115  unzip Android.zip 
+  116  cd /etc/httpd/sites-available/
+  117  ll
+  118  nano resource.conf 
+  119  systemctl restart httped
+  120  systemctl restart httpd
+  121  cd /var/www/resource/html/Resource/Dragon/100/AssetBundles/
+  122  ll
+  123  rm -rf *
+  124  unzip Android.zip 
+  125  rm -rf *
+  126  unzip Android.zip 
+  127  cd /etc/httpd/sites-available/
+  128  ll
+  129  nano resource.conf 
+  130  cd /var/www/resource/html
+  131  ll
+  132  cd Resource/
+  133  ll
+  134  cd Dragon/
+  135  ll
+  136  cd 100/
+  137  ll
+  138  cd AssetBundles/
+  139  ll
+  140  cd Android
+  141  pwd
+  142  cd /etc/httpd/sites-available/
+  143  nano resource.conf 
+  144  nano resource-le-ssl.conf 
+  145  systemctl restart httpd
+  146  cd /var/www/resource/html/Resource/Dragon/100/AssetBundles/Android
+  147  pwd
+  148  nano /etc/httpd/sites-available/resource.conf 
+  149  nano /etc/httpd/sites-available/resource-le-ssl.conf 
+  150  systemctl restart httpd
+  151  nano .htaccess
+  152  ll
+  153  rm -rf *
+  154  ls -la
+  155  cd ..
+  156  ll
+  157  rm -rf *
+  158  ll
+  159  unzip Android.zip 
+  160  ll
+  161  cd Android
+  162  ll
+  163  ls -la
+  164  cd /var/www/resource/html/Resource/Dragon/100/
+  165  ll
+  166  cd AssetBundles/
+  167  ll
+  168  rm -rf *
+  169  unzip Android.zip 
+  170  cd Android
+  171  nano .htaccess
+  172  ls -la
+  173  php -v
+  174  history > /tmp/his.txt

@@ -1,10 +1,9 @@
-import { Input, Textfield } from '@/components/core';
+import { DatePicker, Input, Textfield } from '@/components/core';
 
 export default function Test() {
   return (
     <div>
-      <Input label='Name' />
-      <Textfield label='Email' />
+      <DatePicker label='Checkin Date' />
     </div>
   );
 }
