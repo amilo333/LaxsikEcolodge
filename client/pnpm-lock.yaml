@@ -5719,7 +5719,7 @@ snapshots:
   react-aria-components@1.17.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4):
     dependencies:
       '@internationalized/date': 3.12.2
-      '@react-types/shared': 3.34.0(react@19.2.4)
+      '@react-types/shared': 3.35.0(react@19.2.4)
       '@swc/helpers': 0.5.15
       client-only: 0.0.1
       react: 19.2.4
@@ -5743,7 +5743,7 @@ snapshots:
       '@internationalized/date': 3.12.2
       '@internationalized/number': 3.6.7
       '@internationalized/string': 3.2.9
-      '@react-types/shared': 3.34.0(react@19.2.4)
+      '@react-types/shared': 3.35.0(react@19.2.4)
       '@swc/helpers': 0.5.15
       aria-hidden: 1.2.6
       clsx: 2.1.1
@@ -5784,7 +5784,7 @@ snapshots:
       '@internationalized/date': 3.12.2
       '@internationalized/number': 3.6.7
       '@internationalized/string': 3.2.9
-      '@react-types/shared': 3.34.0(react@19.2.4)
+      '@react-types/shared': 3.35.0(react@19.2.4)
       '@swc/helpers': 0.5.15
       react: 19.2.4
       use-sync-external-store: 1.6.0(react@19.2.4)
