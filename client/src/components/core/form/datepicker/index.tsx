@@ -12,7 +12,7 @@ export default function DatePicker(props: TDatePickerProps) {
   const { label } = props;
 
   return (
-    <DatePickerHero className='h-24 w-72' name='date'>
+    <DatePickerHero className='h-24 w-full' name='date'>
       <Label>{label}</Label>
       <DateField.Group fullWidth className='rounded-none!'>
         <DateField.Input>
