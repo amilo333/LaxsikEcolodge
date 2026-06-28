@@ -1,9 +1,11 @@
-import { Input } from '@heroui/react';
+'use client';
+
+import { TextArea } from '@heroui/react';
 import clsx from 'clsx';
 import Label from '../../label';
-import { TTextfieldProps } from './type';
+import { TTextAreaProps } from './type';
 
-export default function Textfield(props: TTextfieldProps) {
+export default function Textarea(props: TTextAreaProps) {
   const { label, error, field, required, ...rest } = props;
 
   return (
@@ -12,11 +14,11 @@ export default function Textfield(props: TTextfieldProps) {
       <Label className='text-black' required={required}>
         {label}
       </Label>
-      <Input
+      <TextArea
         {...field}
         {...rest}
         className={clsx(
-          'bg-input-background border-input-border hover:border-input-border-hover focus:border-input-border-focus h-12 rounded-none border shadow-none focus:ring-0'
+          'bg-light border-input-border hover:border-input-border-hover focus:border-input-border-focus h-50 rounded-none border shadow-none focus:ring-0'
         )}
       />
       {error && <small className='text-error'>{error}</small>}

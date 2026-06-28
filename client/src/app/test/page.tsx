@@ -1,9 +1,9 @@
-import { Dialog, Input, Textfield } from '@/components/core';
+import { Dialog } from '@/components/core';
 
 export default function Test() {
   return (
     <div>
-      <Dialog />
+      <Dialog tourName='Hard Treaking' price='1200000' />
     </div>
   );
 }

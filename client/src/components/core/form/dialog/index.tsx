@@ -1,30 +1,42 @@
 'use client';
-import { Button, Modal } from '@heroui/react';
+import { Modal } from '@heroui/react';
+import Textfield from '../textfield';
+import Textarea from '../textarea';
+import Button from '../button';
+import { TDialogProps } from './type';
 
-export default function Dialog() {
+export default function Dialog(props: TDialogProps) {
+  const { tourName, price } = props;
+
   return (
     <Modal>
-      <Button
-        variant='secondary'
-        className='rounded-none bg-[#0D4949] font-semibold text-white'>
+      <Button className='w-[150px]! rounded-none bg-[#0D4949] font-semibold text-white'>
         BOOK NOW
       </Button>
       <Modal.Backdrop>
         <Modal.Container>
-          <Modal.Dialog className='sm:max-w-[360px]'>
+          <Modal.Dialog className='rounded-none sm:max-w-[400px]'>
             <Modal.CloseTrigger />
             <Modal.Header>
-              <Modal.Heading>BOOK TOUR</Modal.Heading>
+              <Modal.Heading className='text-[28px]'>BOOK TOUR</Modal.Heading>
             </Modal.Header>
-            <Modal.Body>
-              <p>
-                A beautiful, fast, and modern React UI library for building
-                accessible and customizable web applications with ease.
-              </p>
+            <Modal.Body className='flex flex-col gap-4'>
+              <div className='bg-gray-100 p-4'>
+                <p className='font-bold text-black uppercase'>{tourName}</p>
+                <p className='text-[20px] font-bold text-black'>
+                  {price} VNĐ
+                  <span className='text-sm text-[12px] font-normal'>/PAX</span>
+                </p>
+              </div>
+
+              <Textfield label='Name' />
+              <Textfield label='Email' />
+              <Textarea label='Message' />
             </Modal.Body>
-            <Modal.Footer>
-              <Button className='w-full' slot='close'>
-                Continue
+            <Modal.Footer className='flex justify-between gap-4'>
+              <Button className='w-[170px]!'>SEND</Button>
+              <Button className='w-[170px]! bg-gray-200 text-black!'>
+                CANCEL
               </Button>
             </Modal.Footer>
           </Modal.Dialog>
