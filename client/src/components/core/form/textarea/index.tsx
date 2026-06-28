@@ -11,7 +11,9 @@ export default function Textarea(props: TTextAreaProps) {
   return (
     <div
       className={clsx('c_textfield-container', 'flex w-full flex-col gap-1.5')}>
-      <Label required={required}>{label}</Label>
+      <Label className='text-black' required={required}>
+        {label}
+      </Label>
       <TextArea
         {...field}
         {...rest}

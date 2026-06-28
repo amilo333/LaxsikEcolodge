@@ -1,9 +1,9 @@
-import { Button } from '@/components/core';
+import { Dialog } from '@/components/core';
 
 export default function Test() {
   return (
     <div>
-      <Button>FIND NOW</Button>
+      <Dialog tourName='Hard Treaking' price='1200000' />
     </div>
   );
 }
