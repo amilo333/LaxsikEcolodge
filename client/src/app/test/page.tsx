@@ -1,9 +1,9 @@
-import { Button } from '@/components/core';
+import { DatePicker } from '@/components/core';
 
 export default function Test() {
   return (
     <div>
-      <Button>FIND NOW</Button>
+      <DatePicker label='Checkin Date' />
     </div>
   );
 }
