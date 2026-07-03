@@ -14,7 +14,7 @@ export default function DatePicker(props: TDatePickerProps) {
   return (
     <DatePickerHero className='h-24 w-full' name='date'>
       <Label>{label}</Label>
-      <DateField.Group fullWidth className='rounded-none!'>
+      <DateField.Group fullWidth className='h-[48px] rounded-none!'>
         <DateField.Input>
           {(segment) => <DateField.Segment segment={segment} />}
         </DateField.Input>
