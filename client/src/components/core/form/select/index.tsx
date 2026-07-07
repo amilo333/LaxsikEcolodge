@@ -1,8 +1,8 @@
 import { ListBox, Select as SelectHero } from '@heroui/react';
-import Image from 'next/image';
-import Label from '../../label';
-import { TSelectProps } from './type';
 import clsx from 'clsx';
+import Image from 'next/image';
+import { Label } from '../../label';
+import { TSelectProps } from './type';
 
 export default function Select(props: TSelectProps) {
   const { label, options } = props;

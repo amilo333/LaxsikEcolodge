@@ -1,8 +1,6 @@
-import React from 'react';
-import Navbar from './Navbar';
-import BookingBar from './BookingBar';
+import { BookingBar, Navbar } from './components';
 
-export default function Header() {
+export function Header() {
   return (
     <div className='relative'>
       <Navbar />

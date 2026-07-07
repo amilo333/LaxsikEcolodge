@@ -1,6 +1,6 @@
 import { Input } from '@heroui/react';
 import clsx from 'clsx';
-import Label from '../../label';
+import { Label } from '../../label';
 import { TTextfieldProps } from './type';
 
 export default function Textfield(props: TTextfieldProps) {

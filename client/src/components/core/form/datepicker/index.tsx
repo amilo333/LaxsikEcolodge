@@ -1,20 +1,20 @@
 'use client';
 import Image from 'next/image';
-import Label from '../../label';
 import {
   Calendar,
   DateField,
   DatePicker as DatePickerHero,
 } from '@heroui/react';
 import { TDatePickerProps } from './type';
+import { Label } from '../../label';
 
 export default function DatePicker(props: TDatePickerProps) {
-  const { label } = props;
+  const { field, label } = props;
 
   return (
     <DatePickerHero className='h-24 w-full' name='date'>
       <Label>{label}</Label>
-      <DateField.Group fullWidth className='h-[48px] rounded-none!'>
+      <DateField.Group fullWidth className='h-12 rounded-none!'>
         <DateField.Input>
           {(segment) => <DateField.Segment segment={segment} />}
         </DateField.Input>

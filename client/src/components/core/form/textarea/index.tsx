@@ -2,7 +2,7 @@
 
 import { TextArea } from '@heroui/react';
 import clsx from 'clsx';
-import Label from '../../label';
+import { Label } from '../../label';
 import { TTextAreaProps } from './type';
 
 export default function Textarea(props: TTextAreaProps) {

@@ -1,17 +1,8 @@
 import { Button } from '@/components/core';
 import Image from 'next/image';
+import { MENUS } from '../contants';
 
-const menus = [
-  'OVERVIEW',
-  'ROOMS',
-  'DINNING',
-  'SPA & MASSAGE',
-  'NEWS',
-  'GALLERY',
-  'CONTACT',
-];
-
-export default function Navbar() {
+export function Navbar() {
   return (
     <div className='bg-[#0D4949]/90 text-white'>
       <div className='flex h-[120px] w-full items-center justify-between px-[60px]'>
@@ -37,7 +28,7 @@ export default function Navbar() {
             </h1>
 
             <ul className='mt-2 flex gap-6 text-sm font-bold'>
-              {menus.map((item) => (
+              {MENUS.map((item) => (
                 <li key={item} className='flex items-center gap-[6px]'>
                   {item}{' '}
                   <Image
