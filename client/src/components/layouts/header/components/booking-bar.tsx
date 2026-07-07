@@ -8,9 +8,11 @@ import {
 } from '@/components/core';
 import Image from 'next/image';
 import { useForm } from 'react-hook-form';
-import { TBookingBarFindForm } from '../types';
+import { TBookingBarFindForm, TBookingBarProps } from '../types';
 
-export function BookingBar() {
+export function BookingBar(props: TBookingBarProps) {
+  const { onClickHide } = props;
+
   const { control, handleSubmit } = useForm<TBookingBarFindForm>({
     defaultValues: {
       checkinDate: '',
@@ -70,7 +72,8 @@ export function BookingBar() {
 
           <Button
             variant='danger'
-            className='h-[24px] w-[90px] bg-white text-sm! text-black!'>
+            className='h-[24px] w-[90px] bg-white text-sm! text-black!'
+            onClick={onClickHide}>
             HIDE
           </Button>
         </div>

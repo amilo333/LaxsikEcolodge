@@ -1,8 +1,12 @@
+'use client';
 import { Button } from '@/components/core';
 import Image from 'next/image';
 import { MENUS } from '../contants';
+import { TNavbarProps } from '../types';
 
-export function Navbar() {
+export function Navbar(props: TNavbarProps) {
+  const { onClickFind } = props;
+
   return (
     <div className='bg-[#0D4949]/90 text-white'>
       <div className='flex h-[120px] w-full items-center justify-between px-[60px]'>
@@ -14,13 +18,7 @@ export function Navbar() {
             height={120}
           />
 
-          <Image
-            src='/images/serperate_line.png'
-            alt='down'
-            width={12}
-            height={6}
-            className='h-[68px] w-[1px]'
-          />
+          <div className='h-17 w-px bg-[#ffffff4d]'></div>
 
           <div>
             <h1 className='font-["Times_New_Roman"] text-[26px] opacity-70'>
@@ -61,7 +59,9 @@ export function Navbar() {
             className='h-[6px] w-[12px]'
           />
 
-          <Button className='ml-[36px] h-[52px] w-[185px]! bg-white text-[#0D4949]!'>
+          <Button
+            className='ml-[36px] h-[52px] w-[185px]! bg-white text-[#0D4949]!'
+            onClick={onClickFind}>
             FIND NOW
           </Button>
         </div>
