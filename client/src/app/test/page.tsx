@@ -1,8 +1,10 @@
+import { Header } from '@/components/layouts';
 import { Card } from '@/components/core';
 
 export default function Test() {
   return (
     <div>
+      <Header />
       <Card
         imageSrc='./images/rooms/room.png'
         title='DELUCY BACONY'

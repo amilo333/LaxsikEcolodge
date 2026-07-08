@@ -1,6 +1,7 @@
 import { ListBox, Select as SelectHero } from '@heroui/react';
+import clsx from 'clsx';
 import Image from 'next/image';
-import Label from '../../label';
+import { Label } from '../../label';
 import { TSelectProps } from './type';
 
 export default function Select(props: TSelectProps) {
@@ -9,7 +10,10 @@ export default function Select(props: TSelectProps) {
   return (
     <SelectHero className='w-full' placeholder='Select one'>
       <Label>{label}</Label>
-      <SelectHero.Trigger className='flex h-[48px] items-center justify-between rounded-none'>
+      <SelectHero.Trigger
+        className={clsx(
+          'flex h-[48px] items-center justify-between rounded-none'
+        )}>
         <SelectHero.Value />
         <Image
           src='/images/icon/ic_chevron_down.png'
