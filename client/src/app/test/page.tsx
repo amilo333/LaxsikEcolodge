@@ -1,16 +1,12 @@
-import { Select } from '@/components/core';
+import { Card } from '@/components/core';
 
 export default function Test() {
   return (
     <div>
-      <Select
-        label='Guests'
-        options={[
-          { id: 'florida', label: 'Florida' },
-          { id: 'delaware', label: 'Delaware' },
-          { id: 'california', label: 'California' },
-          { id: 'texas', label: 'Texas' },
-        ]}
+      <Card
+        imageSrc='./images/rooms/room.png'
+        title='DELUCY BACONY'
+        description='The spacious double room features air conditioning, a private entrance, a terrace with garden views as well as a private bathroom boasting a shower. The unit has 1 bed.'
       />
     </div>
   );
