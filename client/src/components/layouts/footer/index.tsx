@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { TFooterProps } from './type';
 
-export default function Footer(props: TFooterProps) {
+export function Footer(props: TFooterProps) {
   const {
     logo,
     title,
