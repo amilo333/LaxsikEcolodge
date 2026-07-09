@@ -25,7 +25,7 @@ export default function Card(props: TCardProps) {
           </HeroCard.Description>
         </HeroCard.Header>
         <HeroCard.Footer className='flex w-full flex-col items-center'>
-          <Button className='h-[46px] w-[416px] rounded-none bg-[#0D4949]'>
+          <Button className='h-[46px] w-full rounded-none bg-[#0D4949]'>
             EXPLORE
           </Button>
         </HeroCard.Footer>
