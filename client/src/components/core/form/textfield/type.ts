@@ -15,4 +15,6 @@ export type TTextfieldProps<
     type?: 'text' | 'password';
     // Error message
     error?: string;
+
+    className?: string;
   };
