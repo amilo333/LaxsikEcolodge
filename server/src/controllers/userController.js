@@ -21,18 +21,15 @@ const createUser = async (req, res) => {
       });
     }
 
-    // Kiểm tra số điện thoại
-    const phoneExist = await User.findOne({ phone });
+    // Mã hóa mật khẩu
+    const hashPassword = await argon2.hash(password);
 
+    const phoneExist = await User.findOne({ phone });
     if (phoneExist) {
       return res.status(400).json({
         message: "Phone already exists",
       });
     }
-
-    // Mã hóa mật khẩu
-    const hashPassword = await argon2.hash(password);
-
     // Tạo user
     const newUser = new User({
       full_name,
