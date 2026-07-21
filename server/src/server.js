@@ -14,15 +14,20 @@ const PORT = process.env.PORT || 5000;
 // Connect to database
 connectDB();
 
+// CORS (đặt trước routes)
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  }),
+);
+
 // Parse request body
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Enable CORS
-app.use(cors());
-
-// Routes;
+// Routes
 app.use("/api/user", userRoutes);
 
 app.listen(PORT, () => {

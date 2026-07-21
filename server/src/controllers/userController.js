@@ -67,6 +67,10 @@ const loginUser = async (req, res) => {
       });
     }
     const userExist = await User.findOne({ email });
+    if (!userExist) {
+      return res.status(400).json({ message: "Email is not exist" });
+    }
+
     if (userExist) {
       const isPasswordValid = await argon2.verify(userExist.password, password);
       if (isPasswordValid) {

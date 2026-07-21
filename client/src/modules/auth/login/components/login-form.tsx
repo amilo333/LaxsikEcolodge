@@ -7,8 +7,14 @@ import { loginSchema } from '../schema';
 import { TLoginForm } from '../types';
 import Link from 'next/link';
 import { LOGIN_FORM_DEFAULT_VALUES } from '../constants';
+import { useRouter } from 'next/navigation';
+import { useLogin } from '@/hooks/auth/useLogin';
 
 export function LoginForm() {
+  const router = useRouter();
+
+  const { mutate, isPending } = useLogin();
+
   const {
     control,
     formState: { errors },
@@ -19,7 +25,11 @@ export function LoginForm() {
   });
 
   const onSubmit = (data: TLoginForm) => {
-    console.log(data);
+    mutate(data, {
+      onSuccess: () => {
+        router.push('/home');
+      },
+    });
   };
 
   return (
