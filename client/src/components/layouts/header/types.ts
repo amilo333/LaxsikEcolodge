@@ -1,6 +1,8 @@
+import type { CalendarDate } from '@internationalized/date';
+
 export type TBookingBarFindForm = {
-  checkinDate?: string;
-  checkoutDate?: string;
+  checkinDate?: CalendarDate | null;
+  checkoutDate?: CalendarDate | null;
   guest?: string;
   promoCode?: string;
 };

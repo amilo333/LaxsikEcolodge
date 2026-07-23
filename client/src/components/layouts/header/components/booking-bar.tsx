@@ -9,14 +9,15 @@ import {
 import Image from 'next/image';
 import { useForm } from 'react-hook-form';
 import { TBookingBarFindForm, TBookingBarProps } from '../types';
+import { today, getLocalTimeZone } from '@internationalized/date';
 
 export function BookingBar(props: TBookingBarProps) {
   const { onClickHide } = props;
 
   const { control, handleSubmit } = useForm<TBookingBarFindForm>({
     defaultValues: {
-      checkinDate: '',
-      checkoutDate: '',
+      checkinDate: today(getLocalTimeZone()),
+      checkoutDate: today(getLocalTimeZone()),
       promoCode: '',
       guest: '',
     },
