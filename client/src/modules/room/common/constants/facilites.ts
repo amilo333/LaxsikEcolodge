@@ -1,4 +1,4 @@
-import { TFacilites } from './../types/facilitie-type';
+import { TFacilites } from '../types/facilitie-type';
 export const FACILITES: TFacilites[] = [
   {
     id: '1',

@@ -1,15 +1,14 @@
 import Image from 'next/image';
 
-type PageLayoutProps = {
+export function MainLayout({
+  children,
+}: Readonly<{
   children: React.ReactNode;
-  srcIBg: string;
-};
-
-export function PageLayout({ children, srcIBg }: Readonly<PageLayoutProps>) {
+}>) {
   return (
     <main className='relative min-h-screen'>
       <Image
-        src={srcIBg}
+        src={'/images/bg-screen.jpg'}
         alt='Background'
         className='-z-10 object-cover'
         fill

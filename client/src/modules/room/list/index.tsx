@@ -1,6 +1,6 @@
 import React from 'react';
-import { ROOMS } from '../constants/rooms';
-import { RoomItem } from '../components/room-item';
+import { ROOMS } from '../common/constants/rooms';
+import { RoomItem } from '../common/components/room-item';
 
 export function RoomListModule() {
   return (

@@ -1,18 +1,17 @@
 import { Footer, Header } from '@/components/layouts';
-import { Facilities } from '@/modules/room/components/facilities';
-import { Policies } from '@/modules/room/components/policies';
-import { RoomCard } from '@/modules/room/components/room-card';
-import { RoomItem } from '@/modules/room/components/room-item';
+import { MainLayout } from '@/layouts';
+import { Facilities } from '@/modules/room/common/components/facilities';
+import { Policies } from '@/modules/room/common/components/policies';
 import { RoomListModule } from '@/modules/room/list';
 
 export default function RoomPage() {
   return (
-    <div>
+    <MainLayout>
       <Header />
       <RoomListModule />
       <Facilities />
       <Policies />
       <Footer />
-    </div>
+    </MainLayout>
   );
 }
