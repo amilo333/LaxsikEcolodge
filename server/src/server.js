@@ -4,10 +4,10 @@ import dotenv from "dotenv";
 import express from "express";
 import connectDB from "./config/db.js";
 import { route } from "./routes/index.js";
-// import { setServers } from "node:dns/promises";
+import { setServers } from "node:dns/promises";
 
 dotenv.config();
-// setServers(["1.1.1.1", "8.8.8.8"]);
+setServers(["1.1.1.1", "8.8.8.8"]);
 
 const app = express();
 const PORT = process.env.PORT || 5000;

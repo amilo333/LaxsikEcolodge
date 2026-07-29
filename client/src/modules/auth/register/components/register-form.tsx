@@ -2,14 +2,16 @@
 import { Button, Field, Textfield } from '@/components/core';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { REGISTER_FORM_DEFAULT_VALUES } from '../constant';
 import { registerSchema } from '../schema';
 import { TRegisterForm } from '../types';
-import { useRegister } from '@/hooks/auth/useRegister';
-import { useRouter } from 'next/navigation';
+import { useRegisterApi } from '../../common/hooks';
+
 export function RegisterForm() {
   const router = useRouter();
+
   const {
     control,
     formState: { errors },
@@ -19,7 +21,7 @@ export function RegisterForm() {
     defaultValues: REGISTER_FORM_DEFAULT_VALUES,
   });
 
-  const { mutate, isPending } = useRegister();
+  const { mutate } = useRegisterApi();
 
   const onSubmit = (data: TRegisterForm) => {
     mutate(data, {

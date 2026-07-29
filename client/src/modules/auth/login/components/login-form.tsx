@@ -1,19 +1,19 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Field, Textfield } from '@/components/core';
+import { zodResolver } from '@hookform/resolvers/zod';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { useLoginApi } from '../../common';
+import { LOGIN_FORM_DEFAULT_VALUES } from '../constants';
 import { loginSchema } from '../schema';
 import { TLoginForm } from '../types';
-import Link from 'next/link';
-import { LOGIN_FORM_DEFAULT_VALUES } from '../constants';
-import { useRouter } from 'next/navigation';
-import { useLogin } from '@/hooks/auth/useLogin';
 
 export function LoginForm() {
   const router = useRouter();
 
-  const { mutate, isPending } = useLogin();
+  const { mutate } = useLoginApi();
 
   const {
     control,

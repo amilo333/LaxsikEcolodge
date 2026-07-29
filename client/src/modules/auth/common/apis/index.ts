@@ -1,18 +1,18 @@
-import { axiosInstance } from './axios';
+import { axiosInstance } from '@/apis/axios';
 import { LoginRequest, RegisterRequest } from '@/types/auth';
 
 export const registerApi = async (data: RegisterRequest) => {
-  const res = await axiosInstance.post('/user', data);
+  const res = await axiosInstance.post('/auth/register', data);
   return res;
 };
 
 export const loginApi = async (data: LoginRequest) => {
-  const res = await axiosInstance.post('/user/auth', data);
+  const res = await axiosInstance.post('/auth/login', data);
   return res;
 };
 
 export const logoutApi = async () => {
-  const res = await axiosInstance.post('/user/logout');
+  const res = await axiosInstance.post('/auth/logout');
   return res.data;
 };
 
