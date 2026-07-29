@@ -1,14 +1,20 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Field, Textfield } from '@/components/core';
+import { zodResolver } from '@hookform/resolvers/zod';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { useLoginApi } from '../../common';
+import { LOGIN_FORM_DEFAULT_VALUES } from '../constants';
 import { loginSchema } from '../schema';
 import { TLoginForm } from '../types';
-import Link from 'next/link';
-import { LOGIN_FORM_DEFAULT_VALUES } from '../constants';
 
 export function LoginForm() {
+  const router = useRouter();
+
+  const { mutate } = useLoginApi();
+
   const {
     control,
     formState: { errors },
@@ -19,7 +25,11 @@ export function LoginForm() {
   });
 
   const onSubmit = (data: TLoginForm) => {
-    console.log(data);
+    mutate(data, {
+      onSuccess: () => {
+        router.push('/home');
+      },
+    });
   };
 
   return (

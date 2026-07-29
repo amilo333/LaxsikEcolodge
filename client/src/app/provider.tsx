@@ -1,14 +1,16 @@
-import { NextIntlClientProvider } from 'next-intl';
+'use client';
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useState } from 'react';
 import { Toaster as ToasterProvider } from 'sonner';
 
-export function Providers({
-  children,
-}: {
-  children: React.ReactNode;
-}): React.ReactNode {
+export function Providers({ children }: { children: React.ReactNode }) {
+  const [queryClient] = useState(() => new QueryClient());
+
   return (
-    <NextIntlClientProvider>
+    <QueryClientProvider client={queryClient}>
       {children}
+
       <ToasterProvider
         className='toaster-provider'
         position='top-right'
@@ -16,6 +18,6 @@ export function Providers({
         mobileOffset={{ top: '10px', right: '10px' }}
         toastOptions={{ duration: 5000 }}
       />
-    </NextIntlClientProvider>
+    </QueryClientProvider>
   );
 }
