@@ -9,10 +9,14 @@ import { TDatePickerProps } from './type';
 import { Label } from '../../label';
 
 export default function DatePicker(props: TDatePickerProps) {
-  const { field, label } = props;
+  const { field, label, required, ...rest } = props;
 
   return (
-    <DatePickerHero className='h-24 w-full' name='date'>
+    <DatePickerHero
+      className='h-24 w-full'
+      value={field?.value}
+      onChange={field?.onChange}
+      name={field?.name}>
       <Label>{label}</Label>
       <DateField.Group fullWidth className='h-12 rounded-none!'>
         <DateField.Input>
