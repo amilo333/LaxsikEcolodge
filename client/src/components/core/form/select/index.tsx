@@ -5,10 +5,14 @@ import { Label } from '../../label';
 import { TSelectProps } from './type';
 
 export default function Select(props: TSelectProps) {
-  const { label, options } = props;
+  const { field, label, options, ...rest } = props;
 
   return (
-    <SelectHero className='w-full' placeholder='Select one'>
+    <SelectHero
+      {...field}
+      {...rest}
+      className='w-full'
+      placeholder='Select one'>
       <Label>{label}</Label>
       <SelectHero.Trigger
         className={clsx(

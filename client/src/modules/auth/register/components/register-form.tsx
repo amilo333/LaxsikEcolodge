@@ -2,12 +2,16 @@
 import { Button, Field, Textfield } from '@/components/core';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { REGISTER_FORM_DEFAULT_VALUES } from '../constant';
 import { registerSchema } from '../schema';
 import { TRegisterForm } from '../types';
+import { useRegisterApi } from '../../common/hooks';
 
 export function RegisterForm() {
+  const router = useRouter();
+
   const {
     control,
     formState: { errors },
@@ -17,19 +21,29 @@ export function RegisterForm() {
     defaultValues: REGISTER_FORM_DEFAULT_VALUES,
   });
 
+  const { mutate } = useRegisterApi();
+
   const onSubmit = (data: TRegisterForm) => {
-    console.log(data);
+    mutate(data, {
+      onSuccess: () => {
+        router.push('/auth/login');
+      },
+    });
   };
 
   return (
     <div className='flex flex-col gap-5'>
       <div className='mb-4 flex flex-col gap-5'>
-        <Field control={control} name='fullname' label='Full Name'>
-          <Textfield label='Full Name' error={errors.fullname?.message} />
+        <Field control={control} name='full_name' label='Full Name'>
+          <Textfield label='Full Name' error={errors.full_name?.message} />
         </Field>
 
         <Field control={control} name='email' label='Email'>
           <Textfield label='Email' error={errors.email?.message} />
+        </Field>
+
+        <Field control={control} name='phone' label='Phone'>
+          <Textfield label='Phone' error={errors.phone?.message} />
         </Field>
 
         <Field control={control} name='password' label='Password'>
