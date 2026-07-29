@@ -1,21 +1,12 @@
 import Image from 'next/image';
-import { TFooterProps } from './type';
+import { FOOTER_DATA } from './constant';
 
-export function Footer(props: TFooterProps) {
-  const {
-    logo,
-    title,
-    address,
-    hotline,
-    email,
-    menus,
-    socials,
-    copyright,
-    className,
-  } = props;
+export function Footer() {
+  const { logo, title, address, hotline, email, menus, socials, copyright } =
+    FOOTER_DATA;
 
   return (
-    <footer className={className}>
+    <footer>
       <div className='flex flex-col items-center bg-[#F5F5F5] px-4 py-10'>
         <Image
           src={logo}
@@ -29,6 +20,7 @@ export function Footer(props: TFooterProps) {
 
         <div className='flex flex-col items-center'>
           <p className='mt-3 text-[17px]'>Hotline: {hotline}</p>
+
           <p className='mt-1 text-[17px]'>Email: {email}</p>
         </div>
 
@@ -44,12 +36,13 @@ export function Footer(props: TFooterProps) {
                 alt={social.alt}
                 width={48}
                 height={48}
+                className='h-12 w-12'
               />
             </a>
           ))}
         </div>
 
-        <div className='text-uppercase mt-10 flex flex-wrap justify-center gap-10 text-[16px] font-semibold uppercase'>
+        <div className='mt-10 flex flex-wrap justify-center gap-10 text-[16px] font-semibold uppercase'>
           {menus.map((menu) => (
             <div key={menu}>{menu}</div>
           ))}
