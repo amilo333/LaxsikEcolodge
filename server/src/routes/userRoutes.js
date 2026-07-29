@@ -18,9 +18,8 @@ router
   .route("/")
   .post(createUser)
   .get(authenticate, authorizedAdmin, getAllUsers);
-
-router.route("/auth").post(loginUser);
-router.route("/logout").post(logoutCurrentUser);
+router.route("/auth/login").post(loginUser);
+router.route("/auth/logout").post(logoutCurrentUser);
 
 router
   .route("/profile")
@@ -33,4 +32,5 @@ router
   .delete(authenticate, authorizedAdmin, deleteUserById)
   .get(authenticate, authorizedAdmin, getUserById)
   .put(authenticate, authorizedAdmin, updateUserById);
+
 export default router;

@@ -1,6 +1,7 @@
-import User from "../models/User.js";
 import argon2 from "argon2";
-import createToken from "../utils/createToken.js";
+import User from "../models/User.js";
+import { generateToken } from "../utils/generate-token.js";
+
 const createUser = async (req, res) => {
   try {
     const { full_name, email, password, phone } = req.body;
@@ -8,7 +9,7 @@ const createUser = async (req, res) => {
     // Kiểm tra dữ liệu
     if (!full_name || !email || !password || !phone) {
       return res.status(400).json({
-        message: "Please fill all fields",
+        message: "Please fill all the fields",
       });
     }
 
@@ -21,15 +22,16 @@ const createUser = async (req, res) => {
       });
     }
 
-    // Mã hóa mật khẩu
-    const hashPassword = await argon2.hash(password);
-
     const phoneExist = await User.findOne({ phone });
     if (phoneExist) {
       return res.status(400).json({
         message: "Phone already exists",
       });
     }
+
+    // Mã hóa mật khẩu
+    const hashPassword = await argon2.hash(password);
+
     // Tạo user
     const newUser = new User({
       full_name,
@@ -38,7 +40,7 @@ const createUser = async (req, res) => {
       phone,
     });
     await newUser.save();
-    createToken(res, newUser._id);
+    generateToken(res, newUser._id);
     res.status(201).json({
       message: "Create user successfully",
       data: {
@@ -74,7 +76,7 @@ const loginUser = async (req, res) => {
     if (userExist) {
       const isPasswordValid = await argon2.verify(userExist.password, password);
       if (isPasswordValid) {
-        createToken(res, userExist._id);
+        generateToken(res, userExist._id);
         res.status(200).json({
           message: "Login successfully",
           data: {
@@ -206,12 +208,12 @@ const updateUserById = async (req, res) => {
 
 export {
   createUser,
-  loginUser,
-  logoutCurrentUser,
+  deleteUserById,
   getAllUsers,
   getCurrentUserProfile,
-  updateCurrentProfile,
-  deleteUserById,
   getUserById,
+  loginUser,
+  logoutCurrentUser,
+  updateCurrentProfile,
   updateUserById,
 };
