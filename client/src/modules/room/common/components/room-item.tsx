@@ -4,15 +4,17 @@ import { Button } from '@/components/core';
 import { TRoom } from '../types/room-type';
 import { useRouter } from 'next/navigation';
 
-type RoomItemProps = {
+type TRoomItemProps = {
   room: TRoom;
 };
 
-export function RoomItem({ room }: RoomItemProps) {
+export function RoomItem(props: TRoomItemProps) {
+  const { room } = props;
+
   const router = useRouter();
 
-  const handleButton = () => {
-    router.push(`/rooms/${room.id}`);
+  const handleBookRoom = () => {
+    router.push(`/room/${room.id}`);
   };
 
   return (
@@ -81,7 +83,7 @@ export function RoomItem({ room }: RoomItemProps) {
             <div className='text-2xl font-bold'>$ {room.price}.00</div>
           </div>
 
-          <Button onClick={handleButton}>BOOK NOW</Button>
+          <Button onClick={handleBookRoom}>BOOK NOW</Button>
         </div>
       </div>
     </div>

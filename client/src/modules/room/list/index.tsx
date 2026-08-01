@@ -1,9 +1,8 @@
 import React from 'react';
-import { ROOMS } from '../constants/rooms';
-import { RoomItem } from '../components/room-item';
+import { ROOMS } from '../common/constants/rooms';
+import { RoomItem } from '../common/components/room-item';
 import { Footer, Header } from '@/components/layouts';
-import { Facilities } from '../components/facilities';
-import { Policies } from '../components/policies';
+import { Facilities, Policies } from '../common';
 
 export function RoomListModule() {
   return (
