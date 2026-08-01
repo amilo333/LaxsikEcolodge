@@ -56,6 +56,18 @@ const roomSchema = new mongoose.Schema(
       min: 0,
     },
 
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+
+    updatedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+
     status: {
       type: String,
       enum: ["available", "maintenance", "inactive"],
