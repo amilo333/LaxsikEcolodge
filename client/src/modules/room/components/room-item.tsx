@@ -1,12 +1,20 @@
+'use client';
 import Image from 'next/image';
 import { Button } from '@/components/core';
 import { TRoom } from '../types/room-type';
+import { useRouter } from 'next/navigation';
 
 type RoomItemProps = {
   room: TRoom;
 };
 
 export function RoomItem({ room }: RoomItemProps) {
+  const router = useRouter();
+
+  const handleButton = () => {
+    router.push(`/rooms/${room.id}`);
+  };
+
   return (
     <div className='flex h-[482px] w-[1300px] items-center bg-white'>
       <Image
@@ -73,7 +81,7 @@ export function RoomItem({ room }: RoomItemProps) {
             <div className='text-2xl font-bold'>$ {room.price}.00</div>
           </div>
 
-          <Button>BOOK NOW</Button>
+          <Button onClick={handleButton}>BOOK NOW</Button>
         </div>
       </div>
     </div>
