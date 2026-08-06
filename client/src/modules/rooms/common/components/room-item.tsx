@@ -14,15 +14,15 @@ export function RoomItem(props: TRoomItemProps) {
   const router = useRouter();
 
   const handleBookRoom = () => {
-    router.push(`/room/${room.id}`);
+    router.push(`/rooms/${room.id}`);
   };
 
   return (
-    <div className='flex h-[482px] w-[1300px] items-center bg-white'>
+    <div className='flex h-120.5 w-325 items-center bg-white'>
       <Image
         height={400}
         width={600}
-        src={room.image}
+        src={room.thumbnail}
         alt={room.title}
         className='w-1/2'
       />

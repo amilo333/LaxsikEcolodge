@@ -3,6 +3,7 @@ import '@/styles/heroui.css';
 import type { Metadata } from 'next';
 import { Montserrat } from 'next/font/google';
 import { Providers } from './provider';
+import { lora } from '../../public/font/font';
 
 const monserrat = Montserrat({
   variable: '--font-montserrat',
@@ -22,7 +23,7 @@ export default function RootLayout({
   return (
     <html
       lang='en'
-      className={`${monserrat.className} ${monserrat.variable} h-full antialiased`}
+      className={`${monserrat.className} ${monserrat.variable} ${lora.variable} h-full antialiased`}
       data-mode='light'>
       <body className='flex min-h-full flex-col'>
         <Providers>{children}</Providers>

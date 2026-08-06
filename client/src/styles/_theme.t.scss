@@ -11,4 +11,14 @@
   --color-input-background: #ffffff;
 
   --font-times: 'Times New Roman', Times, serif;
+  --font-lora: var(--font-lora);
+  --font-montserrat: var(--font-montserrat);
+}
+
+@utility font-lora {
+  font-family: var(--font-lora);
+}
+
+@utility font-montserrat {
+  font-family: var(--font-montserrat);
 }

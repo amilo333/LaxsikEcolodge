@@ -1,4 +1,4 @@
-import { RoomListModule } from '@/modules/room/list';
+import { RoomListModule } from '@/modules/rooms/list';
 
 export default function RoomPage() {
   return (

@@ -37,3 +37,7 @@ export const FACILITES: TFacilites[] = [
     image: '/images/icon/ic-t-shirt.png',
   },
 ];
+
+export * from './rooms';
+export * from './facilites';
+export * from './policies';
