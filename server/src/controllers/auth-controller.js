@@ -75,7 +75,7 @@ export const login = async (req, res) => {
     if (userExist) {
       const isPasswordValid = await argon2.verify(userExist.password, password);
       if (isPasswordValid) {
-        generateToken(res, userExist);
+        generateToken(res, userExist._id);
         res.status(200).json({
           message: "Login successfully",
           data: {
@@ -100,7 +100,7 @@ export const login = async (req, res) => {
 };
 
 export const logout = async (req, res) => {
-  res.cookie("accessToken", "", {
+  res.cookie("jwt", "", {
     httpOnly: true,
     expires: new Date(0),
   });

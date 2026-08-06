@@ -1,8 +1,9 @@
-import React from 'react';
-import { ROOMS } from '../common/constants/rooms';
-import { RoomItem } from '../common/components/room-item';
+'use client';
 import { Footer, Header } from '@/components/layouts';
 import { Facilities, Policies } from '../common';
+import { RoomItem } from '../common/components/room-item';
+import { ROOMS } from '../common/constants/rooms';
+import { Pagination } from '@/components/core';
 
 export function RoomListModule() {
   return (
@@ -13,6 +14,7 @@ export function RoomListModule() {
           return <RoomItem key={room.id} room={room} />;
         })}
       </div>
+      <Pagination currentPage={1} totalPages={1} onChangePage={() => {}} />
       <Facilities />
       <Policies />
       <Footer />

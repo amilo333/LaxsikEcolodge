@@ -14,12 +14,7 @@ import { authenticate, authorizedAdmin } from "../middleware/authMiddleware.js";
 
 const router = Router();
 
-router
-  .route("/")
-  .post(createUser)
-  .get(authenticate, authorizedAdmin, getAllUsers);
-router.route("/auth/login").post(loginUser);
-router.route("/auth/logout").post(logoutCurrentUser);
+router.route("/").get(authenticate, authorizedAdmin, getAllUsers);
 
 router
   .route("/profile")
@@ -33,4 +28,4 @@ router
   .get(authenticate, authorizedAdmin, getUserById)
   .put(authenticate, authorizedAdmin, updateUserById);
 
-export default router;
+export { router as userRouter };
