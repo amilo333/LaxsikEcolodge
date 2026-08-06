@@ -7,7 +7,7 @@ export const generateToken = (res, userId) => {
 
   //gan jwt vao cookie
   //Set JWT as an HTTP-only Cookie
-  res.cookie("accessToken", token, {
+  res.cookie("jwt", token, {
     httpOnly: true,
     secure: process.env.NODE_ENV !== "development",
     sameSite: "strict",

@@ -3,6 +3,7 @@ import '@/styles/heroui.css';
 import type { Metadata } from 'next';
 import { Montserrat } from 'next/font/google';
 import { Providers } from './provider';
+import 'swiper/css';
 
 const monserrat = Montserrat({
   variable: '--font-montserrat',
