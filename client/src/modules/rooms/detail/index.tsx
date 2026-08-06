@@ -17,10 +17,10 @@ export function DetailRoomModule({ room }: DetailRoomModuleProps) {
           width={1600}
           src='/images/rooms/room_img.png'
           alt='room-detail'
-          className='h-[800px] w-full object-cover'
+          className='h-200 w-full object-cover'
         />
 
-        <div className='absolute top-[650px] left-1/2 -translate-x-1/2'>
+        <div className='absolute top-162.5 left-1/2 -translate-x-1/2'>
           <RoomCard />
         </div>
       </div>

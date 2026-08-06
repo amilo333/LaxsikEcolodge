@@ -1,5 +1,6 @@
-import React, { useCallback, useState } from 'react';
+'use client';
 import { Pagination as HeroPagination } from '@heroui/react';
+import { useCallback, useState } from 'react';
 import { TPaginationProps } from './type';
 
 export function Pagination(props: TPaginationProps) {

@@ -8,11 +8,7 @@ export default async function RoomDetailPage({
 }) {
   const { id } = await params;
 
-  console.log(id);
-
   const room = ROOMS.find((room) => room.id === id);
-
-  console.log(room);
 
   if (!room) return <div>Room not found</div>;
 

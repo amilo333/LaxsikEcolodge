@@ -1,10 +1,13 @@
-import React from 'react';
-import { ROOMS } from '../common/constants/rooms';
-import { RoomItem } from '../common/components/room-item';
+'use client';
 import { Footer, Header } from '@/components/layouts';
 import { Facilities, Policies } from '../common';
+import { RoomItem } from '../common/components/room-item';
+import { ROOMS } from '../common/constants/rooms';
+import { useRoomListApi } from '../common/hooks';
 
 export function RoomListModule() {
+  const { data } = useRoomListApi();
+
   return (
     <div>
       <Header />
