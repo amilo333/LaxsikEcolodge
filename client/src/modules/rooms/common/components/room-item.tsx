@@ -14,7 +14,7 @@ export function RoomItem(props: TRoomItemProps) {
   const router = useRouter();
 
   const handleBookRoom = () => {
-    router.push(`/rooms/${room.id}`);
+    router.push(`/rooms/${room._id}`);
   };
 
   return (

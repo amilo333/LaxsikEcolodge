@@ -1,4 +1,5 @@
 export type TRoom = {
+  _id: string;
   id: string;
   title: string;
   description: string;
