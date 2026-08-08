@@ -9,9 +9,30 @@ const storage = multer.diskStorage({
 });
 
 const uploadImageMulter = multer({
-  storage: storage,
+  storage,
   fileFilter: imageFileFilter,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
 });
 
+const uploadRoomImages = (req, res, next) => {
+  uploadImageMulter.any()(req, res, (error) => {
+    if (error instanceof multer.MulterError) {
+      return res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+
+    if (error) {
+      return res.status(400).json({
+        success: false,
+        message: error.message,
+      });
+    }
+
+    next();
+  });
+};
+
+export { uploadRoomImages };
 export default uploadImageMulter;

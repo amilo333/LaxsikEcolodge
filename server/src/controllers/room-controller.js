@@ -84,46 +84,48 @@ export const getRoomById = async (req, res) => {
 // @access  Private/Admin
 export const createRoom = async (req, res) => {
   try {
-    const {
-      title,
-      description,
-      price,
-      images,
-      thumbnail,
-      bed,
-      area,
-      capacity,
-      quantity,
-      status,
-    } = req.body;
+    const { title, description, price, bed, area, capacity, quantity, status } =
+      req.body;
 
-    if (!req.file) {
-      return res.status(400).json({ message: "Image file is required" });
+    const uploadedFiles = req.files || [];
+    const thumbnailFile = uploadedFiles.find(
+      (file) => file.fieldname === "thumbnail",
+    );
+    const imageFiles = uploadedFiles.filter(
+      (file) => file.fieldname !== "thumbnail",
+    );
+
+    if (!thumbnailFile) {
+      return ResponseUtil.badRequest(res, "Thumbnail file is required");
     }
 
-    const uploadedImage = await uploadOnCloudinary(
-      req.file.path,
-      "mern-images",
-    );
+    if (imageFiles.length > 5) {
+      return ResponseUtil.badRequest(res, "Maximum 5 images are allowed");
+    }
+
+    const [uploadedThumbnail, ...uploadedImages] = await Promise.all([
+      uploadOnCloudinary(thumbnailFile.path, "mern-images"),
+      ...imageFiles.map((file) => uploadOnCloudinary(file.path, "mern-images")),
+    ]);
 
     const room = new Room({
       title,
       description,
       price,
-      thumbnail: uploadedImage.url,
-      images,
+      thumbnail: uploadedThumbnail.url,
+      images: uploadedImages.map((image) => image.url),
       bed,
       area,
       capacity,
       quantity,
       createdBy: req.user._id,
-      updatedBy: null,
+      updatedBy: req.user._id,
       status,
     });
 
     await room.save();
 
-    ResponseUtil.created(res, "Room created successfully", "room");
+    ResponseUtil.created(res, room, "Room created successfully");
   } catch (error) {
     ResponseUtil.serverError(res, error.message);
   }
