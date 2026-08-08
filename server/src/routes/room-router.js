@@ -7,13 +7,20 @@ import {
   deleteRoom,
 } from "../controllers/room-controller.js";
 import { authenticate, authorizedAdmin } from "../middleware/authMiddleware.js";
+import uploadImageMulter from "../middleware/multer.js";
 
 const router = express.Router();
 
 router.get("/", getAllRooms); // Public
 router.get("/:id", getRoomById); // Public
 
-router.post("/", authenticate, authorizedAdmin, createRoom);
+router.post(
+  "/",
+  authenticate,
+  authorizedAdmin,
+  uploadImageMulter.single("thumbnail"),
+  createRoom,
+);
 router.put("/:id", authenticate, authorizedAdmin, updateRoom);
 router.delete("/:id", authenticate, authorizedAdmin, deleteRoom);
 

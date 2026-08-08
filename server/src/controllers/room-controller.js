@@ -1,4 +1,5 @@
 import Room from "../models/Room.js";
+import { uploadOnCloudinary } from "../service/cloudinary.js";
 import { ResponseUtil } from "../utils/response.util.js";
 
 // @desc    Get all rooms
@@ -87,8 +88,8 @@ export const createRoom = async (req, res) => {
       title,
       description,
       price,
-      thumbnail,
       images,
+      thumbnail,
       bed,
       area,
       capacity,
@@ -96,11 +97,20 @@ export const createRoom = async (req, res) => {
       status,
     } = req.body;
 
+    if (!req.file) {
+      return res.status(400).json({ message: "Image file is required" });
+    }
+
+    const uploadedImage = await uploadOnCloudinary(
+      req.file.path,
+      "mern-images",
+    );
+
     const room = new Room({
       title,
       description,
       price,
-      thumbnail,
+      thumbnail: uploadedImage.url,
       images,
       bed,
       area,
@@ -113,7 +123,7 @@ export const createRoom = async (req, res) => {
 
     await room.save();
 
-    ResponseUtil.created(res, "Room created successfully", room);
+    ResponseUtil.created(res, "Room created successfully", "room");
   } catch (error) {
     ResponseUtil.serverError(res, error.message);
   }

@@ -10,8 +10,6 @@ export const uploadImage = async (req, res) => {
       return res.status(400).json({ message: "Image file is required" });
     }
 
-    console.log("file:", req.file);
-
     const uploadedImage = await uploadOnCloudinary(
       req.file.path,
       "mern-images",
