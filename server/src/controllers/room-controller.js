@@ -1,4 +1,5 @@
 import Room from "../models/Room.js";
+import { uploadOnCloudinary } from "../service/cloudinary.js";
 import { ResponseUtil } from "../utils/response.util.js";
 
 // @desc    Get all rooms
@@ -87,33 +88,58 @@ export const createRoom = async (req, res) => {
       title,
       description,
       price,
-      thumbnail,
-      images,
       bed,
       area,
       capacity,
       quantity,
       status,
+      bathroom,
+      fireplace,
+      views,
     } = req.body;
+
+    const uploadedFiles = req.files || [];
+    const thumbnailFile = uploadedFiles.find(
+      (file) => file.fieldname === "thumbnail",
+    );
+    const imageFiles = uploadedFiles.filter(
+      (file) => file.fieldname !== "thumbnail",
+    );
+
+    if (!thumbnailFile) {
+      return ResponseUtil.badRequest(res, "Thumbnail file is required");
+    }
+
+    if (imageFiles.length > 5) {
+      return ResponseUtil.badRequest(res, "Maximum 5 images are allowed");
+    }
+
+    const [uploadedThumbnail, ...uploadedImages] = await Promise.all([
+      uploadOnCloudinary(thumbnailFile.path, "mern-images"),
+      ...imageFiles.map((file) => uploadOnCloudinary(file.path, "mern-images")),
+    ]);
 
     const room = new Room({
       title,
       description,
       price,
-      thumbnail,
-      images,
+      thumbnail: uploadedThumbnail.url,
+      images: uploadedImages.map((image) => image.url),
       bed,
       area,
       capacity,
       quantity,
       createdBy: req.user._id,
-      updatedBy: null,
+      updatedBy: req.user._id,
       status,
+      bathroom,
+      fireplace,
+      views,
     });
 
     await room.save();
 
-    ResponseUtil.created(res, "Room created successfully", room);
+    ResponseUtil.created(res, room, "Room created successfully");
   } catch (error) {
     ResponseUtil.serverError(res, error.message);
   }
