@@ -29,7 +29,8 @@ export function DetailRoomModule({ room }: DetailRoomModuleProps) {
       </div>
       <DetailFacilities room={room} />
       <ContactCta />
-      <SlideRoom />
+      <SlideRoom currentRoomId={room.id} />
+      <ContactCta />
       <Footer />
     </div>
   );

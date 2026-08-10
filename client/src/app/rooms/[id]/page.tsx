@@ -1,23 +1,27 @@
-// import { ROOMS } from '@/modules/rooms/common/constants/rooms';
-// import { DetailRoomModule } from '@/modules/rooms/detail';
+'use client';
 
-// export default async function RoomDetailPage({
-//   params,
-// }: {
-//   params: Promise<{ id: string }>;
-// }) {
-//   const { id } = await params;
-
-//   const room = ROOMS.find((room) => room.id === id);
-
-//   if (!room) return <div>Room not found</div>;
-
-//   return <DetailRoomModule room={room} />;
-// }
-
-import { ROOMS } from '@/modules/rooms/common';
+import { useParams } from 'next/navigation';
 import { DetailRoomModule } from '@/modules/rooms/detail';
+import { useRoomDetailApi } from '@/modules/rooms/common/hooks';
 
 export default function RoomDetailPage() {
-  return <DetailRoomModule room={ROOMS[0]} />;
+  const params = useParams<{ id: string }>();
+
+  const id = params.id;
+
+  const { data, isLoading, isError } = useRoomDetailApi(id);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isError) {
+    return <div>Failed to load room</div>;
+  }
+
+  if (!data) {
+    return <div>Room not found</div>;
+  }
+
+  return <DetailRoomModule room={data} />;
 }

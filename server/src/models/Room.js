@@ -31,10 +31,17 @@ const roomSchema = new mongoose.Schema(
       },
     ],
 
+    // FACILITIES
     bed: {
       type: String,
       required: true,
       trim: true,
+    },
+
+    capacity: {
+      type: Number,
+      required: true,
+      min: 1,
     },
 
     area: {
@@ -43,10 +50,19 @@ const roomSchema = new mongoose.Schema(
       min: 1,
     },
 
-    capacity: {
-      type: Number,
-      required: true,
-      min: 1,
+    bathroom: {
+      type: String,
+      trim: true,
+    },
+
+    fireplace: {
+      type: String,
+      trim: true,
+    },
+
+    views: {
+      type: String,
+      trim: true,
     },
 
     quantity: {

@@ -39,7 +39,7 @@ export function RoomItem(props: TRoomItemProps) {
         </div>
 
         <div className='flex flex-col gap-7'>
-          <div>{room.description}</div>
+          <div className='line-clamp-2'>{room.description}</div>
 
           <div className='flex items-center gap-2'>
             <Image

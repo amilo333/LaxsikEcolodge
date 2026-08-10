@@ -84,8 +84,19 @@ export const getRoomById = async (req, res) => {
 // @access  Private/Admin
 export const createRoom = async (req, res) => {
   try {
-    const { title, description, price, bed, area, capacity, quantity, status } =
-      req.body;
+    const {
+      title,
+      description,
+      price,
+      bed,
+      area,
+      capacity,
+      quantity,
+      status,
+      bathroom,
+      fireplace,
+      views,
+    } = req.body;
 
     const uploadedFiles = req.files || [];
     const thumbnailFile = uploadedFiles.find(
@@ -121,6 +132,9 @@ export const createRoom = async (req, res) => {
       createdBy: req.user._id,
       updatedBy: req.user._id,
       status,
+      bathroom,
+      fireplace,
+      views,
     });
 
     await room.save();

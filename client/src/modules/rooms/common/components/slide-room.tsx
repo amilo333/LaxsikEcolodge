@@ -1,28 +1,33 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
+import useEmblaCarousel from 'embla-carousel-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import useEmblaCarousel from 'embla-carousel-react';
+import { useCallback, useEffect, useState } from 'react';
 
-import { TRoom } from '../types';
-import { ROOMS } from '../constants';
 import { Button } from '@/components/core';
+import { useRoomListApi } from '../hooks';
+import { TRoom } from '../types';
 
 type SlideRoomProps = {
-  rooms?: TRoom[];
+  currentRoomId: string;
   title?: string;
   onExploreRoom?: (room: TRoom) => void;
 };
 
 export function SlideRoom({
-  rooms = ROOMS,
+  currentRoomId,
   title = 'OTHER ROOMS',
   onExploreRoom,
 }: SlideRoomProps) {
   const router = useRouter();
 
-  const displayRooms = rooms && rooms.length > 0 ? rooms : ROOMS;
+  const { data, isLoading } = useRoomListApi();
+
+  const rooms = data?.data ?? [];
+  console.log('SlideRoom rooms:', rooms);
+
+  const displayRooms = rooms.filter((room) => room._id !== currentRoomId);
   const initialIndex = Math.floor(displayRooms.length / 2);
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
