@@ -15,17 +15,14 @@ type SlideRoomProps = {
   onExploreRoom?: (room: TRoom) => void;
 };
 
-export function SlideRoom({
-  currentRoomId,
-  title = 'OTHER ROOMS',
-  onExploreRoom,
-}: SlideRoomProps) {
+export function SlideRoom(props: SlideRoomProps) {
+  const { currentRoomId, title = 'OTHER ROOMS', onExploreRoom } = props;
+
   const router = useRouter();
 
-  const { data, isLoading } = useRoomListApi();
+  const { data } = useRoomListApi();
 
   const rooms = data?.data ?? [];
-  console.log('SlideRoom rooms:', rooms);
 
   const displayRooms = rooms.filter((room) => room._id !== currentRoomId);
   const initialIndex = Math.floor(displayRooms.length / 2);
@@ -61,7 +58,7 @@ export function SlideRoom({
     if (onExploreRoom) {
       onExploreRoom(room);
     } else {
-      router.push(`/rooms/${room.id}`);
+      router.push(`/rooms/${room._id}`);
     }
   };
 
