@@ -7,7 +7,7 @@ export function Footer() {
 
   return (
     <footer>
-      <div className='flex flex-col items-center bg-[#F5F5F5] px-4 py-10'>
+      <div className='flex flex-col items-center bg-white px-4 py-10'>
         <Image
           src={logo}
           alt={title}

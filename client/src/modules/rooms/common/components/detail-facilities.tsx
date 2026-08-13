@@ -48,8 +48,8 @@ export function DetailFacilities({ room }: DetailFacilitiesProps) {
   const rows = [details.slice(0, 2), details.slice(2, 4), details.slice(4, 6)];
 
   return (
-    <section>
-      <h2 className='font-montserrat text-center text-[32px] font-medium text-[#0D4949]'>
+    <section className='my-40'>
+      <h2 className='font-lora text-center text-[32px] font-medium font-semibold text-[#0D4949]'>
         FACILITIES
       </h2>
 
