@@ -1,9 +1,5 @@
-import { DiningModule } from '@/modules/dining';
+import React from 'react';
 
 export default function DiningPage() {
-  return (
-    <main>
-      <DiningModule />
-    </main>
-  );
+  return DiningPage;
 }
