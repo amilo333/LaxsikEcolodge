@@ -59,7 +59,7 @@ export function ServiceDining({
 }: ServiceDiningProps) {
   return (
     <section
-      className={`relative w-full overflow-hidden bg-white py-12 select-none md:py-20 ${className}`}>
+      className={`relative w-full overflow-hidden select-none ${className}`}>
       {/* Background Wave Pattern */}
       {/* <div
         className='pointer-events-none absolute inset-0 opacity-[0.04]'
@@ -72,7 +72,7 @@ export function ServiceDining({
       <div className='relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
         {/* Section Title */}
         {title && (
-          <h2 className='font-lora mb-10 text-center text-2xl font-bold tracking-wider text-[#0D4949] uppercase md:mb-16 md:text-3xl lg:text-[32px]'>
+          <h2 className='font-lora mb-10 text-center text-[32px] font-semibold text-[#0D4949] uppercase md:mb-16'>
             {title}
           </h2>
         )}

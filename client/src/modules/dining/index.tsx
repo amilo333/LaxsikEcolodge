@@ -1,3 +1,4 @@
+'use client';
 import { ContactCta, Footer, Header } from '@/components/layouts';
 import {
   BannerDining,
@@ -5,15 +6,18 @@ import {
   ServiceDining,
   SlideImage,
 } from './common/component';
+import { useDiningListApi } from './common/hooks';
+
 export function DiningModule() {
+  const { data } = useDiningListApi();
   return (
-    <div className='bg-white'>
+    <div className=''>
       <Header />
       <BannerDining />
       <SlideImage />
       <ServiceDining />
       <ContactCta />
-      <DiningList />
+      <DiningList dining={data?.data} />
       <Footer />
     </div>
   );

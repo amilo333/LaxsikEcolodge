@@ -27,72 +27,76 @@ export function SlideImage({
   const initialIndex = Math.floor(images.length / 2);
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
-    loop: true,
+    loop: false,
     align: 'center',
     containScroll: false,
     startIndex: initialIndex,
   });
 
-  const [selectedIndex, setSelectedIndex] = useState<number>(initialIndex);
+  const [selectedIndex, setSelectedIndex] = useState(initialIndex);
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
+
     setSelectedIndex(emblaApi.selectedScrollSnap());
   }, [emblaApi]);
 
   useEffect(() => {
     if (!emblaApi) return;
 
-    emblaApi.on('init', onSelect).on('reInit', onSelect).on('select', onSelect);
+    emblaApi.on('select', onSelect);
+    emblaApi.on('reInit', onSelect);
 
     return () => {
-      emblaApi
-        .off('init', onSelect)
-        .off('reInit', onSelect)
-        .off('select', onSelect);
+      emblaApi.off('select', onSelect);
+      emblaApi.off('reInit', onSelect);
     };
   }, [emblaApi, onSelect]);
 
+  if (!images.length) return null;
+
   return (
     <section
-      className={`relative w-full overflow-hidden bg-white py-12 select-none md:py-20 ${className}`}>
-      <div className='relative z-10 flex w-full flex-col items-center gap-8 md:gap-12'>
-        {/* Title */}
+      className={`relative w-full overflow-hidden select-none ${className}`}>
+      <div className='relative z-10 my-30 flex w-full flex-col items-center gap-8 md:gap-12'>
+        {/* TITLE */}
         {title && (
-          <h2 className='font-lora text-center text-2xl font-bold tracking-wider text-[#0D4949] uppercase md:text-3xl lg:text-[32px]'>
+          <h2 className='font-lora text-center text-[32px] font-semibold text-[#0D4949] uppercase'>
             {title}
           </h2>
         )}
 
-        {/* Embla Carousel Viewport */}
-        <div
-          className='w-full cursor-grab overflow-hidden py-4 active:cursor-grabbing'
-          ref={emblaRef}>
-          <div className='flex touch-pan-y items-center justify-center gap-4 md:gap-6'>
+        {/* VIEWPORT */}
+        <div ref={emblaRef} className='w-full overflow-hidden py-4'>
+          {/* CONTAINER */}
+          <div className='flex items-center gap-4 md:gap-6'>
             {images.map((img, index) => {
               const isActive = selectedIndex === index;
 
               return (
                 <div
-                  key={index}
-                  className='flex flex-none items-center justify-center transition-all duration-500'
-                  style={{
-                    flex: isActive
-                      ? '0 0 min(800px, 60vw)'
-                      : '0 0 min(600px, 42vw)',
-                  }}>
+                  key={`${img}-${index}`}
+                  className={`flex flex-[0_0_auto] items-center justify-center transition-all duration-500 ease-out ${
+                    isActive
+                      ? 'w-[80vw] max-w-[800px]'
+                      : 'w-[60vw] max-w-[600px]'
+                  } `}>
                   <div
-                    className={`relative overflow-hidden bg-white transition-all duration-500 ${
+                    className={`relative w-full overflow-hidden bg-white transition-all duration-500 ease-out ${
                       isActive
-                        ? 'z-10 h-[280px] w-full shadow-2xl ring-1 ring-black/5 sm:h-[380px] md:h-[480px] lg:h-[540px]'
-                        : 'z-0 h-[230px] w-full opacity-80 shadow-md sm:h-[310px] md:h-[400px] lg:h-[450px]'
-                    }`}>
+                        ? 'z-20 h-[280px] shadow-2xl sm:h-[380px] md:h-[480px] lg:h-[540px]'
+                        : 'z-10 mt-[40px] h-[230px] opacity-80 shadow-md sm:h-[310px] md:h-[400px] lg:h-[450px]'
+                    } `}>
                     <Image
                       src={img}
                       alt={`${title} - image ${index + 1}`}
                       fill
+                      sizes='
+                        (max-width: 640px) 80vw,
+                        (max-width: 1024px) 60vw,
+                        800px
+                      '
                       className='object-cover transition-transform duration-700 hover:scale-105'
-                      sizes='(max-width: 768px) 80vw, 800px'
                     />
                   </div>
                 </div>

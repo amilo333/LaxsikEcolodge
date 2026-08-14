@@ -8,10 +8,10 @@ export function RoomCard() {
 
   const id = params.id;
 
-  const { data, isLoading, isError } = useRoomDetailApi(id);
+  const { data } = useRoomDetailApi(id);
 
   return (
-    <div className='flex h-[433px] w-[1600px] items-center justify-center bg-white'>
+    <div className='flex max-h-[433px] w-full max-w-[1600px] items-center justify-center rounded-2xl bg-white shadow-2xl'>
       <div className='flex flex-col items-center gap-[24px] px-[56px] py-[44px]'>
         <div className='font-lora flex items-center gap-2 text-[32px] font-semibold uppercase'>
           {data?.title || 'Deluxe Double Room with Balcony'}
@@ -29,7 +29,7 @@ export function RoomCard() {
               {data?.price ? `$ ${data.price.toFixed(2)}` : '$ 100.00'}
             </div>
           </div>
-          <Button className='h-[71px]! w-[260px]! text-[28px]!'>
+          <Button className='h-[clamp(52px,4.5vw,71px)]! w-[clamp(180px,18vw,260px)]! text-[clamp(20px,2vw,28px)]!'>
             BOOK NOW
           </Button>
         </div>

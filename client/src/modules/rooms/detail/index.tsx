@@ -1,36 +1,51 @@
-import Image from 'next/image';
-import { DetailFacilities, ImageSlider, RoomCard, TRoom } from '../common';
+import { Footer, Header } from '@/components/layouts';
 import { ContactCta } from '@/components/layouts/contact-cta';
+import Image from 'next/image';
+import { useParams } from 'next/navigation';
+import { DetailFacilities, ImageSlider, RoomCard } from '../common';
 import { SlideRoom } from '../common/components/slide-room';
-import { Footer } from '@/components/layouts';
+import { useRoomDetailApi } from '../common/hooks';
 
-type DetailRoomModuleProps = {
-  room: TRoom;
-};
+export function DetailRoomModule() {
+  const params = useParams<{ id: string }>();
 
-export function DetailRoomModule({ room }: DetailRoomModuleProps) {
+  const id = params.id;
+
+  const { data, isLoading, isError } = useRoomDetailApi(id);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isError) {
+    return <div>Failed to load room</div>;
+  }
+
+  if (!data) {
+    return <div>Room not found</div>;
+  }
   return (
     <div>
+      <Header />
       <div className='relative'>
         <Image
           height={400}
           width={1600}
-          src='/images/rooms/room_img.png'
+          src={data.thumbnail}
           alt='room-detail'
-          className='h-200 w-full object-cover'
+          className='object-fit h-200 w-full'
         />
 
-        <div className='absolute top-162.5 left-1/2 -translate-x-1/2'>
+        <div className='absolute top-162.5 left-1/2 w-4/5 -translate-x-1/2'>
           <RoomCard />
         </div>
       </div>
       <div className='mt-110'>
-        <ImageSlider images={room.images} title='Room’s Gallery' />
+        <ImageSlider images={data.images} title='Room’s Gallery' />
       </div>
-      <DetailFacilities room={room} />
+      <DetailFacilities room={data} />
       <ContactCta />
-      <SlideRoom currentRoomId={room.id} />
-      <ContactCta />
+      <SlideRoom currentRoomId={data.id} />
       <Footer />
     </div>
   );

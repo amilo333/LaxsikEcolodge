@@ -16,7 +16,7 @@ export function Button(props: TButtonProps) {
         {...rest}
         className={clsx(
           className,
-          'h-12 w-full rounded-none bg-[#0D4949] text-[20px] font-semibold text-white'
+          'h-12 w-full rounded-full bg-[#0D4949] text-[20px] font-semibold text-white'
         )}
         onPress={handleClick}>
         {children}
