@@ -18,17 +18,19 @@ export function RoomItem(props: TRoomItemProps) {
   };
 
   return (
-    <div className='flex h-120.5 w-325 items-center bg-white'>
-      <Image
-        height={400}
-        width={600}
-        src={room.thumbnail}
-        alt={room.title}
-        className='w-1/2'
-      />
+    <div className='flex h-100 w-[75%] items-center rounded-2xl bg-white shadow-2xl'>
+      <div className='h-[99.5%] w-1/2 rounded-2xl'>
+        <Image
+          height={400}
+          width={600}
+          src={room.thumbnail}
+          alt={room.title}
+          className='h-full w-full rounded-2xl object-cover'
+        />
+      </div>
 
       <div className='flex w-1/2 flex-col gap-6 py-9 pr-9 pl-14'>
-        <div className='flex items-center gap-2 text-[22px] font-semibold text-[#0D4949] uppercase'>
+        <div className='flex items-center gap-2 truncate text-[22px] font-semibold text-[#0D4949] uppercase'>
           {room.title}
           <Image
             height={30}

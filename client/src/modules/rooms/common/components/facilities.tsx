@@ -5,7 +5,9 @@ import Image from 'next/image';
 export function Facilities() {
   return (
     <div className='flex h-[356px] flex-col items-center justify-center gap-[44px] bg-[#0D4949] text-white'>
-      <div className='font-times text-center text-[32px]'>FACILITIES</div>
+      <div className='font-lora text-center text-[32px] font-semibold'>
+        FACILITIES
+      </div>
       <div className='flex gap-[24px]'>
         {FACILITES.map((facility) => {
           return (

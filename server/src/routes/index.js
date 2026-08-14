@@ -1,6 +1,10 @@
 import { authRouter } from "./auth-router.js";
+import { diningRouter } from "./dining-router.js";
+import { diningServiceRouter } from "./dining-service-router.js";
 import { imageRouter } from "./image-router.js";
 import { roomRouter } from "./room-router.js";
+import { spaRouter } from "./spa-router.js";
+import { spaServiceRouter } from "./spa-service-router.js";
 import { userRouter } from "./userRoutes.js";
 
 export function route(app) {
@@ -8,4 +12,8 @@ export function route(app) {
   app.use("/api/user", userRouter);
   app.use("/api/rooms", roomRouter);
   app.use("/api/images", imageRouter);
+  app.use("/api/dining", diningRouter);
+  app.use("/api/dining-services", diningServiceRouter);
+  app.use("/api/spa", spaRouter);
+  app.use("/api/spa-services", spaServiceRouter);
 }

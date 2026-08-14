@@ -7,7 +7,15 @@ export function Footer() {
 
   return (
     <footer>
-      <div className='flex flex-col items-center bg-[#F5F5F5] px-4 py-10'>
+      <Image
+        src='/images/mask.png'
+        height={200}
+        width={1920}
+        alt='mask'
+        className='height-[250px]! w-full object-fill'
+      />
+
+      <div className='flex flex-col items-center bg-white px-4 py-10'>
         <Image
           src={logo}
           alt={title}

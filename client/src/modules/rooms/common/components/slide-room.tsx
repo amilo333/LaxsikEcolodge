@@ -15,134 +15,206 @@ type SlideRoomProps = {
   onExploreRoom?: (room: TRoom) => void;
 };
 
-export function SlideRoom({
-  currentRoomId,
-  title = 'OTHER ROOMS',
-  onExploreRoom,
-}: SlideRoomProps) {
+export function SlideRoom(props: SlideRoomProps) {
+  const { currentRoomId, title = 'OTHER ROOMS', onExploreRoom } = props;
+
   const router = useRouter();
 
-  const { data, isLoading } = useRoomListApi();
+  const { data, isLoading, isError } = useRoomListApi();
 
-  const rooms = data?.data ?? [];
-  console.log('SlideRoom rooms:', rooms);
+  const rooms: TRoom[] = data?.data ?? [];
 
   const displayRooms = rooms.filter((room) => room._id !== currentRoomId);
-  const initialIndex = Math.floor(displayRooms.length / 2);
+
+  const initialIndex = displayRooms.length > 2 ? 2 : 0;
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
-    loop: true,
+    loop: false,
     align: 'center',
     containScroll: false,
     startIndex: initialIndex,
   });
 
-  const [selectedIndex, setSelectedIndex] = useState<number>(initialIndex);
+  const [selectedIndex, setSelectedIndex] = useState(initialIndex);
 
   const onSelect = useCallback(() => {
     if (!emblaApi) return;
+
     setSelectedIndex(emblaApi.selectedScrollSnap());
   }, [emblaApi]);
 
   useEffect(() => {
     if (!emblaApi) return;
 
-    emblaApi.on('init', onSelect).on('reInit', onSelect).on('select', onSelect);
+    emblaApi.on('select', onSelect).on('reInit', onSelect);
 
     return () => {
-      emblaApi
-        .off('init', onSelect)
-        .off('reInit', onSelect)
-        .off('select', onSelect);
+      emblaApi.off('select', onSelect).off('reInit', onSelect);
     };
   }, [emblaApi, onSelect]);
+
+  // =========================
+  // EXPLORE ROOM
+  // =========================
 
   const handleExplore = (room: TRoom) => {
     if (onExploreRoom) {
       onExploreRoom(room);
-    } else {
-      router.push(`/rooms/${room.id}`);
+      return;
     }
+
+    router.push(`/rooms/${room._id}`);
   };
 
-  return (
-    <div className='relative w-full overflow-hidden border-none bg-[#F6F4EE] py-16 select-none'>
-      {/* Background Subtle Pattern */}
-      <div
-        className='pointer-events-none absolute inset-0 opacity-[0.04]'
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 10 Q 25 0, 50 10 T 100 10' fill='none' stroke='%3C0D4949' stroke-width='1.5'/%3E%3C/svg%3E")`,
-          backgroundRepeat: 'repeat',
-        }}
-      />
+  // =========================
+  // LOADING
+  // =========================
 
-      <div className='relative flex w-full flex-col items-center gap-10'>
-        {/* Title */}
+  if (isLoading) {
+    return (
+      <section className='flex w-full justify-center py-16'>
+        <p className='font-montserrat text-sm text-[#0D4949]'>
+          Loading rooms...
+        </p>
+      </section>
+    );
+  }
+
+  // =========================
+  // ERROR
+  // =========================
+
+  if (isError) {
+    return (
+      <section className='flex w-full justify-center py-16'>
+        <p className='font-montserrat text-sm text-red-500'>
+          Failed to load rooms.
+        </p>
+      </section>
+    );
+  }
+
+  // =========================
+  // EMPTY
+  // =========================
+
+  if (!displayRooms.length) {
+    return null;
+  }
+
+  // =========================
+  // UI
+  // =========================
+
+  return (
+    <section className='w-full overflow-hidden py-10 md:py-14'>
+      <div className='flex w-full flex-col items-center'>
+        {/* =========================
+            TITLE
+        ========================= */}
+
         {title && (
-          <h2 className='font-lora text-8 text-center font-bold text-[#0D4949] uppercase md:text-3xl'>
+          <h2 className='font-lora mb-10 text-[32px] font-bold text-[#0D4949] uppercase md:text-3xl'>
             {title}
           </h2>
         )}
 
-        {/* Embla Carousel Viewport */}
-        <div
-          className='w-full cursor-grab overflow-hidden py-6 active:cursor-grabbing'
-          ref={emblaRef}>
-          <div className='flex touch-pan-y items-center justify-center gap-4 px-4 md:gap-6'>
-            {displayRooms.map((room: TRoom, index: number) => {
+        {/* =========================
+            EMBLA VIEWPORT
+        ========================= */}
+
+        <div ref={emblaRef} className='w-full overflow-hidden'>
+          {/* =========================
+              EMBLA CONTAINER
+          ========================= */}
+
+          <div className='flex items-center gap-6'>
+            {/* =========================
+                ALL ROOMS FROM API
+            ========================= */}
+
+            {displayRooms.map((room, index) => {
               const isActive = selectedIndex === index;
 
               return (
                 <div
-                  key={room.id || index}
-                  className='flex flex-none items-center justify-center transition-all duration-500'
-                  style={{
-                    flex: isActive
-                      ? '0 0 min(480px, 26vw)'
-                      : '0 0 min(340px, 17vw)',
-                  }}>
+                  key={room._id || room.id || index}
+                  className={`flex-none transition-all duration-500 ease-out ${
+                    isActive ? 'w-[380px]' : 'w-[300px]'
+                  } `}>
+                  {/* =========================
+                        ROOM CARD
+                    ========================= */}
+
                   <div
-                    className={`flex flex-col justify-between overflow-hidden bg-white transition-all duration-500 ${
-                      isActive
-                        ? 'z-10 h-[656px] w-[min(480px,26vw)] shadow-2xl ring-1 ring-black/5'
-                        : 'z-0 h-[578px] w-[min(340px,17vw)] opacity-95 shadow-md'
-                    }`}>
-                    {/* Room Image */}
+                    className={`flex w-full flex-col overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-500 ease-out ${
+                      isActive ? 'h-[520px]' : 'h-[470px]'
+                    } `}>
+                    {/* =========================
+                          IMAGE
+                      ========================= */}
+
                     <div
-                      className={`relative w-full overflow-hidden bg-gray-100 transition-all duration-500 ${
-                        isActive ? 'h-[380px]' : 'h-[460px]'
-                      }`}>
+                      className={`relative w-full flex-none overflow-hidden bg-[#F5F5F5] ${
+                        isActive ? 'h-[300px]' : 'h-[380px]'
+                      } `}>
                       <Image
                         src={
                           room.thumbnail ||
                           room.images?.[0] ||
                           '/images/rooms/room.png'
                         }
-                        alt={room.title}
+                        alt={room.title || 'Room'}
                         fill
-                        className='object-cover transition-transform duration-700 hover:scale-105'
+                        sizes='
+                            (max-width: 768px) 80vw,
+                            (max-width: 1280px) 380px,
+                            380px
+                          '
+                        className='object-cover transition-transform duration-700'
                       />
                     </div>
 
-                    {/* Room Content */}
+                    {/* =========================
+                          CONTENT
+                      ========================= */}
+
                     <div
-                      className={`flex flex-grow flex-col items-center justify-between bg-white p-4 text-center transition-all duration-500 md:p-6 ${
-                        isActive ? 'h-[276px]' : 'h-[118px] justify-center'
-                      }`}>
-                      <h3 className='font-Montserrat text-[24px] font-bold text-[#1A1A1A] uppercase md:text-base lg:text-lg'>
+                      className={`flex flex-1 flex-col items-center bg-white text-center ${
+                        isActive
+                          ? 'justify-between px-6 py-5'
+                          : 'justify-center px-4 py-4'
+                      } `}>
+                      {/* =========================
+                            ROOM TITLE
+                        ========================= */}
+
+                      <h3
+                        className={`font-montserrat leading-tight font-bold text-[#151515] uppercase ${
+                          isActive ? 'text-[17px]' : 'text-[15px]'
+                        } `}>
                         {room.title}
                       </h3>
 
+                      {/* =========================
+                            ACTIVE CONTENT
+                        ========================= */}
+
                       {isActive && (
-                        <div className='animate-fadeIn mt-2 flex w-full flex-col items-center gap-4'>
-                          <p className='font-montserrat line-clamp-3 max-w-sm px-2 text-[17px] leading-relaxed text-[#555555]'>
+                        <div className='flex w-full flex-1 flex-col items-center justify-between pt-4'>
+                          {/* DESCRIPTION */}
+
+                          <p className='font-montserrat line-clamp-3 max-w-[320px] text-sm leading-relaxed'>
                             {room.description}
                           </p>
+
+                          {/* EXPLORE */}
+
                           <Button
                             type='button'
                             onClick={() => handleExplore(room)}
-                            className='text-4 mt-1 min-w-[416px] cursor-pointer bg-[#0D4949] px-8 py-3 font-semibold text-white uppercase shadow-md transition-colors duration-200 hover:bg-[#073333] md:px-12'>
-                            EXPLORE
+                            className='h-[40px]! w-full! max-w-[320px]! bg-[#0D4949]! px-4! text-[16px]! font-semibold tracking-wider! text-white! transition-colors duration-200 hover:bg-[#083B3B]!'>
+                            Explore Now
                           </Button>
                         </div>
                       )}
@@ -154,6 +226,6 @@ export function SlideRoom({
           </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 }

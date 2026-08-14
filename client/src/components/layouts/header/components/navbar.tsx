@@ -1,8 +1,9 @@
 'use client';
 import { Button } from '@/components/core';
 import Image from 'next/image';
-import { MENUS } from '../contants';
 import { TNavbarProps } from '../types';
+import Link from 'next/link';
+import { MENUS } from '../contants';
 
 export function Navbar(props: TNavbarProps) {
   const { onClickFind } = props;
@@ -27,8 +28,8 @@ export function Navbar(props: TNavbarProps) {
 
             <ul className='mt-2 flex gap-6 text-sm font-bold'>
               {MENUS.map((item) => (
-                <li key={item} className='flex items-center gap-[6px]'>
-                  {item}{' '}
+                <li key={item.label} className='flex items-center gap-[6px]'>
+                  <Link href={item.href}>{item.label}</Link>{' '}
                   <Image
                     src='/images/chevron_down.png'
                     alt='down'

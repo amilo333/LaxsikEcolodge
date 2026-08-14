@@ -1,9 +1,8 @@
 'use client';
 
+import useEmblaCarousel from 'embla-carousel-react';
 import Image from 'next/image';
-import { Swiper, SwiperSlide } from 'swiper/react';
-
-import 'swiper/css';
+import { useCallback, useEffect, useState } from 'react';
 
 type ImageSliderProps = {
   images: string[];
@@ -11,35 +10,73 @@ type ImageSliderProps = {
 };
 
 export function ImageSlider({ images, title }: ImageSliderProps) {
+  const initialIndex = Math.floor(images.length / 2);
+
+  const [emblaRef, emblaApi] = useEmblaCarousel({
+    loop: true,
+    align: 'center',
+    containScroll: false,
+    startIndex: initialIndex,
+  });
+
+  const [selectedIndex, setSelectedIndex] = useState(initialIndex);
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+
+    setSelectedIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+
+    emblaApi.on('select', onSelect).on('reInit', onSelect);
+
+    return () => {
+      emblaApi.off('select', onSelect).off('reInit', onSelect);
+    };
+  }, [emblaApi, onSelect]);
+
+  if (!images.length) {
+    return null;
+  }
+
   return (
-    <div className='mx-auto w-full overflow-hidden'>
+    <section className='w-full overflow-hidden py-6 md:py-10'>
       {title && (
-        <h2 className='font-lora mb-10 text-center text-[32px] font-semibold text-[#0D4949] uppercase'>
+        <h2 className='font-lora mb-6 text-center text-[32px] font-semibold text-[#0D4949] uppercase md:mb-8'>
           {title}
         </h2>
       )}
 
-      <Swiper
-        centeredSlides
-        loop
-        slidesPerView={3}
-        spaceBetween={30}
-        className='overflow-visible!'>
-        {images.map((image, index) => (
-          <SwiperSlide
-            key={index}
-            className='flex! w-full items-center! justify-center!'>
-            {({ isActive }) => (
+      <div ref={emblaRef} className='w-full overflow-hidden'>
+        <div className='flex items-center'>
+          {images.map((image, index) => {
+            const isActive = selectedIndex === index;
+
+            return (
               <div
-                className={`relative overflow-hidden transition-all duration-500 ${
-                  isActive ? 'h-[600px] w-[900px]' : 'mt-12 h-[480px] w-[720px]'
-                }`}>
-                <Image src={image} alt='' fill className='object-cover' />
+                key={`${image}-${index}`}
+                className='flex min-w-0 flex-[0_0_auto] items-center justify-center px-3 md:px-4'>
+                <div
+                  className={`relative overflow-hidden transition-all duration-500 ease-out ${
+                    isActive
+                      ? 'z-20 h-[min(467px,60vw)] w-[min(700px,90vw)]'
+                      : 'z-10 mt-[40px] h-[min(373px,48vw)] w-[min(560px,72vw)]'
+                  }`}>
+                  <Image
+                    src={image}
+                    alt={`Room gallery ${index + 1}`}
+                    fill
+                    sizes='(max-width: 768px) 90vw, (max-width: 1280px) 70vw, 700px'
+                    className='object-cover'
+                  />
+                </div>
               </div>
-            )}
-          </SwiperSlide>
-        ))}
-      </Swiper>
-    </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
   );
 }

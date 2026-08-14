@@ -14,7 +14,7 @@ const uploadImageMulter = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
 });
 
-const uploadRoomImages = (req, res, next) => {
+const uploadImages = (req, res, next) => {
   uploadImageMulter.any()(req, res, (error) => {
     if (error instanceof multer.MulterError) {
       return res.status(400).json({
@@ -34,5 +34,5 @@ const uploadRoomImages = (req, res, next) => {
   });
 };
 
-export { uploadRoomImages };
+export { uploadImages };
 export default uploadImageMulter;
