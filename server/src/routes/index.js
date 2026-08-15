@@ -14,6 +14,6 @@ export function route(app) {
   app.use("/api/images", imageRouter);
   app.use("/api/dining", diningRouter);
   app.use("/api/dining-services", diningServiceRouter);
-  app.use("/api/spa", spaRouter);
+  app.use("/api/spa-massage", spaRouter);
   app.use("/api/spa-services", spaServiceRouter);
 }
