@@ -20,6 +20,16 @@ const roomSchema = new mongoose.Schema(
       min: 0,
     },
 
+    checkinTime: {
+      type: String,
+      trim: true,
+    },
+
+    checkoutTime: {
+      type: String,
+      trim: true,
+    },
+
     thumbnail: {
       type: String,
       required: true,
