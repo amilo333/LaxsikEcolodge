@@ -5,6 +5,7 @@ import {
   getRoomById,
   updateRoom,
   deleteRoom,
+  getAvailableRooms,
 } from "../controllers/room-controller.js";
 import { authenticate, authorizedAdmin } from "../middleware/authMiddleware.js";
 import { uploadImages } from "../middleware/multer.js";
@@ -12,6 +13,7 @@ import { uploadImages } from "../middleware/multer.js";
 const router = express.Router();
 
 router.get("/", getAllRooms); // Public
+router.get("/available", getAvailableRooms); //Public
 router.get("/:id", getRoomById); // Public
 
 router.post("/", authenticate, authorizedAdmin, uploadImages, createRoom);

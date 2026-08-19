@@ -2,43 +2,46 @@ import mongoose from "mongoose";
 
 const voucherSchema = new mongoose.Schema(
   {
-    title: {
+    code: {
       type: String,
       required: true,
+      unique: true,
+      uppercase: true,
       trim: true,
     },
 
-    value: {
+    discountType: {
+      type: String,
+      enum: ["percent", "amount"],
+      required: true,
+    },
+
+    discountValue: {
       type: Number,
       required: true,
-    },
-
-    unit: {
-      type: String,
-      enum: ["percentage", "currency"],
-      required: true,
-    },
-
-    createdBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-
-    updatedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-
-    expiredTime: {
-      type: Date,
-      required: true,
+      min: 0,
     },
 
     quantity: {
       type: Number,
-      default: 0,
+      required: true,
+      min: 0,
+    },
+
+    startDate: {
+      type: Date,
+      required: true,
+    },
+
+    endDate: {
+      type: Date,
+      required: true,
+    },
+
+    status: {
+      type: String,
+      enum: ["active", "inactive"],
+      default: "active",
     },
   },
   {
