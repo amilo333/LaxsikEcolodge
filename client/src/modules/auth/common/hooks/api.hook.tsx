@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { toast } from 'sonner';
 import {
@@ -6,6 +6,7 @@ import {
   loginApi,
   logoutApi,
   registerApi,
+  TUser,
   useAuthStore,
 } from '..';
 
@@ -16,7 +17,7 @@ export const useRegisterApi = () => {
 };
 
 export const useProfileApi = () => {
-  return useQuery({
+  return useQuery<TUser>({
     queryKey: ['profile'],
     queryFn: getProfileApi,
     retry: false,
@@ -25,11 +26,13 @@ export const useProfileApi = () => {
 
 export const useLoginApi = () => {
   const setUser = useAuthStore((state) => state.setUser);
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: loginApi,
 
     onSuccess: (response) => {
       setUser(response.data.data);
+      queryClient.setQueryData(['profile'], response.data.data);
     },
 
     onError: (error) => {
@@ -44,12 +47,14 @@ export const useLoginApi = () => {
 
 export const useLogoutApi = () => {
   const { reset } = useAuthStore((state) => state);
+  const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: logoutApi,
 
     onSuccess: () => {
       reset();
+      queryClient.removeQueries({ queryKey: ['profile'] });
     },
   });
 };

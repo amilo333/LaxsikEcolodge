@@ -7,7 +7,10 @@ export function Header() {
 
   return (
     <div className='relative'>
-      <Navbar onClickFind={() => setIsShowBookingBar(true)} />
+      <Navbar
+        isBookingBarVisible={isShowBookingBar}
+        onClickFind={() => setIsShowBookingBar(true)}
+      />
       {isShowBookingBar && (
         <BookingBar onClickHide={() => setIsShowBookingBar(false)} />
       )}

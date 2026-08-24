@@ -6,8 +6,10 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 import { Button } from '@/components/core';
-import { useRoomListApi } from '../hooks';
+import { buildRoomDetailUrl } from '@/utils';
+import { useAvailableRoomsApi, useRoomListApi } from '../hooks';
 import { TRoom } from '../types';
+import { useSearchParams } from 'next/navigation';
 
 type SlideRoomProps = {
   currentRoomId: string;
@@ -19,10 +21,27 @@ export function SlideRoom(props: SlideRoomProps) {
   const { currentRoomId, title = 'OTHER ROOMS', onExploreRoom } = props;
 
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const { data, isLoading, isError } = useRoomListApi();
-
-  const rooms: TRoom[] = data?.data ?? [];
+  const checkInDate = searchParams.get('checkInDate');
+  const checkOutDate = searchParams.get('checkOutDate');
+  const isSearching = Boolean(checkInDate && checkOutDate);
+  const roomListQuery = useRoomListApi(!isSearching);
+  const availableRoomsQuery = useAvailableRoomsApi({
+    checkInDate,
+    checkOutDate,
+    guests: searchParams.get('guests'),
+    rooms: searchParams.get('rooms'),
+  });
+  const rooms: TRoom[] =
+    (isSearching ? availableRoomsQuery.data?.data : roomListQuery.data?.data) ??
+    [];
+  const isLoading = isSearching
+    ? availableRoomsQuery.isLoading
+    : roomListQuery.isLoading;
+  const isError = isSearching
+    ? availableRoomsQuery.isError
+    : roomListQuery.isError;
 
   const displayRooms = rooms.filter((room) => room._id !== currentRoomId);
 
@@ -63,7 +82,7 @@ export function SlideRoom(props: SlideRoomProps) {
       return;
     }
 
-    router.push(`/rooms/${room._id}`);
+    router.push(buildRoomDetailUrl(room._id, searchParams));
   };
 
   // =========================
@@ -138,7 +157,7 @@ export function SlideRoom(props: SlideRoomProps) {
 
               return (
                 <div
-                  key={room._id || room.id || index}
+                  key={room._id}
                   className={`flex-none transition-all duration-500 ease-out ${
                     isActive ? 'w-[380px]' : 'w-[300px]'
                   } `}>
@@ -159,12 +178,8 @@ export function SlideRoom(props: SlideRoomProps) {
                         isActive ? 'h-[300px]' : 'h-[380px]'
                       } `}>
                       <Image
-                        src={
-                          room.thumbnail ||
-                          room.images?.[0] ||
-                          '/images/rooms/room.png'
-                        }
-                        alt={room.title || 'Room'}
+                        src={room.thumbnail}
+                        alt={room.title}
                         fill
                         sizes='
                             (max-width: 768px) 80vw,

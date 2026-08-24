@@ -11,7 +11,7 @@ import { useDiningListApi } from './common/hooks';
 export function DiningModule() {
   const { data } = useDiningListApi();
   return (
-    <div className=''>
+    <div className="min-h-screen bg-[url('/images/bg-screen.jpg')] bg-[length:720px_720px] text-[#151515]">
       <Header />
       <BannerDining />
       <SlideImage />

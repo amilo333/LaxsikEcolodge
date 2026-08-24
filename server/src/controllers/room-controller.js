@@ -217,7 +217,7 @@ export const deleteRoom = async (req, res) => {
 // @access  Public
 export const getAvailableRooms = async (req, res) => {
   try {
-    const { checkInDate, checkOutDate, guests } = req.query;
+    const { checkInDate, checkOutDate, guests, rooms: roomCount } = req.query;
 
     if (!checkInDate || !checkOutDate) {
       return res.status(400).json({
@@ -237,6 +237,29 @@ export const getAvailableRooms = async (req, res) => {
     if (checkIn >= checkOut) {
       return res.status(400).json({
         message: "Check-out date must be after check-in date",
+      });
+    }
+
+    const currentDate = new Date();
+    currentDate.setHours(0, 0, 0, 0);
+
+    if (checkIn < currentDate) {
+      return res.status(400).json({
+        message: "Check-in date cannot be in the past",
+      });
+    }
+
+    const requestedGuests = guests ? Number(guests) : undefined;
+    const requestedRooms = roomCount ? Number(roomCount) : undefined;
+
+    if (
+      (requestedGuests !== undefined &&
+        (!Number.isInteger(requestedGuests) || requestedGuests < 1)) ||
+      (requestedRooms !== undefined &&
+        (!Number.isInteger(requestedRooms) || requestedRooms < 1))
+    ) {
+      return res.status(400).json({
+        message: "Guests and rooms must be positive whole numbers",
       });
     }
 
@@ -304,8 +327,12 @@ export const getAvailableRooms = async (req, res) => {
           return false;
         }
 
-        if (guests) {
-          return room.capacity >= Number(guests);
+        if (requestedRooms && room.availableQuantity < requestedRooms) {
+          return false;
+        }
+
+        if (requestedGuests) {
+          return room.capacity >= requestedGuests;
         }
 
         return true;

@@ -17,4 +17,5 @@ export type TTextfieldProps<
     error?: string;
 
     className?: string;
+    inputClassName?: string;
   };

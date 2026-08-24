@@ -13,4 +13,5 @@ export type TBookingBarProps = {
 
 export type TNavbarProps = {
   onClickFind: () => void;
+  isBookingBarVisible: boolean;
 };

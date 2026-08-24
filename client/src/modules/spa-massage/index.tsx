@@ -7,7 +7,7 @@ import { useSpaListApi } from './common/hooks';
 export function SpaModule() {
   const { data } = useSpaListApi();
   return (
-    <div>
+    <div className="min-h-screen bg-[url('/images/bg-screen.jpg')] bg-[length:720px_720px] text-[#151515]">
       <Header />
       <BannerSpa />
       <SpaList spa={data?.data}>

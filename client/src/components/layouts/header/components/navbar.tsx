@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { MENUS } from '../contants';
 
 export function Navbar(props: TNavbarProps) {
-  const { onClickFind } = props;
+  const { onClickFind, isBookingBarVisible } = props;
 
   return (
     <div className='bg-[#0D4949]/90 text-white'>
@@ -44,27 +44,13 @@ export function Navbar(props: TNavbarProps) {
         </div>
 
         <div className='mr-[40px] flex items-center gap-2'>
-          <Image
-            src='/images/flag_eng.png'
-            alt='language'
-            width={24}
-            height={16}
-            className='h-[16px] w-[24px]'
-          />
-          <span className='text-sm font-bold'>ENG</span>
-          <Image
-            src='/images/chevron_down.png'
-            alt='down'
-            width={12}
-            height={6}
-            className='h-[6px] w-[12px]'
-          />
-
-          <Button
-            className='ml-[36px] h-[52px] w-[185px]! bg-white text-[#0D4949]!'
-            onClick={onClickFind}>
-            FIND NOW
-          </Button>
+          {!isBookingBarVisible && (
+            <Button
+              className='ml-[36px] h-[48px] w-[148px]! bg-white text-lg! text-[#0D4949]!'
+              onClick={onClickFind}>
+              Book Now
+            </Button>
+          )}
         </div>
       </div>
     </div>
