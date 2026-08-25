@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { TVoucher } from '../types';
+import { TBookingCustomerInfo, TPaymentMethod, TVoucher } from '../types';
 
 type TInitializeBooking = {
   bookingKey: string;
@@ -14,6 +14,9 @@ type TBookingStore = {
   appliedVoucher: TVoucher | null;
   voucherError: string;
   checkoutMessage: string;
+  customerInfo: TBookingCustomerInfo | null;
+  paymentMethod: TPaymentMethod;
+  createdBookingId: string | null;
   initializeBooking: (booking: TInitializeBooking) => void;
   setRoomQuantity: (roomId: string, quantity: number) => void;
   setVoucherCode: (code: string) => void;
@@ -21,6 +24,11 @@ type TBookingStore = {
   applyVoucher: (voucher: TVoucher) => void;
   removeVoucher: () => void;
   setCheckoutMessage: (message: string) => void;
+  setBookingDetails: (
+    customerInfo: TBookingCustomerInfo,
+    paymentMethod: TPaymentMethod
+  ) => void;
+  setCreatedBookingId: (bookingId: string | null) => void;
 };
 
 export const useBookingStore = create<TBookingStore>((set) => ({
@@ -30,6 +38,9 @@ export const useBookingStore = create<TBookingStore>((set) => ({
   appliedVoucher: null,
   voucherError: '',
   checkoutMessage: '',
+  customerInfo: null,
+  paymentMethod: 'banking',
+  createdBookingId: null,
 
   initializeBooking: ({ bookingKey, roomId, roomQuantity }) =>
     set((state) => {
@@ -42,6 +53,9 @@ export const useBookingStore = create<TBookingStore>((set) => ({
         appliedVoucher: null,
         voucherError: '',
         checkoutMessage: '',
+        customerInfo: null,
+        paymentMethod: 'banking',
+        createdBookingId: null,
       };
     }),
 
@@ -67,4 +81,9 @@ export const useBookingStore = create<TBookingStore>((set) => ({
     set({ appliedVoucher: null, voucherCode: '', voucherError: '' }),
 
   setCheckoutMessage: (checkoutMessage) => set({ checkoutMessage }),
+
+  setBookingDetails: (customerInfo, paymentMethod) =>
+    set({ customerInfo, paymentMethod }),
+
+  setCreatedBookingId: (createdBookingId) => set({ createdBookingId }),
 }));

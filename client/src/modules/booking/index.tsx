@@ -12,6 +12,8 @@ import {
   BookingProgress,
   BookingRoomSelection,
   BookingSummary,
+  BookingStepThree,
+  BookingStepTwo,
   getNightCount,
   TAvailableRoom,
   useBookingStore,
@@ -29,6 +31,15 @@ export function BookingModule() {
   const requestedGuests = bookingParams.get('guests');
   const requestedRooms = bookingParams.get('rooms');
   const selectedRoomId = searchParams.get('roomId');
+  const requestedStep = searchParams.get('step');
+  const bookingIdFromUrl = searchParams.get('bookingId');
+  const createdBookingId = useBookingStore((state) => state.createdBookingId);
+  const activeStep =
+    requestedStep === '3' && (bookingIdFromUrl || createdBookingId)
+      ? 3
+      : requestedStep === '2'
+        ? 2
+        : 1;
   const numberOfNights = getNightCount(checkInDate, checkOutDate);
   const parsedRequestedRooms = Number(requestedRooms);
   const initialRoomQuantity =
@@ -51,7 +62,7 @@ export function BookingModule() {
       guests: requestedGuests,
       rooms: requestedRooms,
     },
-    profileQuery.isSuccess
+    profileQuery.isSuccess && activeStep !== 3
   );
   const availableRooms = (roomQuery.data?.data ?? []) as TAvailableRoom[];
   const rooms = selectedRoomId
@@ -79,6 +90,35 @@ export function BookingModule() {
     }
   }, [currentBookingUrl, isUnauthorized, router]);
 
+  const navigateToStep = (
+    step: 1 | 2 | 3,
+    bookingId?: string,
+    replace = false
+  ) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (step === 1) {
+      params.delete('step');
+      params.delete('bookingId');
+    } else {
+      params.set('step', String(step));
+
+      if (bookingId) {
+        params.set('bookingId', bookingId);
+      } else {
+        params.delete('bookingId');
+      }
+    }
+
+    const url = `/booking?${params.toString()}`;
+
+    if (replace) {
+      router.replace(url);
+    } else {
+      router.push(url);
+    }
+  };
+
   if (profileQuery.isLoading || isUnauthorized) {
     return <BookingAuthState />;
   }
@@ -94,24 +134,53 @@ export function BookingModule() {
       <Header />
 
       <main>
-        <BookingProgress />
+        <BookingProgress activeStep={activeStep} />
 
-        <section className='mx-auto w-[calc(100%-32px)] max-w-[1120px] py-6 sm:py-9 lg:py-12'>
-          <div className='rounded-[16px] border border-[#0D4949]/15 bg-white px-4 py-5 shadow-[0_18px_55px_rgba(13,73,73,0.09)] sm:px-7 sm:py-7 lg:px-8'>
-            <BookingRoomSelection
-              checkInDate={checkInDate}
-              checkOutDate={checkOutDate}
-              numberOfNights={numberOfNights}
-              rooms={rooms}
-              selectedRoomId={selectedRoomId}
-              isLoading={roomQuery.isLoading}
-              isError={roomQuery.isError}
-              onRetry={() => void roomQuery.refetch()}
-            />
+        {activeStep === 1 && (
+          <section className='mx-auto w-[calc(100%-32px)] max-w-[1120px] py-6 sm:py-9 lg:py-12'>
+            <div className='rounded-[16px] border border-[#0D4949]/15 bg-white px-4 py-5 shadow-[0_18px_55px_rgba(13,73,73,0.09)] sm:px-7 sm:py-7 lg:px-8'>
+              <BookingRoomSelection
+                checkInDate={checkInDate}
+                checkOutDate={checkOutDate}
+                numberOfNights={numberOfNights}
+                rooms={rooms}
+                selectedRoomId={selectedRoomId}
+                isLoading={roomQuery.isLoading}
+                isError={roomQuery.isError}
+                onRetry={() => void roomQuery.refetch()}
+              />
 
-            <BookingSummary rooms={rooms} numberOfNights={numberOfNights} />
-          </div>
-        </section>
+              <BookingSummary
+                rooms={rooms}
+                numberOfNights={numberOfNights}
+                onContinue={() => navigateToStep(2)}
+              />
+            </div>
+          </section>
+        )}
+
+        {activeStep === 2 && (
+          <BookingStepTwo
+            profile={profileQuery.data!}
+            rooms={rooms}
+            checkInDate={checkInDate}
+            checkOutDate={checkOutDate}
+            numberOfNights={numberOfNights}
+            requestedGuests={requestedGuests}
+            isLoading={roomQuery.isLoading}
+            isError={roomQuery.isError}
+            onRetry={() => void roomQuery.refetch()}
+            onBack={() => navigateToStep(1)}
+            onBookingCreated={(bookingId) => navigateToStep(3, bookingId, true)}
+          />
+        )}
+
+        {activeStep === 3 && (
+          <BookingStepThree
+            bookingId={bookingIdFromUrl ?? createdBookingId}
+            onFinish={() => router.push('/rooms')}
+          />
+        )}
       </main>
 
       <Footer />

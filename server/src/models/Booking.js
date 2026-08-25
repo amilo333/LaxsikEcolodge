@@ -106,7 +106,7 @@ const bookingSchema = new mongoose.Schema(
 
     paymentMethod: {
       type: String,
-      enum: ["banking", "vnpay"],
+      enum: ["banking", "vnpay", "momo"],
       default: null,
     },
 

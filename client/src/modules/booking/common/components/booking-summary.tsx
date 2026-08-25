@@ -10,11 +10,13 @@ import { VoucherSelector } from './voucher-selector';
 type TBookingSummaryProps = {
   rooms: TAvailableRoom[];
   numberOfNights: number;
+  onContinue: () => void;
 };
 
 export function BookingSummary({
   rooms,
   numberOfNights,
+  onContinue,
 }: TBookingSummaryProps) {
   const appliedVoucher = useBookingStore((state) => state.appliedVoucher);
   const checkoutMessage = useBookingStore((state) => state.checkoutMessage);
@@ -24,11 +26,13 @@ export function BookingSummary({
   const pricing = useBookingPricing(rooms, numberOfNights);
 
   const handleCheckout = () => {
-    setCheckoutMessage(
-      pricing.selectedRoomCount === 0
-        ? 'Please select at least one room to continue.'
-        : 'Your room selection is ready. Guest details will be completed in step 2.'
-    );
+    if (pricing.selectedRoomCount === 0) {
+      setCheckoutMessage('Please select at least one room to continue.');
+      return;
+    }
+
+    setCheckoutMessage('');
+    onContinue();
   };
 
   return (
@@ -80,7 +84,7 @@ export function BookingSummary({
           <Button
             onClick={handleCheckout}
             className='h-12! w-auto! min-w-[170px]! rounded-full! px-8! text-sm! tracking-[0.04em] uppercase'>
-            Book Now
+            Continue
           </Button>
         </div>
 

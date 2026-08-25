@@ -12,7 +12,7 @@ export type TTextfieldProps<
     // Label for the text field
     label: string;
     // Type of the text field
-    type?: 'text' | 'password';
+    type?: 'text' | 'password' | 'email' | 'tel';
     // Error message
     error?: string;
 
