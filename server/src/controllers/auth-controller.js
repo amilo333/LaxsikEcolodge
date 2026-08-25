@@ -40,6 +40,8 @@ export const register = async (req, res) => {
       phone,
     });
     await newUser.save();
+    generateToken(res, newUser._id);
+
     res.status(201).json({
       message: "Create user successfully",
       data: {

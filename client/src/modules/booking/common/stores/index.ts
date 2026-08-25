@@ -1,5 +1,9 @@
 import { create } from 'zustand';
-import { TBookingCustomerInfo, TPaymentMethod, TVoucher } from '../types';
+import {
+  TBookingCustomerInfo,
+  TCheckoutPaymentMethod,
+  TVoucher,
+} from '../types';
 
 type TInitializeBooking = {
   bookingKey: string;
@@ -15,7 +19,7 @@ type TBookingStore = {
   voucherError: string;
   checkoutMessage: string;
   customerInfo: TBookingCustomerInfo | null;
-  paymentMethod: TPaymentMethod;
+  paymentMethod: TCheckoutPaymentMethod;
   createdBookingId: string | null;
   initializeBooking: (booking: TInitializeBooking) => void;
   setRoomQuantity: (roomId: string, quantity: number) => void;
@@ -26,7 +30,7 @@ type TBookingStore = {
   setCheckoutMessage: (message: string) => void;
   setBookingDetails: (
     customerInfo: TBookingCustomerInfo,
-    paymentMethod: TPaymentMethod
+    paymentMethod: TCheckoutPaymentMethod
   ) => void;
   setCreatedBookingId: (bookingId: string | null) => void;
 };

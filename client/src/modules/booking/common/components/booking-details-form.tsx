@@ -2,8 +2,13 @@
 
 import { Button, Field, Textarea, Textfield } from '@/components/core';
 import { TUser } from '@/modules/auth/common';
+import {
+  getPaymentErrorMessage,
+  useStartVnpayPayment,
+} from '@/modules/payment/common';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useCreateBookingApi } from '../hooks';
 import { bookingDetailsSchema } from '../schemas';
@@ -49,6 +54,11 @@ export function BookingDetailsForm({
     (state) => state.setCreatedBookingId
   );
   const createBooking = useCreateBookingApi();
+  const vnpayPayment = useStartVnpayPayment();
+  const [paymentRetryBookingId, setPaymentRetryBookingId] = useState<
+    string | null
+  >(null);
+  const [paymentError, setPaymentError] = useState('');
   const {
     control,
     register,
@@ -66,7 +76,19 @@ export function BookingDetailsForm({
     },
   });
 
-  const onSubmit = (form: TBookingDetailsForm) => {
+  const onSubmit = async (form: TBookingDetailsForm) => {
+    setPaymentError('');
+
+    if (paymentRetryBookingId) {
+      try {
+        await vnpayPayment.startPayment(paymentRetryBookingId);
+      } catch (error) {
+        setPaymentError(getPaymentErrorMessage(error));
+      }
+
+      return;
+    }
+
     const bookingItems = rooms
       .map((room) => ({
         roomId: room._id,
@@ -89,19 +111,32 @@ export function BookingDetailsForm({
     };
 
     setBookingDetails(customerInfo, form.paymentMethod);
-    createBooking.mutate(payload, {
-      onSuccess: ({ booking, payment }) => {
-        setCreatedBookingId(booking._id);
+    let booking;
 
-        if (payment?.provider === 'momo') {
-          window.location.assign(payment.payUrl);
-          return;
-        }
+    try {
+      booking = await createBooking.mutateAsync(payload);
+    } catch {
+      return;
+    }
 
-        onBookingCreated(booking._id);
-      },
-    });
+    setCreatedBookingId(booking._id);
+
+    if (form.paymentMethod === 'vnpay') {
+      setPaymentRetryBookingId(booking._id);
+
+      try {
+        await vnpayPayment.startPayment(booking._id);
+      } catch (error) {
+        setPaymentError(getPaymentErrorMessage(error));
+      }
+
+      return;
+    }
+
+    onBookingCreated(booking._id);
   };
+
+  const isSubmitting = createBooking.isPending || vnpayPayment.isPending;
 
   return (
     <div>
@@ -184,6 +219,7 @@ export function BookingDetailsForm({
               value={field?.value ?? 'banking'}
               onChange={(value) => field?.onChange(value)}
               error={errors.paymentMethod?.message}
+              isDisabled={isSubmitting || Boolean(paymentRetryBookingId)}
             />
           )}
         </Field>
@@ -214,19 +250,39 @@ export function BookingDetailsForm({
         </p>
       )}
 
+      {paymentError && (
+        <div
+          className='mt-4 rounded-[16px] border border-[#E7B8B8] bg-[#FFF0F0] px-4 py-3 text-xs text-[#8F2F2F]'
+          role='alert'>
+          <p className='font-bold'>Your booking was created.</p>
+          <p className='mt-1'>{paymentError}</p>
+          <p className='mt-1'>Retrying will not create another booking.</p>
+        </div>
+      )}
+
       <div className='mt-7 flex flex-col-reverse justify-end gap-3 border-t border-[#E3E9E7] pt-6 sm:flex-row'>
         <Button
-          onClick={onBack}
-          isDisabled={createBooking.isPending}
+          onClick={() =>
+            paymentRetryBookingId
+              ? onBookingCreated(paymentRetryBookingId)
+              : onBack()
+          }
+          isDisabled={isSubmitting}
           className='h-12! w-auto! min-w-[130px]! rounded-full! border border-[#0D4949]! bg-white! px-7! text-sm! text-[#0D4949]!'>
-          Back
+          {paymentRetryBookingId ? 'View booking' : 'Back'}
         </Button>
         <Button
           type='submit'
-          isDisabled={createBooking.isPending}
+          isDisabled={isSubmitting}
           onClick={handleSubmit(onSubmit)}
           className='h-12! w-auto! min-w-[190px]! rounded-full! px-8! text-sm! tracking-[0.04em] uppercase'>
-          {createBooking.isPending ? 'Creating booking…' : 'Confirm & book'}
+          {createBooking.isPending
+            ? 'Creating booking…'
+            : vnpayPayment.isPending
+              ? 'Opening VNPAY…'
+              : paymentRetryBookingId
+                ? 'Retry payment'
+                : 'Confirm & book'}
         </Button>
       </div>
     </div>

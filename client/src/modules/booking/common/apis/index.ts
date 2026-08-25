@@ -1,10 +1,5 @@
 import { axiosInstance } from '@/apis/axios';
-import {
-  TBooking,
-  TCreateBookingPayload,
-  TPaymentInitiation,
-  TVoucher,
-} from '../types';
+import { TBooking, TCreateBookingPayload, TVoucher } from '../types';
 
 type TValidateVoucherResponse = {
   message: string;
@@ -25,25 +20,31 @@ type TBookingResponse = {
   data: TBooking;
 };
 
-type TCreateBookingResponse = TBookingResponse & {
-  payment: TPaymentInitiation | null;
-};
-
 export const createBookingApi = async (payload: TCreateBookingPayload) => {
-  const response = await axiosInstance.post<TCreateBookingResponse>(
+  const response = await axiosInstance.post<TBookingResponse>(
     '/booking',
     payload
   );
 
-  return {
-    booking: response.data.data,
-    payment: response.data.payment,
-  };
+  return response.data.data;
 };
 
 export const getBookingDetailsApi = async (bookingId: string) => {
   const response = await axiosInstance.get<TBookingResponse>(
     `/booking/${bookingId}`
+  );
+
+  return response.data.data;
+};
+
+type TMyBookingsResponse = {
+  message: string;
+  data: TBooking[];
+};
+
+export const getMyBookingsApi = async () => {
+  const response = await axiosInstance.get<TMyBookingsResponse>(
+    '/booking/my-bookings'
   );
 
   return response.data.data;

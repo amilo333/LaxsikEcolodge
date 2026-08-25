@@ -130,29 +130,62 @@ const getCurrentUserProfile = async (req, res) => {
 };
 
 const updateCurrentProfile = async (req, res) => {
-  console.log(req.body);
-  console.log(req.user);
-  const user = await User.findById(req.user._id);
+  try {
+    const user = await User.findById(req.user._id);
 
-  if (user) {
-    user.full_name = req.body.full_name || user.full_name;
-    user.email = req.body.email || user.email;
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const nextEmail = req.body.email?.trim().toLowerCase();
+    const nextPhone = req.body.phone?.trim();
+
+    if (nextEmail) {
+      const emailOwner = await User.findOne({
+        email: nextEmail,
+        _id: { $ne: user._id },
+      });
+
+      if (emailOwner) {
+        return res.status(409).json({ message: "Email already exists" });
+      }
+
+      user.email = nextEmail;
+    }
+
+    if (nextPhone) {
+      const phoneOwner = await User.findOne({
+        phone: nextPhone,
+        _id: { $ne: user._id },
+      });
+
+      if (phoneOwner) {
+        return res.status(409).json({ message: "Phone already exists" });
+      }
+
+      user.phone = nextPhone;
+    }
+
+    user.full_name = req.body.full_name?.trim() || user.full_name;
+
     if (req.body.password) {
       const hashedPassword = await argon2.hash(req.body.password);
       user.password = hashedPassword;
     }
-    user.phone = req.body.phone || user.phone;
 
     const updateUser = await user.save();
 
-    res.json({
+    return res.json({
       _id: updateUser._id,
       full_name: updateUser.full_name,
       email: updateUser.email,
       phone: updateUser.phone,
+      role: updateUser.role,
     });
-  } else {
-    res.status(404).json({ message: "User not found" });
+  } catch (error) {
+    console.error("Update profile error:", error);
+
+    return res.status(500).json({ message: "Unable to update profile" });
   }
 };
 

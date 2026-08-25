@@ -1,7 +1,7 @@
-import { TPaymentMethod } from '../types';
+import { TCheckoutPaymentMethod } from '../types';
 
 const PAYMENT_METHODS: Array<{
-  value: TPaymentMethod;
+  value: TCheckoutPaymentMethod;
   label: string;
   description: string;
 }> = [
@@ -15,32 +15,31 @@ const PAYMENT_METHODS: Array<{
     label: 'VNPAY',
     description: 'Pay through the VNPAY payment method.',
   },
-  {
-    value: 'momo',
-    label: 'MoMo',
-    description: 'Continue securely to the MoMo payment gateway.',
-  },
 ];
 
 type TPaymentMethodSelectorProps = {
-  value: TPaymentMethod;
-  onChange: (value: TPaymentMethod) => void;
+  value: TCheckoutPaymentMethod;
+  onChange: (value: TCheckoutPaymentMethod) => void;
   error?: string;
+  isDisabled?: boolean;
 };
 
 export function PaymentMethodSelector({
   value,
   onChange,
   error,
+  isDisabled = false,
 }: TPaymentMethodSelectorProps) {
   return (
     <fieldset>
       <legend className='text-sm font-bold'>Payment method</legend>
-      <div className='mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3'>
+      <div className='mt-3 grid gap-3 sm:grid-cols-2'>
         {PAYMENT_METHODS.map((method) => (
           <label
             key={method.value}
-            className={`cursor-pointer rounded-[16px] border p-4 transition ${
+            className={`rounded-[16px] border p-4 transition ${
+              isDisabled ? 'cursor-not-allowed opacity-60' : 'cursor-pointer'
+            } ${
               value === method.value
                 ? 'border-[#0D4949] bg-[#EEF5F3] ring-1 ring-[#0D4949]'
                 : 'border-[#DCE4E1] bg-white hover:border-[#8EAAA2]'
@@ -52,6 +51,7 @@ export function PaymentMethodSelector({
                 value={method.value}
                 checked={value === method.value}
                 onChange={() => onChange(method.value)}
+                disabled={isDisabled}
                 className='mt-0.5 h-4 w-4 accent-[#0D4949]'
               />
               <span>

@@ -1,6 +1,12 @@
 'use client';
 
 import { Button } from '@/components/core';
+import {
+  getPaymentErrorMessage,
+  useStartVnpayPayment,
+  useVnpayPaymentStatusApi,
+} from '@/modules/payment/common';
+import { useEffect, useState } from 'react';
 import { useBookingDetailsApi } from '../hooks';
 import { formatCurrency, formatStayDate } from '../utils';
 
@@ -14,6 +20,25 @@ export function BookingStepThree({
   onFinish,
 }: TBookingStepThreeProps) {
   const bookingQuery = useBookingDetailsApi(bookingId);
+  const vnpayPayment = useStartVnpayPayment();
+  const [paymentError, setPaymentError] = useState('');
+  const shouldReconcileVnpay =
+    bookingQuery.data?.paymentMethod === 'vnpay' &&
+    bookingQuery.data.paymentStatus === 'pending';
+  const vnpayStatusQuery = useVnpayPaymentStatusApi(
+    bookingId,
+    shouldReconcileVnpay
+  );
+  const refetchBooking = bookingQuery.refetch;
+
+  useEffect(() => {
+    if (
+      vnpayStatusQuery.data &&
+      vnpayStatusQuery.data.paymentStatus !== 'pending'
+    ) {
+      void refetchBooking();
+    }
+  }, [refetchBooking, vnpayStatusQuery.data]);
 
   if (!bookingId) {
     return (
@@ -64,18 +89,39 @@ export function BookingStepThree({
   const booking = bookingQuery.data;
   const paymentFailed = booking.paymentStatus === 'failed';
   const paymentCompleted = booking.paymentStatus === 'paid';
+  const paymentPending = booking.paymentStatus === 'pending';
+  const canRetryVnpay =
+    booking.paymentMethod === 'vnpay' &&
+    (booking.paymentStatus === 'failed' || booking.paymentStatus === 'unpaid');
   const paymentMethodLabel =
     booking.paymentMethod === 'momo'
       ? 'MoMo'
       : booking.paymentMethod === 'vnpay'
         ? 'VNPAY'
         : 'Bank transfer';
+  const statusIcon = paymentFailed ? '!' : paymentPending ? '…' : '✓';
+  const statusIconClass = paymentFailed
+    ? 'bg-[#B33939]'
+    : paymentPending
+      ? 'bg-[#B87918]'
+      : 'bg-[#0D4949]';
+
+  const retryPayment = async () => {
+    setPaymentError('');
+
+    try {
+      await vnpayPayment.startPayment(booking._id);
+    } catch (error) {
+      setPaymentError(getPaymentErrorMessage(error));
+    }
+  };
 
   return (
     <section className='mx-auto w-[calc(100%-32px)] max-w-[860px] py-8 sm:py-12'>
       <div className='rounded-[16px] border border-[#0D4949]/15 bg-white p-5 text-center shadow-[0_18px_55px_rgba(13,73,73,0.09)] sm:p-8'>
-        <span className='mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#0D4949] text-2xl text-white'>
-          {paymentFailed ? '!' : '✓'}
+        <span
+          className={`mx-auto flex h-14 w-14 items-center justify-center rounded-full text-2xl text-white ${statusIconClass}`}>
+          {statusIcon}
         </span>
         <p className='mt-5 text-[11px] font-bold tracking-[0.15em] text-[#0D4949]/60 uppercase'>
           Step 3 of 3
@@ -85,7 +131,9 @@ export function BookingStepThree({
             ? 'Payment was not completed'
             : paymentCompleted
               ? 'Your booking is confirmed'
-              : 'Your booking is created'}
+              : paymentPending
+                ? 'Confirming your payment'
+                : 'Your booking is created'}
         </h1>
         <p className='mt-2 text-sm text-[#68726E]'>
           Booking reference:{' '}
@@ -152,15 +200,50 @@ export function BookingStepThree({
         </div>
 
         <p className='mx-auto mt-5 max-w-[620px] text-xs leading-5 text-[#68726E]'>
-          The booking is currently {booking.bookingStatus}. Payment instructions
-          and status will follow the selected method.
+          {paymentPending
+            ? 'We are checking the payment result with the server. This page refreshes automatically; please do not create another booking.'
+            : `The booking is currently ${booking.bookingStatus}. Payment instructions and status follow the selected method.`}
         </p>
 
-        <Button
-          onClick={onFinish}
-          className='mx-auto mt-7 h-12! w-auto! min-w-[180px]! rounded-full! px-8! text-sm!'>
-          View rooms
-        </Button>
+        {paymentPending && bookingQuery.isFetching && (
+          <p className='mt-2 text-[11px] font-semibold text-[#B87918]'>
+            Checking the latest payment status…
+          </p>
+        )}
+
+        {paymentPending && vnpayStatusQuery.isFetching && (
+          <p className='mt-2 text-[11px] font-semibold text-[#B87918]'>
+            Verifying the transaction directly with VNPAY…
+          </p>
+        )}
+
+        {paymentError && (
+          <p
+            className='mx-auto mt-4 max-w-[620px] rounded-[16px] bg-[#FFF0F0] px-4 py-3 text-xs font-medium text-[#B33939]'
+            role='alert'>
+            {paymentError}
+          </p>
+        )}
+
+        <div className='mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row'>
+          {canRetryVnpay && (
+            <Button
+              onClick={() => void retryPayment()}
+              isDisabled={vnpayPayment.isPending}
+              className='h-12! w-auto! min-w-[190px]! rounded-full! px-8! text-sm!'>
+              {vnpayPayment.isPending ? 'Opening VNPAY…' : 'Retry payment'}
+            </Button>
+          )}
+          <Button
+            onClick={onFinish}
+            className={`h-12! w-auto! min-w-[180px]! rounded-full! px-8! text-sm! ${
+              canRetryVnpay
+                ? 'border border-[#0D4949]! bg-white! text-[#0D4949]!'
+                : ''
+            }`}>
+            View rooms
+          </Button>
+        </div>
       </div>
     </section>
   );

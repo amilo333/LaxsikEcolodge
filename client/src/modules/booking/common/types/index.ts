@@ -20,14 +20,7 @@ export type TBookingPricing = {
 };
 
 export type TPaymentMethod = 'banking' | 'vnpay' | 'momo';
-
-export type TPaymentInitiation = {
-  provider: 'momo';
-  payUrl: string;
-  deeplink: string | null;
-  qrCodeUrl: string | null;
-  orderId: string;
-};
+export type TCheckoutPaymentMethod = Exclude<TPaymentMethod, 'momo'>;
 
 export type TBookingCustomerInfo = {
   fullNameContact: string;
@@ -37,7 +30,7 @@ export type TBookingCustomerInfo = {
 };
 
 export type TBookingDetailsForm = TBookingCustomerInfo & {
-  paymentMethod: TPaymentMethod;
+  paymentMethod: TCheckoutPaymentMethod;
   acceptTerms: boolean;
 };
 
@@ -49,7 +42,7 @@ export type TCreateBookingPayload = {
   checkInDate: string;
   checkOutDate: string;
   voucherCode?: string;
-  paymentMethod: TPaymentMethod;
+  paymentMethod: TCheckoutPaymentMethod;
   customerInfo: TBookingCustomerInfo;
 };
 

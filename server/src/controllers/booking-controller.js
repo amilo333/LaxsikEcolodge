@@ -343,7 +343,7 @@ export const createBooking = async (req, res) => {
 
 export const getMyBookings = async (req, res) => {
   try {
-    const userId = req.user.userId;
+    const userId = req.user._id;
 
     const bookings = await Booking.find({
       userId,
@@ -374,7 +374,7 @@ export const getMyBookings = async (req, res) => {
 
 export const getBookingById = async (req, res) => {
   try {
-    const userId = req.user.userId;
+    const userId = req.user._id;
 
     const booking = await Booking.findOne({
       _id: req.params.id,
@@ -409,7 +409,7 @@ export const getBookingById = async (req, res) => {
 
 export const cancelBooking = async (req, res) => {
   try {
-    const userId = req.user.userId;
+    const userId = req.user._id;
 
     const booking = await Booking.findOne({
       _id: req.params.id,

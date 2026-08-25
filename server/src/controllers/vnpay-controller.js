@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import qs from "qs";
 import moment from "moment";
+import { VNPay, ignoreLogger } from "vnpay";
 
 import Booking from "../models/Booking.js";
 import Payment from "../models/Payment.js";
@@ -45,6 +46,75 @@ const getIpAddress = (req) => {
   }
 
   return "127.0.0.1";
+};
+
+// ======================================
+// Lưu kết quả đã được VNPay xác thực
+// ======================================
+
+const applyVnpayResult = async ({
+  payment,
+  gatewayResponse,
+  transactionNo,
+  success,
+}) => {
+  if (
+    payment.paymentStatus === "success" ||
+    payment.paymentStatus === "failed" ||
+    payment.paymentStatus === "refunded"
+  ) {
+    return;
+  }
+
+  payment.gatewayResponse = gatewayResponse;
+
+  if (transactionNo) {
+    payment.transactionCode = transactionNo;
+  }
+
+  if (success) {
+    payment.paymentStatus = "success";
+    payment.paidAt = new Date();
+
+    await payment.save();
+
+    await Booking.findByIdAndUpdate(payment.bookingId, {
+      paymentStatus: "paid",
+      paymentMethod: "vnpay",
+      bookingStatus: "confirmed",
+    });
+
+    return;
+  }
+
+  payment.paymentStatus = "failed";
+
+  await payment.save();
+
+  await Booking.findOneAndUpdate(
+    {
+      _id: payment.bookingId,
+      paymentStatus: { $ne: "paid" },
+    },
+    {
+      paymentStatus: "failed",
+      paymentMethod: "vnpay",
+    },
+  );
+};
+
+const createVnpayClient = () => {
+  const vnpayUrl = new URL(process.env.VNP_URL);
+
+  return new VNPay({
+    tmnCode: process.env.VNP_TMN_CODE,
+    secureSecret: process.env.VNP_HASH_SECRET,
+    vnpayHost: vnpayUrl.origin,
+    testMode: vnpayUrl.hostname.includes("sandbox"),
+    hashAlgorithm: "SHA512",
+    enableLog: false,
+    loggerFn: ignoreLogger,
+  });
 };
 
 // ======================================
@@ -136,6 +206,10 @@ export const createVnpayPayment = async (req, res) => {
       paymentMethod: "vnpay",
 
       paymentStatus: "pending",
+
+      gatewayRequest: {
+        createDate,
+      },
     });
 
     // ======================================
@@ -236,7 +310,91 @@ export const createVnpayPayment = async (req, res) => {
     console.error("Create VNPay payment error:", error);
 
     return res.status(500).json({
-      message: error.message,
+      message: "Unable to create VNPay payment",
+    });
+  }
+};
+
+// ======================================
+// GET AUTHORITATIVE VNPAY STATUS
+// ======================================
+
+export const getVnpayPaymentStatus = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { bookingId } = req.params;
+
+    const booking = await Booking.findOne({
+      _id: bookingId,
+      userId,
+    });
+
+    if (!booking) {
+      return res.status(404).json({
+        message: "Booking not found",
+      });
+    }
+
+    const payment = await Payment.findOne({
+      bookingId: booking._id,
+      userId,
+      paymentMethod: "vnpay",
+    }).sort({ createdAt: -1 });
+
+    if (!payment) {
+      return res.status(404).json({
+        message: "VNPay payment not found",
+      });
+    }
+
+    if (payment.paymentStatus === "pending") {
+      const transactionDate =
+        payment.gatewayRequest?.createDate ||
+        moment(payment.createdAt).utcOffset(7).format("YYYYMMDDHHmmss");
+      const queryDate = moment()
+        .utcOffset(7)
+        .format("YYYYMMDDHHmmss");
+      const vnpay = createVnpayClient();
+      const gatewayResult = await vnpay.queryDr({
+        vnp_RequestId: `QUERY${Date.now()}`,
+        vnp_TxnRef: payment.providerOrderId,
+        vnp_TransactionDate: Number(transactionDate),
+        vnp_CreateDate: Number(queryDate),
+        vnp_IpAddr: getIpAddress(req),
+        vnp_OrderInfo: `Query booking ${booking.bookingCode}`,
+      });
+      const responseCode = String(gatewayResult.vnp_ResponseCode);
+      const transactionStatus = String(gatewayResult.vnp_TransactionStatus);
+      const returnedAmount = Number(gatewayResult.vnp_Amount);
+      const amountIsValid = returnedAmount === payment.amount * 100;
+
+      if (
+        gatewayResult.isVerified &&
+        responseCode === "00" &&
+        amountIsValid &&
+        transactionStatus !== "01"
+      ) {
+        await applyVnpayResult({
+          payment,
+          gatewayResponse: gatewayResult,
+          transactionNo: gatewayResult.vnp_TransactionNo,
+          success: transactionStatus === "00",
+        });
+      }
+    }
+
+    return res.status(200).json({
+      message: "Get VNPay payment status successfully",
+      data: {
+        bookingId: booking._id,
+        paymentStatus: payment.paymentStatus,
+      },
+    });
+  } catch (error) {
+    console.error("Get VNPay payment status error:", error);
+
+    return res.status(502).json({
+      message: "Unable to verify payment status with VNPay",
     });
   }
 };
@@ -292,6 +450,25 @@ export const vnpayReturn = async (req, res) => {
     const transactionStatus = vnpParams["vnp_TransactionStatus"];
 
     const success = responseCode === "00" && transactionStatus === "00";
+
+    const payment = await Payment.findOne({
+      providerOrderId: orderId,
+    });
+
+    const returnedAmount = Number(vnpParams["vnp_Amount"]);
+
+    if (!payment || payment.amount * 100 !== returnedAmount) {
+      return res.redirect(
+        `${process.env.CLIENT_URL}/payment-result?provider=vnpay&status=invalid&code=04`,
+      );
+    }
+
+    await applyVnpayResult({
+      payment,
+      gatewayResponse: req.query,
+      transactionNo: vnpParams["vnp_TransactionNo"],
+      success,
+    });
 
     // ======================================
     // 3. Redirect về frontend React
@@ -403,44 +580,13 @@ export const vnpayIpn = async (req, res) => {
     // 5. Lưu response VNPay
     // ======================================
 
-    payment.gatewayResponse = req.query;
+    const success = responseCode === "00" && transactionStatus === "00";
 
-    payment.transactionCode = transactionNo || null;
-
-    // ======================================
-    // 6. Thanh toán thành công
-    // ======================================
-
-    if (responseCode === "00" && transactionStatus === "00") {
-      payment.paymentStatus = "success";
-      payment.paidAt = new Date();
-
-      await payment.save();
-
-      await Booking.findByIdAndUpdate(payment.bookingId, {
-        paymentStatus: "paid",
-
-        paymentMethod: "vnpay",
-
-        bookingStatus: "confirmed",
-      });
-
-      return res.status(200).json({
-        RspCode: "00",
-        Message: "Success",
-      });
-    }
-
-    // ======================================
-    // 7. Thanh toán thất bại
-    // ======================================
-
-    payment.paymentStatus = "failed";
-
-    await payment.save();
-
-    await Booking.findByIdAndUpdate(payment.bookingId, {
-      paymentStatus: "failed",
+    await applyVnpayResult({
+      payment,
+      gatewayResponse: req.query,
+      transactionNo,
+      success,
     });
 
     return res.status(200).json({

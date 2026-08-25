@@ -19,7 +19,6 @@ const paymentSchema = new mongoose.Schema(
       type: String,
       unique: true,
       sparse: true,
-      default: null,
     },
 
     // requestId dùng nhiều cho MoMo
@@ -27,7 +26,6 @@ const paymentSchema = new mongoose.Schema(
       type: String,
       unique: true,
       sparse: true,
-      default: null,
     },
 
     // VNPay: vnp_TxnRef
@@ -36,7 +34,6 @@ const paymentSchema = new mongoose.Schema(
       type: String,
       unique: true,
       sparse: true,
-      default: null,
     },
 
     amount: {
@@ -58,6 +55,11 @@ const paymentSchema = new mongoose.Schema(
     },
 
     gatewayResponse: {
+      type: Object,
+      default: () => ({}),
+    },
+
+    gatewayRequest: {
       type: Object,
       default: () => ({}),
     },

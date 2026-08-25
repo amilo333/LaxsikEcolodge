@@ -4,6 +4,7 @@ import { Button } from '@/components/core';
 import { TRoom } from '../types/room-type';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { formatCurrency } from '@/utils';
 
 type TRoomItemProps = {
   room: TRoom;
@@ -86,8 +87,10 @@ export function RoomItem(props: TRoomItemProps) {
 
         <div className='flex items-center justify-between'>
           <div>
-            <div>Avg. price per night</div>
-            <div className='text-2xl font-bold'>{room.price}.00 VNĐ</div>
+            <div className='text-sm text-[#66736F]'>Avg. price per night</div>
+            <div className='mt-1 text-2xl font-extrabold tracking-[-0.025em] text-[#0D4949] tabular-nums'>
+              {formatCurrency(room.price)}
+            </div>
           </div>
 
           <Button

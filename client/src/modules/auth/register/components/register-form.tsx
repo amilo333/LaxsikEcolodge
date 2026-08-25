@@ -34,7 +34,7 @@ export function RegisterForm() {
   const onSubmit = (data: TRegisterForm) => {
     mutate(data, {
       onSuccess: () => {
-        router.push(loginHref);
+        router.replace(redirectTo);
       },
     });
   };

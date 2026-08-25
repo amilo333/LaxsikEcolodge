@@ -5,3 +5,9 @@ export type TUser = {
   phone: string;
   role: string;
 };
+
+export type TUpdateProfilePayload = {
+  full_name: string;
+  email: string;
+  phone: string;
+};

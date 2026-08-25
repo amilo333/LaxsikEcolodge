@@ -16,7 +16,4 @@ export const formatStayDate = (date: string) =>
     year: 'numeric',
   }).format(new Date(`${date.slice(0, 10)}T00:00:00`));
 
-export const formatCurrency = (amount: number) =>
-  `VND ${new Intl.NumberFormat('en-US', {
-    maximumFractionDigits: 0,
-  }).format(Math.round(amount))}`;
+export { formatCurrency } from '@/utils/currency';
