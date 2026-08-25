@@ -27,7 +27,7 @@ export function DetailRoomModule() {
   return (
     <div className="min-h-screen bg-[url('/images/bg-screen.jpg')] bg-[length:720px_720px] text-[#151515]">
       <Header />
-      <div className='relative'>
+      <div className='relative z-0'>
         <Image
           height={400}
           width={1600}

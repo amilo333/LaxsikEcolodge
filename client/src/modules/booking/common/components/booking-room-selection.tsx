@@ -28,10 +28,10 @@ export function BookingRoomSelection({
     <>
       <div className='flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between'>
         <div>
-          <p className='text-[11px] font-bold tracking-[0.16em] text-[#0D4949]/60 uppercase'>
+          <p className='text-[11px] font-bold text-[#0D4949]/60 uppercase'>
             Step 1 of 3
           </p>
-          <h1 className='mt-1 text-xl font-bold tracking-[-0.02em] uppercase sm:text-2xl'>
+          <h1 className='mt-1 text-xl font-bold uppercase sm:text-2xl'>
             Choose your room
           </h1>
         </div>

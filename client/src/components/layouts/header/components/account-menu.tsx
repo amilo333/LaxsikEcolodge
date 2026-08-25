@@ -130,6 +130,24 @@ export function AccountMenu() {
           </div>
 
           <div className='p-2'>
+            {user.role === 'admin' && (
+              <Link
+                role='menuitem'
+                href='/admin'
+                onClick={() => setIsOpen(false)}
+                className='flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition hover:bg-[#EEF5F3]'>
+                <svg
+                  viewBox='0 0 24 24'
+                  aria-hidden='true'
+                  className='h-5 w-5 fill-none stroke-[#0D4949] stroke-2'>
+                  <rect x='3' y='3' width='7' height='7' rx='1' />
+                  <rect x='14' y='3' width='7' height='7' rx='1' />
+                  <rect x='3' y='14' width='7' height='7' rx='1' />
+                  <rect x='14' y='14' width='7' height='7' rx='1' />
+                </svg>
+                Admin Dashboard
+              </Link>
+            )}
             <Link
               role='menuitem'
               href='/account/bookings'

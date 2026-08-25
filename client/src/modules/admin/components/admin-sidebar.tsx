@@ -1,0 +1,116 @@
+import { TAdminSection } from '../common';
+import Link from 'next/link';
+
+type TAdminSidebarProps = {
+  activeSection: TAdminSection;
+};
+
+const NAV_ITEMS: Array<{
+  value: TAdminSection;
+  label: string;
+  description: string;
+}> = [
+  { value: 'overview', label: 'Tổng quan', description: 'Dashboard' },
+  { value: 'users', label: 'Người dùng', description: 'Tài khoản & quyền' },
+  { value: 'rooms', label: 'Phòng', description: 'Kho phòng' },
+  { value: 'bookings', label: 'Booking', description: 'Đơn đặt phòng' },
+];
+
+const SECTION_ICONS: Record<TAdminSection, React.ReactNode> = {
+  overview: (
+    <svg
+      viewBox='0 0 24 24'
+      className='h-5 w-5 fill-none stroke-current stroke-2'>
+      <rect x='3' y='3' width='7' height='7' rx='1' />
+      <rect x='14' y='3' width='7' height='7' rx='1' />
+      <rect x='3' y='14' width='7' height='7' rx='1' />
+      <rect x='14' y='14' width='7' height='7' rx='1' />
+    </svg>
+  ),
+  users: (
+    <svg
+      viewBox='0 0 24 24'
+      className='h-5 w-5 fill-none stroke-current stroke-2'>
+      <circle cx='9' cy='8' r='4' />
+      <path d='M2.5 21a6.5 6.5 0 0 1 13 0M17 11a4 4 0 0 1 4.5 4' />
+    </svg>
+  ),
+  rooms: (
+    <svg
+      viewBox='0 0 24 24'
+      className='h-5 w-5 fill-none stroke-current stroke-2'>
+      <path d='M3 20V8l9-5 9 5v12M3 20h18M8 20v-7h8v7' />
+    </svg>
+  ),
+  bookings: (
+    <svg
+      viewBox='0 0 24 24'
+      className='h-5 w-5 fill-none stroke-current stroke-2'>
+      <rect x='3' y='5' width='18' height='16' rx='2' />
+      <path d='M8 3v4m8-4v4M3 10h18' />
+    </svg>
+  ),
+};
+
+export function AdminSidebar({ activeSection }: TAdminSidebarProps) {
+  return (
+    <aside className='border-b border-white/10 bg-[#093C3C] px-3 py-4 text-white lg:fixed lg:inset-y-0 lg:left-0 lg:z-30 lg:w-[258px] lg:border-r lg:border-b-0 lg:px-4 lg:py-6'>
+      <Link href='/admin' className='hidden items-center gap-3 px-3 lg:flex'>
+        <span className='flex h-11 w-11 items-center justify-center rounded-[14px] bg-white text-sm font-black text-[#0D4949]'>
+          LA
+        </span>
+        <span>
+          <span className='block font-[family-name:var(--font-lora)] text-lg font-semibold'>
+            Laxsik
+          </span>
+          <span className='block text-[9px] font-bold text-white/55 uppercase'>
+            Admin Console
+          </span>
+        </span>
+      </Link>
+
+      <nav className='flex gap-2 overflow-x-auto lg:mt-10 lg:flex-col lg:overflow-visible'>
+        {NAV_ITEMS.map((item) => {
+          const isActive = activeSection === item.value;
+
+          return (
+            <Link
+              key={item.value}
+              href={
+                item.value === 'overview'
+                  ? '/admin'
+                  : `/admin?section=${item.value}`
+              }
+              className={`flex shrink-0 items-center gap-3 rounded-[14px] px-4 py-3 transition lg:w-full ${
+                isActive
+                  ? 'bg-white text-[#0D4949] shadow-[0_10px_28px_rgba(0,0,0,0.14)]'
+                  : 'text-white/70 hover:bg-white/10 hover:text-white'
+              }`}>
+              {SECTION_ICONS[item.value]}
+              <span>
+                <span className='block text-xs font-extrabold lg:text-sm'>
+                  {item.label}
+                </span>
+                <span
+                  className={`mt-0.5 hidden text-[9px] lg:block ${
+                    isActive ? 'text-[#67807B]' : 'text-white/40'
+                  }`}>
+                  {item.description}
+                </span>
+              </span>
+            </Link>
+          );
+        })}
+      </nav>
+
+      <div className='absolute right-4 bottom-6 left-4 hidden rounded-[14px] border border-white/10 bg-white/5 p-4 lg:block'>
+        <p className='text-[10px] font-bold text-white/45 uppercase'>
+          Laxsik Ecolodge
+        </p>
+        <p className='mt-1 text-xs leading-5 text-white/65'>
+          Dữ liệu dashboard được đồng bộ trực tiếp từ hệ thống.
+        </p>
+      </div>
+    </aside>
+  );
+}

@@ -6,7 +6,7 @@ export function Header() {
   const [isShowBookingBar, setIsShowBookingBar] = useState(false);
 
   return (
-    <div className='relative'>
+    <header className='relative z-50 overflow-visible'>
       <Navbar
         isBookingBarVisible={isShowBookingBar}
         onClickFind={() => setIsShowBookingBar(true)}
@@ -14,6 +14,6 @@ export function Header() {
       {isShowBookingBar && (
         <BookingBar onClickHide={() => setIsShowBookingBar(false)} />
       )}
-    </div>
+    </header>
   );
 }

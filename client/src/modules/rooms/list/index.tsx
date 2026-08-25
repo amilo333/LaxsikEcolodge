@@ -1,25 +1,34 @@
 'use client';
+import { Pagination } from '@/components/core';
 import { Footer, Header } from '@/components/layouts';
 import { Facilities, Policies } from '../common';
 import { RoomItem } from '../common/components/room-item';
 import { useAvailableRoomsApi, useRoomListApi } from '../common/hooks';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { buildRoomDetailUrl } from '@/utils';
+import { useEffect } from 'react';
 
 export function RoomListModule() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const checkInDate = searchParams.get('checkInDate');
   const checkOutDate = searchParams.get('checkOutDate');
   const guests = searchParams.get('guests');
   const roomCount = searchParams.get('rooms');
+  const requestedPage = Number(searchParams.get('page'));
+  const page =
+    Number.isInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
+  const pageSize = 5;
   const isSearching = Boolean(checkInDate && checkOutDate);
-  const roomListQuery = useRoomListApi(!isSearching);
+  const roomListQuery = useRoomListApi({ page, limit: pageSize }, !isSearching);
   const availableRoomsQuery = useAvailableRoomsApi({
     checkInDate,
     checkOutDate,
     guests,
     rooms: roomCount,
+    page,
+    limit: pageSize,
   });
   const rooms = isSearching
     ? availableRoomsQuery.data?.data
@@ -30,9 +39,41 @@ export function RoomListModule() {
   const isError = isSearching
     ? availableRoomsQuery.isError
     : roomListQuery.isError;
+  const pagination = isSearching
+    ? availableRoomsQuery.data?.pagination
+    : roomListQuery.data?.pagination;
+
+  useEffect(() => {
+    if (!pagination || page <= pagination.totalPages) return;
+
+    const params = new URLSearchParams(searchParams.toString());
+    const safePage = pagination.totalPages;
+
+    if (safePage === 1) {
+      params.delete('page');
+    } else {
+      params.set('page', String(safePage));
+    }
+
+    const query = params.toString();
+    router.replace(`/rooms${query ? `?${query}` : ''}`);
+  }, [page, pagination, router, searchParams]);
+
+  const handleChangePage = (nextPage: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (nextPage === 1) {
+      params.delete('page');
+    } else {
+      params.set('page', String(nextPage));
+    }
+
+    const query = params.toString();
+    router.push(`/rooms${query ? `?${query}` : ''}`);
+  };
 
   return (
-    <div className="min-h-screen bg-[url('/images/bg-screen.jpg')] bg-[length:720px_720px] text-[#151515]">
+    <div className="font-montserrat min-h-screen bg-[url('/images/bg-screen.jpg')] bg-[length:720px_720px] text-[#151515]">
       <Header />
       {isSearching && (
         <div className='mx-auto mt-10 w-[92%] rounded-[20px] border border-[#0D4949]/10 bg-white p-2 shadow-[0_14px_35px_rgba(13,73,73,0.08)] lg:w-[75%]'>
@@ -49,10 +90,10 @@ export function RoomListModule() {
               </div>
 
               <div>
-                <p className='text-[11px] font-bold tracking-[0.16em] text-[#0D4949]/55 uppercase'>
+                <p className='text-[11px] font-bold text-[#0D4949]/55 uppercase'>
                   Your stay
                 </p>
-                <h2 className='mt-0.5 text-xl font-semibold'>
+                <h2 className='font-lora mt-0.5 text-xl font-semibold'>
                   Available rooms
                 </h2>
               </div>
@@ -60,7 +101,7 @@ export function RoomListModule() {
 
             <div className='flex flex-col gap-3 border-y border-[#0D4949]/10 py-4 sm:flex-row sm:items-center sm:gap-6 lg:border-y-0 lg:border-l lg:py-0 lg:pl-6'>
               <div>
-                <p className='text-[11px] font-bold tracking-[0.12em] text-[#0D4949]/55 uppercase'>
+                <p className='text-[11px] font-bold text-[#0D4949]/55 uppercase'>
                   Dates
                 </p>
                 <p className='mt-1 text-sm font-medium'>
@@ -116,6 +157,15 @@ export function RoomListModule() {
           <p className='text-red-700'>
             Unable to load rooms. Please try again.
           </p>
+        )}
+        {!isLoading && !isError && pagination && pagination.totalPages > 1 && (
+          <div className='w-[92%] py-2 lg:w-[75%]'>
+            <Pagination
+              currentPage={Math.min(page, pagination.totalPages)}
+              totalPages={pagination.totalPages}
+              onChangePage={handleChangePage}
+            />
+          </div>
         )}
       </div>
       <Facilities />

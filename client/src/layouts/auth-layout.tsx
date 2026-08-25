@@ -29,10 +29,10 @@ export function AuthLayout({
             className='h-auto w-[150px] object-contain'
           />
 
-          <p className='mt-8 text-xs font-bold tracking-[0.28em] text-white/70 uppercase'>
+          <p className='mt-8 text-xs font-bold text-white/70 uppercase'>
             A peaceful nature retreat
           </p>
-          <h1 className='font-lora mt-4 max-w-[620px] text-5xl leading-[1.12] font-semibold tracking-[-0.025em] xl:text-6xl'>
+          <h1 className='font-lora mt-4 max-w-[620px] text-5xl leading-[1.12] font-semibold xl:text-6xl'>
             Return to nature. Rest in comfort.
           </h1>
           <p className='mt-6 max-w-[540px] text-base leading-7 text-white/78'>

@@ -141,10 +141,10 @@ export function BookingDetailsForm({
   return (
     <div>
       <div>
-        <p className='text-[11px] font-bold tracking-[0.14em] text-[#0D4949]/60 uppercase'>
+        <p className='text-[11px] font-bold text-[#0D4949]/60 uppercase'>
           Step 2 of 3
         </p>
-        <h1 className='mt-1 text-xl font-bold tracking-[-0.02em] uppercase sm:text-2xl'>
+        <h1 className='mt-1 text-xl font-bold uppercase sm:text-2xl'>
           Enter your details
         </h1>
         <p className='mt-2 text-xs leading-5 text-[#68726E]'>
@@ -275,7 +275,7 @@ export function BookingDetailsForm({
           type='submit'
           isDisabled={isSubmitting}
           onClick={handleSubmit(onSubmit)}
-          className='h-12! w-auto! min-w-[190px]! rounded-full! px-8! text-sm! tracking-[0.04em] uppercase'>
+          className='h-12! w-auto! min-w-[190px]! rounded-full! px-8! text-sm! uppercase'>
           {createBooking.isPending
             ? 'Creating booking…'
             : vnpayPayment.isPending

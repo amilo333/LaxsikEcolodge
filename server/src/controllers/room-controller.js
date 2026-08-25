@@ -3,17 +3,32 @@ import Booking from "../models/Booking.js";
 import { uploadOnCloudinary } from "../service/cloudinary.js";
 import { ResponseUtil } from "../utils/response.util.js";
 
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 // @desc    Get all rooms
 // @route   GET /api/rooms
 // @access  Public
 export const getAllRooms = async (req, res) => {
   try {
     const page = Number(req.query.page) > 0 ? Number(req.query.page) : 1;
-    const limit = Number(req.query.limit) > 0 ? Number(req.query.limit) : 10;
+    const limit = Math.min(
+      Number(req.query.limit) > 0 ? Number(req.query.limit) : 10,
+      100,
+    );
+    const search = req.query.search?.trim();
+    const query = search
+      ? {
+          $or: [
+            { title: { $regex: escapeRegExp(search), $options: "i" } },
+            { bed: { $regex: escapeRegExp(search), $options: "i" } },
+            { views: { $regex: escapeRegExp(search), $options: "i" } },
+          ],
+        }
+      : {};
     const skip = (page - 1) * limit;
 
     const [rooms, total] = await Promise.all([
-      Room.find()
+      Room.find(query)
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
@@ -25,10 +40,10 @@ export const getAllRooms = async (req, res) => {
           path: "updatedBy",
           select: "-password",
         }),
-      Room.countDocuments(),
+      Room.countDocuments(query),
     ]);
 
-    const totalPages = Math.ceil(total / limit);
+    const totalPages = Math.max(1, Math.ceil(total / limit));
 
     ResponseUtil.pagination(
       res,
@@ -160,10 +175,31 @@ export const updateRoom = async (req, res) => {
       });
     }
 
+    const allowedFields = [
+      "title",
+      "description",
+      "price",
+      "bed",
+      "area",
+      "capacity",
+      "quantity",
+      "status",
+      "bathroom",
+      "fireplace",
+      "views",
+    ];
+    const updates = allowedFields.reduce((result, field) => {
+      if (typeof req.body[field] !== "undefined") {
+        result[field] = req.body[field];
+      }
+
+      return result;
+    }, {});
+
     const updatedRoom = await Room.findByIdAndUpdate(
       req.params.id,
       {
-        ...req.body,
+        ...updates,
         updatedBy: req.user._id,
       },
       {
@@ -196,6 +232,18 @@ export const deleteRoom = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: "Room not found",
+      });
+    }
+
+    const hasBookings = await Booking.exists({
+      "bookingItems.roomId": room._id,
+    });
+
+    if (hasBookings) {
+      return res.status(409).json({
+        success: false,
+        message:
+          "Room has booking history. Set it to inactive instead of deleting it.",
       });
     }
 
@@ -338,9 +386,31 @@ export const getAvailableRooms = async (req, res) => {
         return true;
       });
 
+    const shouldPaginate = Boolean(req.query.page || req.query.limit);
+    const page = Number(req.query.page) > 0 ? Number(req.query.page) : 1;
+    const limit = Math.min(
+      Number(req.query.limit) > 0 ? Number(req.query.limit) : 10,
+      100,
+    );
+    const total = availableRooms.length;
+    const paginatedRooms = shouldPaginate
+      ? availableRooms.slice((page - 1) * limit, page * limit)
+      : availableRooms;
+
     res.status(200).json({
+      success: true,
       message: "Get available rooms successfully",
-      data: availableRooms,
+      data: paginatedRooms,
+      ...(shouldPaginate
+        ? {
+            pagination: {
+              page,
+              limit,
+              total,
+              totalPages: Math.max(1, Math.ceil(total / limit)),
+            },
+          }
+        : {}),
     });
   } catch (error) {
     console.error("Get available rooms error:", error);

@@ -28,7 +28,7 @@ export function BookingDetailPanel({
   return (
     <aside className='space-y-6'>
       <section>
-        <p className='text-[11px] font-bold tracking-[0.14em] text-[#0D4949]/60 uppercase'>
+        <p className='text-[11px] font-bold text-[#0D4949]/60 uppercase'>
           Your booking details
         </p>
 
@@ -67,7 +67,7 @@ export function BookingDetailPanel({
         </dl>
 
         <div className='mt-4 rounded-[16px] bg-[#E9EEEC] p-4'>
-          <p className='text-[10px] font-bold tracking-[0.12em] text-[#56615D] uppercase'>
+          <p className='text-[10px] font-bold text-[#56615D] uppercase'>
             Your selection
           </p>
           <div className='mt-2 divide-y divide-white/80'>
@@ -90,7 +90,7 @@ export function BookingDetailPanel({
       </section>
 
       <section className='border-t border-[#E3E9E7] pt-5'>
-        <p className='text-[11px] font-bold tracking-[0.14em] text-[#0D4949]/60 uppercase'>
+        <p className='text-[11px] font-bold text-[#0D4949]/60 uppercase'>
           Price summary
         </p>
         <dl className='mt-3 space-y-2 text-xs'>

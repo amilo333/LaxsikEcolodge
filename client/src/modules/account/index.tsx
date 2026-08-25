@@ -36,10 +36,10 @@ export function AccountModule({ view }: TAccountModuleProps) {
 
       <main className='mx-auto min-h-[620px] w-[calc(100%-32px)] max-w-[1180px] py-8 sm:py-12'>
         <div className='mb-7'>
-          <p className='text-[11px] font-bold tracking-[0.16em] text-[#0D4949]/60 uppercase'>
+          <p className='text-[11px] font-bold text-[#0D4949]/60 uppercase'>
             Member area
           </p>
-          <h1 className='mt-1 text-3xl font-extrabold tracking-[-0.035em] text-[#123F3D]'>
+          <h1 className='mt-1 text-3xl font-extrabold text-[#123F3D]'>
             Tài khoản của tôi
           </h1>
         </div>

@@ -1,6 +1,9 @@
 import Booking from "../models/Booking.js";
 import Room from "../models/Room.js";
+import User from "../models/User.js";
 import Voucher from "../models/Voucher.js";
+
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 // ======================================
 // Generate booking code
@@ -448,6 +451,187 @@ export const cancelBooking = async (req, res) => {
 
     return res.status(500).json({
       message: error.message,
+    });
+  }
+};
+
+// ======================================
+// ADMIN: GET ALL BOOKINGS
+// ======================================
+
+export const getAllBookingsAdmin = async (req, res) => {
+  try {
+    const page = Number(req.query.page) > 0 ? Number(req.query.page) : 1;
+    const limit = Math.min(
+      Number(req.query.limit) > 0 ? Number(req.query.limit) : 10,
+      100,
+    );
+    const search = req.query.search?.trim();
+    let query = {};
+
+    if (search) {
+      const searchRegex = {
+        $regex: escapeRegExp(search),
+        $options: "i",
+      };
+      const roomIds = await Room.find({ title: searchRegex }).distinct("_id");
+
+      query = {
+        $or: [
+          { bookingCode: searchRegex },
+          { "customerInfo.fullNameContact": searchRegex },
+          { "customerInfo.emailContact": searchRegex },
+          { "customerInfo.phoneContact": searchRegex },
+          { "bookingItems.roomId": { $in: roomIds } },
+        ],
+      };
+    }
+
+    const skip = (page - 1) * limit;
+    const [bookings, total] = await Promise.all([
+      Booking.find(query)
+        .populate("userId", "full_name email phone role status")
+        .populate("bookingItems.roomId")
+        .populate("voucherId")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Booking.countDocuments(query),
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      message: "Get all bookings successfully",
+      data: bookings,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.max(1, Math.ceil(total / limit)),
+      },
+    });
+  } catch (error) {
+    console.error("Admin get bookings error:", error);
+
+    return res.status(500).json({
+      message: "Unable to get bookings",
+    });
+  }
+};
+
+// ======================================
+// ADMIN: DASHBOARD SUMMARY
+// ======================================
+
+export const getAdminDashboardSummary = async (_req, res) => {
+  try {
+    const [
+      totalUsers,
+      activeUsers,
+      totalRooms,
+      availableRooms,
+      totalBookings,
+      pendingBookings,
+      revenueResult,
+      recentBookings,
+    ] = await Promise.all([
+      User.countDocuments(),
+      User.countDocuments({ status: true }),
+      Room.countDocuments(),
+      Room.countDocuments({ status: "available" }),
+      Booking.countDocuments(),
+      Booking.countDocuments({ bookingStatus: "pending" }),
+      Booking.aggregate([
+        { $match: { paymentStatus: "paid" } },
+        { $group: { _id: null, total: { $sum: "$totalAmount" } } },
+      ]),
+      Booking.find()
+        .populate("userId", "full_name email phone role status")
+        .populate("bookingItems.roomId")
+        .sort({ createdAt: -1 })
+        .limit(5),
+    ]);
+
+    return res.status(200).json({
+      message: "Get admin dashboard summary successfully",
+      data: {
+        totalUsers,
+        activeUsers,
+        totalRooms,
+        availableRooms,
+        totalBookings,
+        pendingBookings,
+        paidRevenue: revenueResult[0]?.total ?? 0,
+        recentBookings,
+      },
+    });
+  } catch (error) {
+    console.error("Admin dashboard summary error:", error);
+
+    return res.status(500).json({
+      message: "Unable to get dashboard summary",
+    });
+  }
+};
+
+// ======================================
+// ADMIN: UPDATE BOOKING STATUS
+// ======================================
+
+export const updateBookingAdmin = async (req, res) => {
+  try {
+    const booking = await Booking.findById(req.params.id);
+
+    if (!booking) {
+      return res.status(404).json({ message: "Booking not found" });
+    }
+
+    const bookingStatuses = ["pending", "confirmed", "cancelled", "completed"];
+    const paymentStatuses = ["unpaid", "pending", "paid", "failed", "refunded"];
+
+    if (
+      req.body.bookingStatus &&
+      !bookingStatuses.includes(req.body.bookingStatus)
+    ) {
+      return res.status(400).json({ message: "Invalid booking status" });
+    }
+
+    if (
+      req.body.paymentStatus &&
+      !paymentStatuses.includes(req.body.paymentStatus)
+    ) {
+      return res.status(400).json({ message: "Invalid payment status" });
+    }
+
+    if (req.body.bookingStatus) {
+      booking.bookingStatus = req.body.bookingStatus;
+    }
+
+    if (req.body.paymentStatus) {
+      booking.paymentStatus = req.body.paymentStatus;
+
+      if (
+        req.body.paymentStatus === "paid" &&
+        booking.bookingStatus === "pending"
+      ) {
+        booking.bookingStatus = "confirmed";
+      }
+    }
+
+    await booking.save();
+    await booking.populate("userId", "full_name email phone role status");
+    await booking.populate("bookingItems.roomId");
+    await booking.populate("voucherId");
+
+    return res.status(200).json({
+      message: "Booking updated successfully",
+      data: booking,
+    });
+  } catch (error) {
+    console.error("Admin update booking error:", error);
+
+    return res.status(500).json({
+      message: "Unable to update booking",
     });
   }
 };

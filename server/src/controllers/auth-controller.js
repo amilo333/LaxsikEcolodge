@@ -74,6 +74,12 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Email does not exist" });
     }
 
+    if (!userExist.status) {
+      return res.status(403).json({
+        message: "Your account has been deactivated",
+      });
+    }
+
     if (userExist) {
       const isPasswordValid = await argon2.verify(userExist.password, password);
       if (isPasswordValid) {

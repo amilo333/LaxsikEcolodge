@@ -26,7 +26,7 @@ export function SlideRoom(props: SlideRoomProps) {
   const checkInDate = searchParams.get('checkInDate');
   const checkOutDate = searchParams.get('checkOutDate');
   const isSearching = Boolean(checkInDate && checkOutDate);
-  const roomListQuery = useRoomListApi(!isSearching);
+  const roomListQuery = useRoomListApi({ page: 1, limit: 100 }, !isSearching);
   const availableRoomsQuery = useAvailableRoomsApi({
     checkInDate,
     checkOutDate,
@@ -228,7 +228,7 @@ export function SlideRoom(props: SlideRoomProps) {
                           <Button
                             type='button'
                             onClick={() => handleExplore(room)}
-                            className='h-[40px]! w-full! max-w-[320px]! bg-[#0D4949]! px-4! text-[16px]! font-semibold tracking-wider! text-white! transition-colors duration-200 hover:bg-[#083B3B]!'>
+                            className='h-[40px]! w-full! max-w-[320px]! bg-[#0D4949]! px-4! text-[16px]! font-semibold text-white! transition-colors duration-200 hover:bg-[#083B3B]!'>
                             Explore Now
                           </Button>
                         </div>

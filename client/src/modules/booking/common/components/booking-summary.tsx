@@ -68,7 +68,7 @@ export function BookingSummary({
 
         <div className='mt-4 flex flex-col gap-4 border-t border-[#DCE3E0] pt-4 sm:flex-row sm:items-center sm:justify-between'>
           <div>
-            <p className='text-[10px] font-bold tracking-[0.12em] text-[#69726E] uppercase'>
+            <p className='text-[10px] font-bold text-[#69726E] uppercase'>
               Total
             </p>
             <p className='mt-0.5 text-xl font-bold'>
@@ -83,7 +83,7 @@ export function BookingSummary({
 
           <Button
             onClick={handleCheckout}
-            className='h-12! w-auto! min-w-[170px]! rounded-full! px-8! text-sm! tracking-[0.04em] uppercase'>
+            className='h-12! w-auto! min-w-[170px]! rounded-full! px-8! text-sm! uppercase'>
             Continue
           </Button>
         </div>

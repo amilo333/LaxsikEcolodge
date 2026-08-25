@@ -1,12 +1,18 @@
 'use client';
 import { Pagination as HeroPagination } from '@heroui/react';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { TPaginationProps } from './type';
 
 export function Pagination(props: TPaginationProps) {
   const { currentPage = 1, totalPages = 1, onChangePage } = props;
 
-  const [page, setPage] = useState(currentPage);
+  const page = currentPage;
+
+  const changePage = (nextPage: number) => {
+    const safePage = Math.min(Math.max(nextPage, 1), totalPages);
+
+    onChangePage(safePage);
+  };
 
   const getPageNumbers = useCallback(() => {
     if (totalPages <= 1) {
@@ -51,11 +57,7 @@ export function Pagination(props: TPaginationProps) {
           <HeroPagination.Item>
             <HeroPagination.Previous
               isDisabled={page === 1}
-              onPress={() => {
-                const newPage = page - 1;
-                setPage(newPage);
-                onChangePage(newPage);
-              }}>
+              onPress={() => changePage(page - 1)}>
               <HeroPagination.PreviousIcon />
             </HeroPagination.Previous>
           </HeroPagination.Item>
@@ -68,7 +70,7 @@ export function Pagination(props: TPaginationProps) {
               <HeroPagination.Item key={p}>
                 <HeroPagination.Link
                   isActive={p === page}
-                  onPress={() => setPage(p)}>
+                  onPress={() => changePage(p)}>
                   {p}
                 </HeroPagination.Link>
               </HeroPagination.Item>
@@ -77,11 +79,7 @@ export function Pagination(props: TPaginationProps) {
           <HeroPagination.Item>
             <HeroPagination.Next
               isDisabled={page === totalPages}
-              onPress={() => {
-                const newPage = page + 1;
-                setPage(newPage);
-                onChangePage(newPage);
-              }}>
+              onPress={() => changePage(page + 1)}>
               <HeroPagination.NextIcon />
             </HeroPagination.Next>
           </HeroPagination.Item>

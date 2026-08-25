@@ -33,7 +33,7 @@ export function Navbar(props: TNavbarProps) {
               Laxsik Ecolodge
             </p>
 
-            <ul className='mt-[14px] flex items-center gap-4 text-[11px] leading-none font-bold tracking-[0.025em] text-white/90 2xl:gap-5 2xl:text-xs'>
+            <ul className='mt-[14px] flex items-center gap-4 text-[11px] leading-none font-bold text-white/90 2xl:gap-5 2xl:text-xs'>
               {MENUS.map((item) => (
                 <li
                   key={item.label}

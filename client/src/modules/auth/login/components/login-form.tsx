@@ -34,8 +34,17 @@ export function LoginForm() {
 
   const onSubmit = (data: TLoginForm) => {
     mutate(data, {
-      onSuccess: () => {
-        router.replace(redirectTo);
+      onSuccess: (response) => {
+        const hasRequestedRedirect = Boolean(
+          redirectParam && redirectTo === redirectParam
+        );
+        const destination = hasRequestedRedirect
+          ? redirectTo
+          : response.data.data.role === 'admin'
+            ? '/admin'
+            : redirectTo;
+
+        router.replace(destination);
       },
     });
   };
@@ -75,7 +84,7 @@ export function LoginForm() {
         {isPending ? 'Signing in…' : 'Sign in'}
       </Button>
 
-      <div className='flex items-center gap-3 text-[10px] font-bold tracking-[0.13em] text-[#87938F] uppercase'>
+      <div className='flex items-center gap-3 text-[10px] font-bold text-[#87938F] uppercase'>
         <span className='h-px flex-1 bg-[#E3E9E7]' />
         New to Laxsik?
         <span className='h-px flex-1 bg-[#E3E9E7]' />

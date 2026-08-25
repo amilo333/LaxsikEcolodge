@@ -1,8 +1,17 @@
 import { axiosInstance } from '@/apis/axios';
+import { TPagination, TPaginationResponse } from '@/types';
 import { TRoom } from '../types';
 
-export const getRoomListApi = async () => {
-  const response = await axiosInstance.get('/rooms');
+export type TRoomListParams = {
+  page: number;
+  limit: number;
+};
+
+export const getRoomListApi = async (params: TRoomListParams) => {
+  const response = await axiosInstance.get<TPaginationResponse<TRoom[]>>(
+    '/rooms',
+    { params }
+  );
   return response.data;
 };
 
@@ -11,10 +20,19 @@ export type TAvailableRoomsParams = {
   checkOutDate: string;
   guests?: string;
   rooms?: string;
+  page?: number;
+  limit?: number;
+};
+
+export type TAvailableRoomsResponse = {
+  success: boolean;
+  message: string;
+  data: TRoom[];
+  pagination?: TPagination;
 };
 
 export const getAvailableRoomsApi = async (params: TAvailableRoomsParams) => {
-  const response = await axiosInstance.get<{ message: string; data: TRoom[] }>(
+  const response = await axiosInstance.get<TAvailableRoomsResponse>(
     '/rooms/available',
     { params }
   );

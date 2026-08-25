@@ -123,7 +123,7 @@ export function BookingStepThree({
           className={`mx-auto flex h-14 w-14 items-center justify-center rounded-full text-2xl text-white ${statusIconClass}`}>
           {statusIcon}
         </span>
-        <p className='mt-5 text-[11px] font-bold tracking-[0.15em] text-[#0D4949]/60 uppercase'>
+        <p className='mt-5 text-[11px] font-bold text-[#0D4949]/60 uppercase'>
           Step 3 of 3
         </p>
         <h1 className='mt-1 text-2xl font-bold text-[#0D4949] sm:text-3xl'>
@@ -142,7 +142,7 @@ export function BookingStepThree({
 
         <div className='mx-auto mt-7 grid max-w-[700px] gap-4 text-left sm:grid-cols-2'>
           <div className='rounded-[16px] bg-[#F4F7F6] p-5'>
-            <p className='text-[10px] font-bold tracking-[0.12em] text-[#69726E] uppercase'>
+            <p className='text-[10px] font-bold text-[#69726E] uppercase'>
               Stay
             </p>
             <p className='mt-2 text-sm font-bold'>
@@ -156,7 +156,7 @@ export function BookingStepThree({
           </div>
 
           <div className='rounded-[16px] bg-[#F4F7F6] p-5'>
-            <p className='text-[10px] font-bold tracking-[0.12em] text-[#69726E] uppercase'>
+            <p className='text-[10px] font-bold text-[#69726E] uppercase'>
               Payment
             </p>
             <p className='mt-2 text-sm font-bold capitalize'>
@@ -170,9 +170,7 @@ export function BookingStepThree({
 
         <div className='mx-auto mt-4 max-w-[700px] rounded-[16px] border border-[#E1E8E5] p-5 text-left'>
           <div className='flex items-center justify-between gap-4 border-b border-[#E6EBE9] pb-4'>
-            <p className='text-xs font-bold tracking-[0.1em] uppercase'>
-              Rooms
-            </p>
+            <p className='text-xs font-bold uppercase'>Rooms</p>
             <p className='text-lg font-bold'>
               {formatCurrency(booking.totalAmount)}
             </p>

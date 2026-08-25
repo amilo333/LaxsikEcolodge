@@ -1,6 +1,10 @@
 import argon2 from "argon2";
 import User from "../models/User.js";
+import Booking from "../models/Booking.js";
 import { generateToken } from "../utils/generate-token.js";
+import { ResponseUtil } from "../utils/response.util.js";
+
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 const createUser = async (req, res) => {
   try {
@@ -110,8 +114,47 @@ const logoutCurrentUser = async (req, res) => {
 };
 
 const getAllUsers = async (req, res) => {
-  const users = await User.find({});
-  res.json(users);
+  try {
+    const page = Number(req.query.page) > 0 ? Number(req.query.page) : 1;
+    const limit = Math.min(
+      Number(req.query.limit) > 0 ? Number(req.query.limit) : 10,
+      100,
+    );
+    const search = req.query.search?.trim();
+    const query = search
+      ? {
+          $or: [
+            { full_name: { $regex: escapeRegExp(search), $options: "i" } },
+            { email: { $regex: escapeRegExp(search), $options: "i" } },
+            { phone: { $regex: escapeRegExp(search), $options: "i" } },
+          ],
+        }
+      : {};
+    const skip = (page - 1) * limit;
+    const [users, total] = await Promise.all([
+      User.find(query)
+        .select("-password")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      User.countDocuments(query),
+    ]);
+
+    return ResponseUtil.pagination(
+      res,
+      users,
+      {
+        page,
+        limit,
+        total,
+        totalPages: Math.max(1, Math.ceil(total / limit)),
+      },
+      "Get users successfully",
+    );
+  } catch (error) {
+    console.error("Get users error:", error);
+    return res.status(500).json({ message: "Unable to get users" });
+  }
 };
 
 const getCurrentUserProfile = async (req, res) => {
@@ -190,15 +233,32 @@ const updateCurrentProfile = async (req, res) => {
 };
 
 const deleteUserById = async (req, res) => {
-  const user = await User.findById(req.params.id);
-  if (user) {
-    if (user.role === "admin") {
-      res.status(400).json({ message: "Cannot delete admin user" });
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
+
+    if (user.role === "admin" || user._id.equals(req.user._id)) {
+      return res.status(400).json({ message: "Cannot delete admin user" });
+    }
+
+    const hasBookings = await Booking.exists({ userId: user._id });
+
+    if (hasBookings) {
+      return res.status(409).json({
+        message:
+          "User has booking history. Deactivate the account instead of deleting it.",
+      });
+    }
+
     await User.deleteOne({ _id: user._id });
-    res.json({ message: "User removed" });
-  } else {
-    res.status(404).json({ message: "User not found" });
+
+    return res.json({ message: "User removed" });
+  } catch (error) {
+    console.error("Delete user error:", error);
+    return res.status(500).json({ message: "Unable to delete user" });
   }
 };
 
@@ -218,24 +278,59 @@ const getUserById = async (req, res) => {
 };
 
 const updateUserById = async (req, res) => {
-  const user = await User.findById(req.params.id);
-  if (user) {
-    user.full_name = req.body.full_name || user.full_name;
-    user.email = req.body.email || user.email;
-    user.phone = req.body.phone || user.phone;
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const isCurrentAdmin = user._id.equals(req.user._id);
+
+    if (
+      isCurrentAdmin &&
+      (req.body.role === "user" || req.body.status === false)
+    ) {
+      return res.status(400).json({
+        message: "You cannot remove your own admin access",
+      });
+    }
+
+    if (req.body.role && !["user", "admin"].includes(req.body.role)) {
+      return res.status(400).json({ message: "Invalid user role" });
+    }
+
+    if (typeof req.body.status !== "undefined") {
+      user.status = Boolean(req.body.status);
+    }
+
+    user.full_name = req.body.full_name?.trim() || user.full_name;
+    user.email = req.body.email?.trim().toLowerCase() || user.email;
+    user.phone = req.body.phone?.trim() || user.phone;
     user.role = req.body.role || user.role;
 
     const updateUser = await user.save();
 
-    res.json({
+    return res.json({
       _id: updateUser._id,
       full_name: updateUser.full_name,
       email: updateUser.email,
       phone: updateUser.phone,
       role: updateUser.role,
+      status: updateUser.status,
+      createdAt: updateUser.createdAt,
+      updatedAt: updateUser.updatedAt,
     });
-  } else {
-    res.status(404).json({ message: "User not found" });
+  } catch (error) {
+    console.error("Update user error:", error);
+
+    if (error?.code === 11000) {
+      return res.status(409).json({
+        message: "Email or phone already exists",
+      });
+    }
+
+    return res.status(500).json({ message: "Unable to update user" });
   }
 };
 

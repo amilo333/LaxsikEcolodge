@@ -103,7 +103,7 @@ export function ServiceDining({
 
                 {/* Service Details */}
                 <div className='flex flex-col gap-1'>
-                  <h3 className='font-montserrat text-sm font-bold tracking-wide text-[#1A1A1A] uppercase md:text-base'>
+                  <h3 className='font-montserrat text-sm font-bold text-[#1A1A1A] uppercase md:text-base'>
                     {item.title}
                   </h3>
                   <p className='font-montserrat text-xs text-[#555555] md:text-sm'>

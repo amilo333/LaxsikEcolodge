@@ -32,7 +32,7 @@ export function RoomCard({ room }: TRoomCardProps) {
         <div className='flex flex-col items-center justify-between gap-2'>
           <div className='flex items-center gap-2 text-[18px]'>
             <div>Avg. price per night</div>
-            <div className='text-[32px] font-extrabold tracking-[-0.025em] text-[#0D4949] tabular-nums'>
+            <div className='text-[32px] font-extrabold text-[#0D4949] tabular-nums'>
               {formatCurrency(room.price)}
             </div>
           </div>

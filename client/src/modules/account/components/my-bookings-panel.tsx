@@ -91,7 +91,7 @@ export function MyBookingsPanel() {
             className='overflow-hidden rounded-[16px] border border-[#DCE7E3] bg-white shadow-[0_16px_45px_rgba(13,73,73,0.08)]'>
             <div className='flex flex-col gap-3 border-b border-[#E4ECE9] bg-[#F6F9F8] px-5 py-4 sm:flex-row sm:items-center sm:justify-between'>
               <div>
-                <p className='text-[10px] font-bold tracking-[0.14em] text-[#75827E] uppercase'>
+                <p className='text-[10px] font-bold text-[#75827E] uppercase'>
                   Mã booking
                 </p>
                 <p className='mt-1 text-sm font-extrabold text-[#193D3B]'>
@@ -144,7 +144,7 @@ export function MyBookingsPanel() {
               </div>
 
               <div className='border-t border-[#E4ECE9] pt-4 text-left md:min-w-[180px] md:border-t-0 md:border-l md:pt-0 md:pl-5 md:text-right'>
-                <p className='text-[10px] font-bold tracking-[0.12em] text-[#75827E] uppercase'>
+                <p className='text-[10px] font-bold text-[#75827E] uppercase'>
                   Tổng thanh toán
                 </p>
                 <p className='mt-2 text-xl font-extrabold text-[#0D4949]'>

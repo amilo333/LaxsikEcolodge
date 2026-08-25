@@ -77,7 +77,7 @@ export function BookingRoomRow({ room }: TBookingRoomRowProps) {
       </div>
 
       <div className='flex items-center gap-2 border-t border-[#EEF1F0] px-4 py-3 text-sm font-bold md:border-t-0 md:border-l md:border-[#E3E8E6] md:py-4'>
-        <span className='text-[10px] tracking-wider text-[#78807D] uppercase md:hidden'>
+        <span className='text-[10px] text-[#78807D] uppercase md:hidden'>
           Guests
         </span>
         {room.capacity}
@@ -91,7 +91,7 @@ export function BookingRoomRow({ room }: TBookingRoomRowProps) {
       </div>
 
       <div className='flex items-center justify-between border-t border-[#EEF1F0] px-4 py-3 md:justify-center md:border-t-0 md:border-l md:border-[#E3E8E6] md:py-4'>
-        <span className='text-[10px] tracking-wider text-[#78807D] uppercase md:hidden'>
+        <span className='text-[10px] text-[#78807D] uppercase md:hidden'>
           Select rooms
         </span>
         <div className='flex items-center gap-3'>

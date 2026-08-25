@@ -88,7 +88,7 @@ export function RoomItem(props: TRoomItemProps) {
         <div className='flex items-center justify-between'>
           <div>
             <div className='text-sm text-[#66736F]'>Avg. price per night</div>
-            <div className='mt-1 text-2xl font-extrabold tracking-[-0.025em] text-[#0D4949] tabular-nums'>
+            <div className='mt-1 text-2xl font-extrabold text-[#0D4949] tabular-nums'>
               {formatCurrency(room.price)}
             </div>
           </div>

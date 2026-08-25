@@ -15,6 +15,12 @@ const authenticate = async (req, res, next) => {
 
     req.user = await User.findById(decoded.userId).select("-password");
 
+    if (!req.user || !req.user.status) {
+      return res.status(401).json({
+        message: "User account is unavailable",
+      });
+    }
+
     next();
   } catch (error) {
     return res.status(401).json({
@@ -28,7 +34,7 @@ const authorizedAdmin = (req, res, next) => {
   if (req.user && req.user.role === "admin") {
     next();
   } else {
-    res.status(403).send("Not authorized as an admin");
+    res.status(403).json({ message: "Not authorized as an admin" });
   }
 };
 

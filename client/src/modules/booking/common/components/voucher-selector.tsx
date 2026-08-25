@@ -40,7 +40,7 @@ export function VoucherSelector() {
   return (
     <div className='rounded-[16px] border border-[#DCE4E1] bg-[#F8FAF9] p-4 sm:p-5'>
       <div>
-        <p className='text-[11px] font-bold tracking-[0.12em] text-[#0D4949]/60 uppercase'>
+        <p className='text-[11px] font-bold text-[#0D4949]/60 uppercase'>
           Special offer
         </p>
         <h2 className='mt-0.5 text-sm font-bold'>Add a voucher</h2>
@@ -63,7 +63,7 @@ export function VoucherSelector() {
           }}
           placeholder='Enter voucher code'
           autoComplete='off'
-          className='h-11 min-w-0 flex-1 rounded-full border border-[#C9D4D0] bg-white px-4 text-sm font-semibold tracking-[0.08em] transition outline-none placeholder:font-normal placeholder:tracking-normal focus:border-[#0D4949] disabled:bg-[#EEF3F1]'
+          className='h-11 min-w-0 flex-1 rounded-full border border-[#C9D4D0] bg-white px-4 text-sm font-semibold transition outline-none placeholder:font-normal focus:border-[#0D4949] disabled:bg-[#EEF3F1]'
         />
 
         {appliedVoucher ? (

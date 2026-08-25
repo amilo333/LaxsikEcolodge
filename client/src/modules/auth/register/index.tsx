@@ -15,15 +15,15 @@ export function RegisterModule() {
             className='h-auto w-[124px]'
           />
         </Link>
-        <span className='rounded-full bg-[#EAF1EF] px-3 py-1.5 text-[10px] font-bold tracking-[0.14em] text-[#0D4949] uppercase'>
+        <span className='rounded-full bg-[#EAF1EF] px-3 py-1.5 text-[10px] font-bold text-[#0D4949] uppercase'>
           Join Laxsik
         </span>
       </div>
 
-      <p className='text-[11px] font-bold tracking-[0.18em] text-[#0D4949]/60 uppercase'>
+      <p className='text-[11px] font-bold text-[#0D4949]/60 uppercase'>
         Create your account
       </p>
-      <h2 className='mt-1.5 text-3xl font-bold tracking-[-0.035em] text-[#153F3D] sm:text-[36px]'>
+      <h2 className='mt-1.5 text-3xl font-bold text-[#153F3D] sm:text-[36px]'>
         Begin your journey
       </h2>
       <p className='mt-2 mb-6 max-w-[470px] text-sm leading-6 text-[#61706C]'>
