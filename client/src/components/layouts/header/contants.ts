@@ -15,14 +15,7 @@ export const MENUS = [
     label: 'SPA & MASSAGE',
     href: '/spa-massage',
   },
-  {
-    label: 'NEWS',
-    href: '/news',
-  },
-  {
-    label: 'TOURS',
-    href: '/tour',
-  },
+
   {
     label: 'CONTACT',
     href: '/contact',

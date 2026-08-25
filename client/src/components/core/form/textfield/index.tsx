@@ -4,7 +4,8 @@ import { Label } from '../../label';
 import { TTextfieldProps } from './type';
 
 export default function Textfield(props: TTextfieldProps) {
-  const { className, label, error, field, required, ...rest } = props;
+  const { className, inputClassName, label, error, field, required, ...rest } =
+    props;
 
   return (
     <div
@@ -18,7 +19,8 @@ export default function Textfield(props: TTextfieldProps) {
         {...field}
         {...rest}
         className={clsx(
-          'bg-input-background border-input-border hover:border-input-border-hover focus:border-input-border-focus h-12 rounded-none border-none shadow focus:ring-0'
+          'bg-input-background border-input-border hover:border-input-border-hover focus:border-input-border-focus h-12 rounded-none border-none shadow focus:ring-0',
+          inputClassName
         )}
       />
       {error && <small className='text-error'>{error}</small>}

@@ -9,16 +9,28 @@ import { TDatePickerProps } from './type';
 import { Label } from '../../label';
 
 export default function DatePicker(props: TDatePickerProps) {
-  const { field, label, required, ...rest } = props;
+  const {
+    field,
+    label,
+    required: _required,
+    minValue,
+    maxValue,
+    isDateUnavailable,
+    ...rest
+  } = props;
 
   return (
     <DatePickerHero
+      {...rest}
+      minValue={minValue}
+      maxValue={maxValue}
+      isDateUnavailable={isDateUnavailable}
       className='h-24 w-full'
       value={field?.value}
       onChange={field?.onChange}
       name={field?.name}>
       <Label>{label}</Label>
-      <DateField.Group fullWidth className='h-12 rounded-none!'>
+      <DateField.Group fullWidth className='shadow-4xl h-12 rounded-[14px]'>
         <DateField.Input>
           {(segment) => <DateField.Segment segment={segment} />}
         </DateField.Input>
@@ -34,7 +46,11 @@ export default function DatePicker(props: TDatePickerProps) {
         </DateField.Suffix>
       </DateField.Group>
       <DatePickerHero.Popover>
-        <Calendar aria-label='Event date'>
+        <Calendar
+          aria-label={label}
+          minValue={minValue}
+          maxValue={maxValue}
+          isDateUnavailable={isDateUnavailable}>
           <Calendar.Header>
             <Calendar.YearPickerTrigger>
               <Calendar.YearPickerTriggerHeading />

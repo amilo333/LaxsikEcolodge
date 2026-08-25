@@ -13,4 +13,6 @@ export type TTextAreaProps<
     type?: 'text' | 'password';
     // Error message
     error?: string;
+    className?: string;
+    inputClassName?: string;
   };

@@ -25,7 +25,7 @@ export function DetailRoomModule() {
     return <div>Room not found</div>;
   }
   return (
-    <div>
+    <div className="min-h-screen bg-[url('/images/bg-screen.jpg')] bg-[length:720px_720px] text-[#151515]">
       <Header />
       <div className='relative'>
         <Image
@@ -37,7 +37,7 @@ export function DetailRoomModule() {
         />
 
         <div className='absolute top-162.5 left-1/2 w-4/5 -translate-x-1/2'>
-          <RoomCard />
+          <RoomCard room={data} />
         </div>
       </div>
       <div className='mt-110'>
@@ -45,7 +45,7 @@ export function DetailRoomModule() {
       </div>
       <DetailFacilities room={data} />
       <ContactCta />
-      <SlideRoom currentRoomId={data.id} />
+      <SlideRoom currentRoomId={data._id} />
       <Footer />
     </div>
   );

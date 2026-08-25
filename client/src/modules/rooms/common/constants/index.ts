@@ -38,6 +38,5 @@ export const FACILITES: TFacilites[] = [
   },
 ];
 
-export * from './rooms';
 export * from './facilites';
 export * from './policies';
