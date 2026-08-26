@@ -1,5 +1,6 @@
 import { authRouter } from "./auth-router.js";
 import { bookingRouter } from "./booking-router.js";
+import { chatRouter } from "./chat-router.js";
 import { diningRouter } from "./dining-router.js";
 import { diningServiceRouter } from "./dining-service-router.js";
 import { imageRouter } from "./image-router.js";
@@ -21,5 +22,6 @@ export function route(app) {
   app.use("/api/spa-services", spaServiceRouter);
   app.use("/api/voucher", voucherRouter);
   app.use("/api/booking", bookingRouter);
+  app.use("/api/chat", chatRouter);
   app.use("/api/payments/vnpay", vnpayRouter);
 }

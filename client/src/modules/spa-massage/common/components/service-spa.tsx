@@ -7,45 +7,6 @@ export type TServiceItem = {
   icon: string;
 };
 
-const DEFAULT_SERVICES: TServiceItem[] = [
-  {
-    id: '1',
-    title: 'FULL BODY MASSAGE',
-    description: '90 minutes, full body massage',
-    icon: '/images/icon/ic_full_body_massage.png',
-  },
-  {
-    id: '2',
-    title: 'FOOT MASSAGE',
-    description: '45 - 75 minutes, foot massage',
-    icon: '/images/icon/ic_foot_massage.png',
-  },
-  {
-    id: '3',
-    title: 'Cupping Therapy',
-    description: '30 minutes, cupping therapy',
-    icon: '/images/icon/ic_face_massage.png',
-  },
-  {
-    id: '4',
-    title: 'FACE MASSAGE',
-    description: '45 minutes, face massage',
-    icon: '/images/icon/ic_face_massage.png',
-  },
-  {
-    id: '5',
-    title: 'Hot Stone Therapy',
-    description: '90 - 120 minutes',
-    icon: '/images/icon/ic_herbal_bath.png',
-  },
-  {
-    id: '6',
-    title: 'HERBAL BATH',
-    description: '90 minutes, herbal massage',
-    icon: '/images/icon/ic_herbal_bath.png',
-  },
-];
-
 type ServiceSpaProps = {
   title?: string;
   services?: TServiceItem[];
@@ -54,7 +15,7 @@ type ServiceSpaProps = {
 
 export function ServiceSpa({
   title = 'SPA SERVICES',
-  services = DEFAULT_SERVICES,
+  services = [],
   className = '',
 }: ServiceSpaProps) {
   return (
@@ -113,6 +74,11 @@ export function ServiceSpa({
               </div>
             );
           })}
+          {services.length === 0 && (
+            <p className='font-montserrat py-8 text-center text-sm text-[#68726F] md:col-span-3'>
+              Chưa có dịch vụ Spa đang hoạt động.
+            </p>
+          )}
         </div>
       </div>
     </section>

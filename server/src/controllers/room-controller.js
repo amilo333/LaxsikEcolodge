@@ -1,6 +1,10 @@
 import Room from "../models/Room.js";
 import Booking from "../models/Booking.js";
 import { uploadOnCloudinary } from "../service/cloudinary.js";
+import {
+  findAvailableRooms,
+  RoomAvailabilityError,
+} from "../service/room-availability.js";
 import { ResponseUtil } from "../utils/response.util.js";
 
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -266,125 +270,12 @@ export const deleteRoom = async (req, res) => {
 export const getAvailableRooms = async (req, res) => {
   try {
     const { checkInDate, checkOutDate, guests, rooms: roomCount } = req.query;
-
-    if (!checkInDate || !checkOutDate) {
-      return res.status(400).json({
-        message: "Check-in and check-out dates are required",
-      });
-    }
-
-    const checkIn = new Date(checkInDate);
-    const checkOut = new Date(checkOutDate);
-
-    if (isNaN(checkIn.getTime()) || isNaN(checkOut.getTime())) {
-      return res.status(400).json({
-        message: "Invalid date",
-      });
-    }
-
-    if (checkIn >= checkOut) {
-      return res.status(400).json({
-        message: "Check-out date must be after check-in date",
-      });
-    }
-
-    const currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0);
-
-    if (checkIn < currentDate) {
-      return res.status(400).json({
-        message: "Check-in date cannot be in the past",
-      });
-    }
-
-    const requestedGuests = guests ? Number(guests) : undefined;
-    const requestedRooms = roomCount ? Number(roomCount) : undefined;
-
-    if (
-      (requestedGuests !== undefined &&
-        (!Number.isInteger(requestedGuests) || requestedGuests < 1)) ||
-      (requestedRooms !== undefined &&
-        (!Number.isInteger(requestedRooms) || requestedRooms < 1))
-    ) {
-      return res.status(400).json({
-        message: "Guests and rooms must be positive whole numbers",
-      });
-    }
-
-    // ==========================
-    // Tìm các booking bị trùng ngày
-    // ==========================
-
-    const overlappingBookings = await Booking.find({
-      bookingStatus: {
-        $in: ["pending", "confirmed"],
-      },
-
-      checkInDate: {
-        $lt: checkOut,
-      },
-
-      checkOutDate: {
-        $gt: checkIn,
-      },
+    const availableRooms = await findAvailableRooms({
+      checkInDate,
+      checkOutDate,
+      guests,
+      roomCount,
     });
-
-    // ==========================
-    // Tính số phòng đã được đặt
-    // ==========================
-
-    const bookedRoomMap = {};
-
-    overlappingBookings.forEach((booking) => {
-      booking.bookingItems.forEach((item) => {
-        const roomId = item.roomId.toString();
-
-        if (!bookedRoomMap[roomId]) {
-          bookedRoomMap[roomId] = 0;
-        }
-
-        bookedRoomMap[roomId] += item.quantity;
-      });
-    });
-
-    // ==========================
-    // Lấy tất cả phòng available
-    // ==========================
-
-    const rooms = await Room.find({
-      status: "available",
-    });
-
-    // ==========================
-    // Lọc phòng còn trống
-    // ==========================
-
-    const availableRooms = rooms
-      .map((room) => {
-        const bookedQuantity = bookedRoomMap[room._id.toString()] || 0;
-
-        const availableQuantity = room.quantity - bookedQuantity;
-
-        return {
-          ...room.toObject(),
-          availableQuantity,
-        };
-      })
-      .filter((room) => {
-        if (room.availableQuantity <= 0) {
-          return false;
-        }
-
-        if (requestedRooms && room.availableQuantity < requestedRooms) {
-          return false;
-        }
-
-        if (requestedGuests) {
-          return room.capacity >= requestedGuests;
-        }
-
-        return true;
-      });
 
     const shouldPaginate = Boolean(req.query.page || req.query.limit);
     const page = Number(req.query.page) > 0 ? Number(req.query.page) : 1;
@@ -414,6 +305,10 @@ export const getAvailableRooms = async (req, res) => {
     });
   } catch (error) {
     console.error("Get available rooms error:", error);
+
+    if (error instanceof RoomAvailabilityError) {
+      return res.status(error.status).json({ message: error.message });
+    }
 
     res.status(500).json({
       message: error.message,

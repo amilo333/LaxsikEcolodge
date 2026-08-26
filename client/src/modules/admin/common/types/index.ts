@@ -2,7 +2,14 @@ import { TUser } from '@/modules/auth/common';
 import { TBooking } from '@/modules/booking/common/types';
 import { TRoom } from '@/modules/rooms/common/types';
 
-export type TAdminSection = 'overview' | 'users' | 'rooms' | 'bookings';
+export type TAdminSection =
+  | 'overview'
+  | 'users'
+  | 'rooms'
+  | 'bookings'
+  | 'vouchers'
+  | 'dining'
+  | 'spa';
 
 export type TAdminListParams = {
   page: number;
@@ -33,6 +40,66 @@ export type TAdminSummary = {
   pendingBookings: number;
   paidRevenue: number;
   recentBookings: TAdminBooking[];
+  bookingTrend: Array<{
+    month: string;
+    label: string;
+    bookings: number;
+    guests: number;
+    paidRevenue: number;
+  }>;
+  bookingStatus: Array<{
+    status: TBooking['bookingStatus'];
+    count: number;
+  }>;
+};
+
+export type TAdminExperienceKind = 'dining' | 'spa';
+
+export type TAdminVoucher = {
+  _id: string;
+  code: string;
+  discountType: 'percent' | 'amount';
+  discountValue: number;
+  quantity: number;
+  startDate: string;
+  endDate: string;
+  status: 'active' | 'inactive';
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type TAdminVoucherPayload = Pick<
+  TAdminVoucher,
+  | 'code'
+  | 'discountType'
+  | 'discountValue'
+  | 'quantity'
+  | 'startDate'
+  | 'endDate'
+  | 'status'
+>;
+
+export type TAdminExperience = {
+  _id: string;
+  title: string;
+  description: string;
+  thumbnail: string;
+  images?: string[];
+  status: 'active' | 'inactive';
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type TAdminExperienceService = {
+  _id: string;
+  title: string;
+  description: string;
+  icon: string;
+  status: 'active' | 'inactive';
+  diningId?: string | Pick<TAdminExperience, '_id' | 'title' | 'thumbnail'>;
+  spaId?: string | Pick<TAdminExperience, '_id' | 'title' | 'thumbnail'>;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type TUpdateAdminBookingPayload = Partial<

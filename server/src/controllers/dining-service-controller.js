@@ -5,6 +5,8 @@ import { uploadOnCloudinary } from "../service/cloudinary.js";
 
 import { ResponseUtil } from "../utils/response.util.js";
 
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
 // @desc    Get all dining services
 // @route   GET /api/dining-services
 // @access  Public
@@ -12,15 +14,30 @@ export const getAllDiningServices = async (req, res) => {
   try {
     const page = Number(req.query.page) > 0 ? Number(req.query.page) : 1;
 
-    const limit = Number(req.query.limit) > 0 ? Number(req.query.limit) : 10;
+    const limit = Math.min(
+      Number(req.query.limit) > 0 ? Number(req.query.limit) : 10,
+      100,
+    );
 
     const skip = (page - 1) * limit;
 
     const filter = {};
 
+    if (["active", "inactive"].includes(req.query.status)) {
+      filter.status = req.query.status;
+    }
+
     // Filter theo Dining
     if (req.query.diningId) {
       filter.diningId = req.query.diningId;
+    }
+
+    if (req.query.search?.trim()) {
+      const search = escapeRegExp(req.query.search.trim());
+      filter.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { description: { $regex: search, $options: "i" } },
+      ];
     }
 
     const [services, total] = await Promise.all([
@@ -36,7 +53,7 @@ export const getAllDiningServices = async (req, res) => {
       DiningService.countDocuments(filter),
     ]);
 
-    const totalPages = Math.ceil(total / limit);
+    const totalPages = Math.max(1, Math.ceil(total / limit));
 
     ResponseUtil.pagination(
       res,

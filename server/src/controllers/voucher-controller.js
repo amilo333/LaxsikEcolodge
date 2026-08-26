@@ -1,4 +1,7 @@
 import Voucher from "../models/Voucher.js";
+import Booking from "../models/Booking.js";
+
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 // CREATE
 export const createVoucher = async (req, res) => {
@@ -47,11 +50,39 @@ export const createVoucher = async (req, res) => {
 // GET ALL
 export const getAllVouchers = async (req, res) => {
   try {
-    const vouchers = await Voucher.find().sort({ createdAt: -1 });
+    const page = Number(req.query.page) > 0 ? Number(req.query.page) : 1;
+    const limit = Math.min(
+      Number(req.query.limit) > 0 ? Number(req.query.limit) : 10,
+      100,
+    );
+    const search = req.query.search?.trim();
+    const query = {};
+
+    if (search) {
+      query.code = { $regex: escapeRegExp(search), $options: "i" };
+    }
+
+    if (["active", "inactive"].includes(req.query.status)) {
+      query.status = req.query.status;
+    }
+
+    const [vouchers, total] = await Promise.all([
+      Voucher.find(query)
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      Voucher.countDocuments(query),
+    ]);
 
     res.status(200).json({
       message: "Get vouchers successfully",
       data: vouchers,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.max(1, Math.ceil(total / limit)),
+      },
     });
   } catch (error) {
     res.status(500).json({
@@ -140,13 +171,26 @@ export const updateVoucher = async (req, res) => {
 // DELETE
 export const deleteVoucher = async (req, res) => {
   try {
-    const voucher = await Voucher.findByIdAndDelete(req.params.id);
+    const voucher = await Voucher.findById(req.params.id);
 
     if (!voucher) {
       return res.status(404).json({
         message: "Voucher not found",
       });
     }
+
+    const bookingCount = await Booking.countDocuments({
+      voucherId: voucher._id,
+    });
+
+    if (bookingCount > 0) {
+      return res.status(409).json({
+        message:
+          "Voucher has booking history and cannot be deleted. Set it to inactive instead.",
+      });
+    }
+
+    await voucher.deleteOne();
 
     res.status(200).json({
       message: "Voucher deleted successfully",

@@ -3,10 +3,15 @@ import { TPaginationResponse } from '@/types';
 import { TRoom } from '@/modules/rooms/common/types';
 import {
   TAdminBooking,
+  TAdminExperience,
+  TAdminExperienceKind,
+  TAdminExperienceService,
   TAdminListParams,
   TAdminRoomPayload,
   TAdminSummary,
   TAdminUser,
+  TAdminVoucher,
+  TAdminVoucherPayload,
   TUpdateAdminBookingPayload,
   TUpdateAdminUserPayload,
 } from '../types';
@@ -93,6 +98,177 @@ export const getAdminSummaryApi = async () => {
     '/booking/admin/summary'
   );
   return response.data.data;
+};
+
+export const getAdminVouchersApi = async (params: TAdminListParams) => {
+  const response = await axiosInstance.get<
+    TPaginationResponse<TAdminVoucher[]>
+  >('/voucher', { params });
+  return response.data;
+};
+
+export const createAdminVoucherApi = async (data: TAdminVoucherPayload) => {
+  const response = await axiosInstance.post<TDataResponse<TAdminVoucher>>(
+    '/voucher',
+    data
+  );
+  return response.data.data;
+};
+
+export const updateAdminVoucherApi = async ({
+  voucherId,
+  data,
+}: {
+  voucherId: string;
+  data: TAdminVoucherPayload;
+}) => {
+  const response = await axiosInstance.put<TDataResponse<TAdminVoucher>>(
+    `/voucher/${voucherId}`,
+    data
+  );
+  return response.data.data;
+};
+
+export const deleteAdminVoucherApi = async (voucherId: string) => {
+  const response = await axiosInstance.delete<{ message: string }>(
+    `/voucher/${voucherId}`
+  );
+  return response.data;
+};
+
+const experienceConfig: Record<
+  TAdminExperienceKind,
+  { resource: string; services: string; parentField: 'diningId' | 'spaId' }
+> = {
+  dining: {
+    resource: '/dining',
+    services: '/dining-services',
+    parentField: 'diningId',
+  },
+  spa: {
+    resource: '/spa-massage',
+    services: '/spa-services',
+    parentField: 'spaId',
+  },
+};
+
+export const getAdminExperiencesApi = async ({
+  kind,
+  params,
+}: {
+  kind: TAdminExperienceKind;
+  params: TAdminListParams;
+}) => {
+  const response = await axiosInstance.get<
+    TPaginationResponse<TAdminExperience[]>
+  >(experienceConfig[kind].resource, { params });
+  return response.data;
+};
+
+export const createAdminExperienceApi = async ({
+  kind,
+  data,
+}: {
+  kind: TAdminExperienceKind;
+  data: FormData;
+}) => {
+  const response = await axiosInstance.post<TDataResponse<TAdminExperience>>(
+    experienceConfig[kind].resource,
+    data
+  );
+  return response.data.data;
+};
+
+export const updateAdminExperienceApi = async ({
+  kind,
+  experienceId,
+  data,
+}: {
+  kind: TAdminExperienceKind;
+  experienceId: string;
+  data: FormData;
+}) => {
+  const response = await axiosInstance.put<{
+    success: boolean;
+    dining?: TAdminExperience;
+    spa?: TAdminExperience;
+  }>(`${experienceConfig[kind].resource}/${experienceId}`, data);
+  return response.data.dining ?? response.data.spa!;
+};
+
+export const deleteAdminExperienceApi = async ({
+  kind,
+  experienceId,
+}: {
+  kind: TAdminExperienceKind;
+  experienceId: string;
+}) => {
+  const response = await axiosInstance.delete<{ message: string }>(
+    `${experienceConfig[kind].resource}/${experienceId}`
+  );
+  return response.data;
+};
+
+export const getAdminExperienceServicesApi = async ({
+  kind,
+  params,
+}: {
+  kind: TAdminExperienceKind;
+  params: TAdminListParams & { parentId?: string };
+}) => {
+  const config = experienceConfig[kind];
+  const { parentId, ...listParams } = params;
+  const response = await axiosInstance.get<
+    TPaginationResponse<TAdminExperienceService[]>
+  >(config.services, {
+    params: {
+      ...listParams,
+      ...(parentId ? { [config.parentField]: parentId } : {}),
+    },
+  });
+  return response.data;
+};
+
+export const createAdminExperienceServiceApi = async ({
+  kind,
+  data,
+}: {
+  kind: TAdminExperienceKind;
+  data: FormData;
+}) => {
+  const response = await axiosInstance.post<
+    TDataResponse<TAdminExperienceService>
+  >(experienceConfig[kind].services, data);
+  return response.data.data;
+};
+
+export const updateAdminExperienceServiceApi = async ({
+  kind,
+  serviceId,
+  data,
+}: {
+  kind: TAdminExperienceKind;
+  serviceId: string;
+  data: FormData;
+}) => {
+  const response = await axiosInstance.put<{
+    success: boolean;
+    service: TAdminExperienceService;
+  }>(`${experienceConfig[kind].services}/${serviceId}`, data);
+  return response.data.service;
+};
+
+export const deleteAdminExperienceServiceApi = async ({
+  kind,
+  serviceId,
+}: {
+  kind: TAdminExperienceKind;
+  serviceId: string;
+}) => {
+  const response = await axiosInstance.delete<{ message: string }>(
+    `${experienceConfig[kind].services}/${serviceId}`
+  );
+  return response.data;
 };
 
 export const updateAdminBookingApi = async ({

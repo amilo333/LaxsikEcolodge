@@ -7,45 +7,6 @@ export type TServiceItem = {
   icon: string;
 };
 
-const DEFAULT_SERVICES: TServiceItem[] = [
-  {
-    id: '1',
-    title: 'SERVING TIME',
-    description: '7:00 - 21h00',
-    icon: '/images/icon/ic_service_time.png',
-  },
-  {
-    id: '2',
-    title: 'BUFFETS',
-    description: '+50 dished',
-    icon: '/images/icon/ic_buffets.png',
-  },
-  {
-    id: '3',
-    title: 'COUPLE DINNER',
-    description: '90 minutes, herbal massage',
-    icon: '/images/icon/ic_couple_dinner.png',
-  },
-  {
-    id: '4',
-    title: 'COCKTAILS & DRINKS',
-    description: 'Unique cocktail & fresh juice',
-    icon: '/images/icon/ic_cocktail_and_drink.png',
-  },
-  {
-    id: '5',
-    title: 'ORGANIC INGREDIENTS',
-    description: 'Local vegatables',
-    icon: '/images/icon/ic_organic_ingredients.png',
-  },
-  {
-    id: '6',
-    title: 'FIREWOOD',
-    description: 'Special grill food',
-    icon: '/images/icon/ic_firewood.png',
-  },
-];
-
 type ServiceDiningProps = {
   title?: string;
   services?: TServiceItem[];
@@ -54,7 +15,7 @@ type ServiceDiningProps = {
 
 export function ServiceDining({
   title = 'SERVICES',
-  services = DEFAULT_SERVICES,
+  services = [],
   className = '',
 }: ServiceDiningProps) {
   return (
@@ -113,6 +74,11 @@ export function ServiceDining({
               </div>
             );
           })}
+          {services.length === 0 && (
+            <p className='font-montserrat py-8 text-center text-sm text-[#68726F] md:col-span-3'>
+              Chưa có dịch vụ Dining đang hoạt động.
+            </p>
+          )}
         </div>
       </div>
     </section>

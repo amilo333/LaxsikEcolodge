@@ -525,6 +525,10 @@ export const getAllBookingsAdmin = async (req, res) => {
 
 export const getAdminDashboardSummary = async (_req, res) => {
   try {
+    const now = new Date();
+    const trendStart = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 5, 1),
+    );
     const [
       totalUsers,
       activeUsers,
@@ -534,6 +538,8 @@ export const getAdminDashboardSummary = async (_req, res) => {
       pendingBookings,
       revenueResult,
       recentBookings,
+      trendResult,
+      statusResult,
     ] = await Promise.all([
       User.countDocuments(),
       User.countDocuments({ status: true }),
@@ -550,7 +556,80 @@ export const getAdminDashboardSummary = async (_req, res) => {
         .populate("bookingItems.roomId")
         .sort({ createdAt: -1 })
         .limit(5),
+      Booking.aggregate([
+        { $match: { createdAt: { $gte: trendStart } } },
+        {
+          $group: {
+            _id: {
+              $dateToString: { format: "%Y-%m", date: "$createdAt" },
+            },
+            bookings: { $sum: 1 },
+            guestIds: {
+              $addToSet: {
+                $cond: [
+                  { $ne: ["$bookingStatus", "cancelled"] },
+                  "$userId",
+                  null,
+                ],
+              },
+            },
+            paidRevenue: {
+              $sum: {
+                $cond: [{ $eq: ["$paymentStatus", "paid"] }, "$totalAmount", 0],
+              },
+            },
+          },
+        },
+        {
+          $project: {
+            bookings: 1,
+            paidRevenue: 1,
+            guests: {
+              $size: { $setDifference: ["$guestIds", [null]] },
+            },
+          },
+        },
+        { $sort: { _id: 1 } },
+      ]),
+      Booking.aggregate([
+        { $group: { _id: "$bookingStatus", count: { $sum: 1 } } },
+      ]),
     ]);
+
+    const bookingTrend = Array.from({ length: 6 }, (_, index) => {
+      const date = new Date(
+        Date.UTC(
+          trendStart.getUTCFullYear(),
+          trendStart.getUTCMonth() + index,
+          1,
+        ),
+      );
+      const key = `${date.getUTCFullYear()}-${String(
+        date.getUTCMonth() + 1,
+      ).padStart(2, "0")}`;
+      const item = trendResult.find((entry) => entry._id === key);
+
+      return {
+        month: key,
+        label: new Intl.DateTimeFormat("vi-VN", {
+          month: "short",
+          year: "2-digit",
+          timeZone: "UTC",
+        }).format(date),
+        bookings: item?.bookings ?? 0,
+        guests: item?.guests ?? 0,
+        paidRevenue: item?.paidRevenue ?? 0,
+      };
+    });
+    const bookingStatus = [
+      "pending",
+      "confirmed",
+      "cancelled",
+      "completed",
+    ].map((status) => ({
+      status,
+      count: statusResult.find((entry) => entry._id === status)?.count ?? 0,
+    }));
 
     return res.status(200).json({
       message: "Get admin dashboard summary successfully",
@@ -563,6 +642,8 @@ export const getAdminDashboardSummary = async (_req, res) => {
         pendingBookings,
         paidRevenue: revenueResult[0]?.total ?? 0,
         recentBookings,
+        bookingTrend,
+        bookingStatus,
       },
     });
   } catch (error) {

@@ -1,6 +1,9 @@
 import Spa from "../models/Spa.js";
+import SpaService from "../models/SpaService.js";
 import { uploadOnCloudinary } from "../service/cloudinary.js";
 import { ResponseUtil } from "../utils/response.util.js";
+
+const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 // @desc    Get all spas
 // @route   GET /api/spa
@@ -9,12 +12,28 @@ export const getAllSpa = async (req, res) => {
   try {
     const page = Number(req.query.page) > 0 ? Number(req.query.page) : 1;
 
-    const limit = Number(req.query.limit) > 0 ? Number(req.query.limit) : 10;
+    const limit = Math.min(
+      Number(req.query.limit) > 0 ? Number(req.query.limit) : 10,
+      100,
+    );
+    const search = req.query.search?.trim();
+    const query = {};
+
+    if (["active", "inactive"].includes(req.query.status)) {
+      query.status = req.query.status;
+    }
+
+    if (search) {
+      query.$or = [
+        { title: { $regex: escapeRegExp(search), $options: "i" } },
+        { description: { $regex: escapeRegExp(search), $options: "i" } },
+      ];
+    }
 
     const skip = (page - 1) * limit;
 
     const [spas, total] = await Promise.all([
-      Spa.find()
+      Spa.find(query)
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
@@ -27,10 +46,10 @@ export const getAllSpa = async (req, res) => {
           select: "-password",
         }),
 
-      Spa.countDocuments(),
+      Spa.countDocuments(query),
     ]);
 
-    const totalPages = Math.ceil(total / limit);
+    const totalPages = Math.max(1, Math.ceil(total / limit));
 
     ResponseUtil.pagination(
       res,
@@ -196,6 +215,15 @@ export const deleteSpa = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: "Spa not found",
+      });
+    }
+
+    const hasServices = await SpaService.exists({ spaId: spa._id });
+
+    if (hasServices) {
+      return res.status(409).json({
+        success: false,
+        message: "Delete spa services before deleting this spa item",
       });
     }
 

@@ -10,17 +10,30 @@ import {
   AdminOverview,
   AdminSidebar,
   BookingsManagement,
+  ExperienceManagement,
   RoomsManagement,
   UsersManagement,
+  VouchersManagement,
 } from './components';
 
-const SECTIONS: TAdminSection[] = ['overview', 'users', 'rooms', 'bookings'];
+const SECTIONS: TAdminSection[] = [
+  'overview',
+  'users',
+  'rooms',
+  'bookings',
+  'vouchers',
+  'dining',
+  'spa',
+];
 
 const TITLES: Record<TAdminSection, string> = {
   overview: 'Tổng quan hệ thống',
   users: 'Quản lý người dùng',
   rooms: 'Quản lý phòng',
   bookings: 'Quản lý booking',
+  vouchers: 'Quản lý voucher',
+  dining: 'Quản lý Dining',
+  spa: 'Quản lý Spa & Massage',
 };
 
 const getInitials = (fullName: string) =>
@@ -118,6 +131,9 @@ export default function AdminModule() {
     users: <UsersManagement currentUser={user} />,
     rooms: <RoomsManagement />,
     bookings: <BookingsManagement />,
+    vouchers: <VouchersManagement />,
+    dining: <ExperienceManagement kind='dining' />,
+    spa: <ExperienceManagement kind='spa' />,
   }[activeSection];
 
   return (

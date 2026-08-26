@@ -110,7 +110,7 @@ export default function BookingsManagement() {
           <p className='text-xs font-semibold text-[#738a88] uppercase'>
             Vận hành đặt phòng
           </p>
-          <h2 className='mt-1 font-serif text-3xl font-semibold text-[#0b5555]'>
+          <h2 className='mt-1 text-3xl font-extrabold text-[#0b5555]'>
             Quản lý booking
           </h2>
           <p className='mt-1 text-sm text-slate-500'>

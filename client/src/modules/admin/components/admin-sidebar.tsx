@@ -14,6 +14,9 @@ const NAV_ITEMS: Array<{
   { value: 'users', label: 'Người dùng', description: 'Tài khoản & quyền' },
   { value: 'rooms', label: 'Phòng', description: 'Kho phòng' },
   { value: 'bookings', label: 'Booking', description: 'Đơn đặt phòng' },
+  { value: 'vouchers', label: 'Voucher', description: 'Mã ưu đãi' },
+  { value: 'dining', label: 'Dining', description: 'Nhà hàng & dịch vụ' },
+  { value: 'spa', label: 'Spa', description: 'Spa & massage' },
 ];
 
 const SECTION_ICONS: Record<TAdminSection, React.ReactNode> = {
@@ -50,6 +53,29 @@ const SECTION_ICONS: Record<TAdminSection, React.ReactNode> = {
       <path d='M8 3v4m8-4v4M3 10h18' />
     </svg>
   ),
+  vouchers: (
+    <svg
+      viewBox='0 0 24 24'
+      className='h-5 w-5 fill-none stroke-current stroke-2'>
+      <path d='M4 5h16v4a3 3 0 0 0 0 6v4H4v-4a3 3 0 0 0 0-6V5Z' />
+      <path d='M12 7v2m0 2v2m0 2v2' />
+    </svg>
+  ),
+  dining: (
+    <svg
+      viewBox='0 0 24 24'
+      className='h-5 w-5 fill-none stroke-current stroke-2'>
+      <path d='M7 3v8m-3-8v5a3 3 0 0 0 6 0V3m-3 8v10M16 3v18m0-18c3 1 4 4 4 7h-4' />
+    </svg>
+  ),
+  spa: (
+    <svg
+      viewBox='0 0 24 24'
+      className='h-5 w-5 fill-none stroke-current stroke-2'>
+      <path d='M12 21c-4.5-2-7-5.1-7-9 3.1 0 5.3 1.2 7 3.4C13.7 13.2 15.9 12 19 12c0 3.9-2.5 7-7 9Z' />
+      <path d='M12 15.4C9.7 12.8 9.7 8.6 12 5c2.3 3.6 2.3 7.8 0 10.4Z' />
+    </svg>
+  ),
 };
 
 export function AdminSidebar({ activeSection }: TAdminSidebarProps) {
@@ -69,7 +95,7 @@ export function AdminSidebar({ activeSection }: TAdminSidebarProps) {
         </span>
       </Link>
 
-      <nav className='flex gap-2 overflow-x-auto lg:mt-10 lg:flex-col lg:overflow-visible'>
+      <nav className='flex gap-2 overflow-x-auto lg:mt-8 lg:max-h-[calc(100vh-190px)] lg:flex-col lg:overflow-y-auto lg:pr-1'>
         {NAV_ITEMS.map((item) => {
           const isActive = activeSection === item.value;
 
@@ -102,15 +128,6 @@ export function AdminSidebar({ activeSection }: TAdminSidebarProps) {
           );
         })}
       </nav>
-
-      <div className='absolute right-4 bottom-6 left-4 hidden rounded-[14px] border border-white/10 bg-white/5 p-4 lg:block'>
-        <p className='text-[10px] font-bold text-white/45 uppercase'>
-          Laxsik Ecolodge
-        </p>
-        <p className='mt-1 text-xs leading-5 text-white/65'>
-          Dữ liệu dashboard được đồng bộ trực tiếp từ hệ thống.
-        </p>
-      </div>
     </aside>
   );
 }
