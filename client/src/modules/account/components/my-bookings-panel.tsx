@@ -1,10 +1,17 @@
 'use client';
 
 import { Button } from '@/components/core';
-import { useMyBookingsApi } from '@/modules/booking/common/hooks';
+import { CANCELLATION_WINDOW_HOURS } from '@/modules/booking/common/constants';
+import {
+  useCancelBookingApi,
+  useMyBookingsApi,
+} from '@/modules/booking/common/hooks';
+import { TBooking } from '@/modules/booking/common/types';
 import { formatCurrency, formatStayDate } from '@/modules/booking/common/utils';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { CancelBookingDialog } from './cancel-booking-dialog';
 
 const BOOKING_STATUS_LABELS = {
   pending: 'Chờ xác nhận',
@@ -32,6 +39,15 @@ const formatBookingDate = (date: string) =>
 
 export function MyBookingsPanel() {
   const bookingsQuery = useMyBookingsApi();
+  const cancelBooking = useCancelBookingApi();
+  const [currentTime, setCurrentTime] = useState(() => Date.now());
+  const [bookingToCancel, setBookingToCancel] = useState<TBooking | null>(null);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setCurrentTime(Date.now()), 60_000);
+
+    return () => window.clearInterval(timer);
+  }, []);
 
   if (bookingsQuery.isLoading) {
     return (
@@ -102,7 +118,18 @@ export function MyBookingsPanel() {
           booking.voucherId && typeof booking.voucherId !== 'string'
             ? booking.voucherId.code
             : null;
-
+        const scheduledCheckIn = new Date(
+          `${booking.checkInDate.slice(0, 10)}T15:00:00+07:00`
+        );
+        const cancellationDeadline = new Date(
+          scheduledCheckIn.getTime() -
+            CANCELLATION_WINDOW_HOURS * 60 * 60 * 1000
+        );
+        const hasCancellableStatus =
+          booking.bookingStatus === 'pending' ||
+          booking.bookingStatus === 'confirmed';
+        const canCancel =
+          hasCancellableStatus && currentTime <= cancellationDeadline.getTime();
         return (
           <article
             key={booking._id}
@@ -295,6 +322,10 @@ export function MyBookingsPanel() {
                   )}
                   <div className='flex justify-between gap-3 text-[#5E6965]'>
                     <dt>Phí dịch vụ (5%)</dt>
+                    <dd>{formatCurrency(booking.serviceChargeAmount)}</dd>
+                  </div>
+                  <div className='flex justify-between gap-3 text-[#5E6965]'>
+                    <dt>Thuế (10%)</dt>
                     <dd>{formatCurrency(booking.taxAmount)}</dd>
                   </div>
                 </dl>
@@ -307,11 +338,40 @@ export function MyBookingsPanel() {
                     {formatCurrency(booking.totalAmount)}
                   </p>
                 </div>
+
+                {hasCancellableStatus && (
+                  <div className='mt-4 border-t border-[#D5E0DC] pt-4'>
+                    <p className='text-[9px] leading-4 text-[#6E7A77]'>
+                      {canCancel
+                        ? `Có thể hủy đến ${formatBookingDate(cancellationDeadline.toISOString())} (trước giờ nhận phòng 48 giờ).`
+                        : 'Đã hết thời hạn hủy trước giờ nhận phòng 48 giờ.'}
+                    </p>
+                    <Button
+                      onClick={() => setBookingToCancel(booking)}
+                      isDisabled={!canCancel || cancelBooking.isPending}
+                      className='mt-3 h-9! w-full! rounded-full! border border-[#A64242]! bg-white! px-4! text-xs! font-bold! text-[#A64242]! disabled:opacity-45'>
+                      Hủy đặt phòng
+                    </Button>
+                  </div>
+                )}
               </aside>
             </div>
           </article>
         );
       })}
+
+      <CancelBookingDialog
+        booking={bookingToCancel}
+        isPending={cancelBooking.isPending}
+        onClose={() => setBookingToCancel(null)}
+        onConfirm={() => {
+          if (!bookingToCancel) return;
+
+          cancelBooking.mutate(bookingToCancel._id, {
+            onSuccess: () => setBookingToCancel(null),
+          });
+        }}
+      />
     </div>
   );
 }

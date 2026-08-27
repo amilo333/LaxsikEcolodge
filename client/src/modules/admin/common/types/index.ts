@@ -15,6 +15,8 @@ export type TAdminListParams = {
   page: number;
   limit: number;
   search?: string;
+  dateFrom?: string;
+  dateTo?: string;
 };
 
 export type TAdminUser = TUser & {

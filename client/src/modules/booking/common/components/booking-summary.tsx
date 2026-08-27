@@ -42,7 +42,7 @@ export function BookingSummary({
         <p className='mt-1'>
           Room availability is held after your booking is confirmed. Taxes and
           service fees are calculated from the room total after any eligible
-          voucher discount.
+          voucher discount. You can cancel up to 48 hours before check-in.
         </p>
       </div>
 
@@ -63,6 +63,10 @@ export function BookingSummary({
           <div className='flex justify-between gap-4 text-[#555E5A]'>
             <dt>Service charge (5%)</dt>
             <dd>{formatCurrency(pricing.serviceCharge)}</dd>
+          </div>
+          <div className='flex justify-between gap-4 text-[#555E5A]'>
+            <dt>Tax (10%)</dt>
+            <dd>{formatCurrency(pricing.taxAmount)}</dd>
           </div>
         </dl>
 

@@ -22,7 +22,7 @@ export const POLICIES = [
     id: 4,
     title: 'CANCEL BOOKING',
     description:
-      'Cancel your reservation with ease. Once your request is received, we will review it based on the applicable cancellation terms and notify you of the confirmation by email.',
+      'Reservations can be cancelled no later than 48 hours before the scheduled check-in time. After this deadline, cancellation is no longer available.',
     image: '/images/icon/ic-cancel-policy.png',
   },
 ];

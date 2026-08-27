@@ -15,6 +15,7 @@ export type TBookingPricing = {
   subtotal: number;
   discountAmount: number;
   serviceCharge: number;
+  taxAmount: number;
   totalAmount: number;
   selectedRoomCount: number;
 };
@@ -62,6 +63,7 @@ export type TBooking = {
   subtotal: number;
   voucherId: string | TVoucher | null;
   discountAmount: number;
+  serviceChargeAmount: number;
   taxAmount: number;
   totalAmount: number;
   bookingStatus: 'pending' | 'confirmed' | 'cancelled' | 'completed';

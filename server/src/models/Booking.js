@@ -78,7 +78,14 @@ const bookingSchema = new mongoose.Schema(
       min: 0,
     },
 
-    // Thuế / phí
+    // Phí dịch vụ
+    serviceChargeAmount: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
+    // Thuế
     taxAmount: {
       type: Number,
       default: 0,

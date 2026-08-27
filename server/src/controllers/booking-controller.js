@@ -4,6 +4,8 @@ import User from "../models/User.js";
 import Voucher from "../models/Voucher.js";
 
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const CANCELLATION_WINDOW_MS = 48 * 60 * 60 * 1000;
+const CHECK_IN_TIME_WITH_OFFSET = "T15:00:00+07:00";
 
 // ======================================
 // Generate booking code
@@ -252,19 +254,20 @@ export const createBooking = async (req, res) => {
     const amountAfterDiscount = subtotal - discountAmount;
 
     // ======================================
-    // 9. Tính thuế / phí
-    // 5%
+    // 9. Tính phí dịch vụ (5%) và thuế (10%) sau giảm giá
     // ======================================
 
-    const TAX_RATE = 0.05;
+    const SERVICE_CHARGE_RATE = 0.05;
+    const TAX_RATE = 0.1;
 
+    const serviceChargeAmount = amountAfterDiscount * SERVICE_CHARGE_RATE;
     const taxAmount = amountAfterDiscount * TAX_RATE;
 
     // ======================================
     // 10. Tính tổng tiền
     // ======================================
 
-    const totalAmount = amountAfterDiscount + taxAmount;
+    const totalAmount = amountAfterDiscount + serviceChargeAmount + taxAmount;
 
     // ======================================
     // 11. Tạo Booking
@@ -288,6 +291,8 @@ export const createBooking = async (req, res) => {
       voucherId,
 
       discountAmount,
+
+      serviceChargeAmount,
 
       taxAmount,
 
@@ -437,6 +442,19 @@ export const cancelBooking = async (req, res) => {
       });
     }
 
+    const scheduledCheckIn = new Date(
+      `${booking.checkInDate.toISOString().slice(0, 10)}${CHECK_IN_TIME_WITH_OFFSET}`,
+    );
+    const cancellationDeadline = new Date(
+      scheduledCheckIn.getTime() - CANCELLATION_WINDOW_MS,
+    );
+
+    if (Date.now() > cancellationDeadline.getTime()) {
+      return res.status(400).json({
+        message: "Booking can only be cancelled at least 48 hours before check-in",
+      });
+    }
+
     booking.bookingStatus = "cancelled";
 
     await booking.save();
@@ -464,10 +482,34 @@ export const getAllBookingsAdmin = async (req, res) => {
     const page = Number(req.query.page) > 0 ? Number(req.query.page) : 1;
     const limit = Math.min(
       Number(req.query.limit) > 0 ? Number(req.query.limit) : 10,
-      100,
+      500,
     );
     const search = req.query.search?.trim();
+    const dateFrom = req.query.dateFrom;
+    const dateTo = req.query.dateTo;
     let query = {};
+
+    if ((dateFrom && !dateTo) || (!dateFrom && dateTo)) {
+      return res.status(400).json({
+        message: "Both dateFrom and dateTo are required",
+      });
+    }
+
+    if (dateFrom && dateTo) {
+      const rangeStart = new Date(dateFrom);
+      const rangeEnd = new Date(dateTo);
+
+      if (
+        Number.isNaN(rangeStart.getTime()) ||
+        Number.isNaN(rangeEnd.getTime()) ||
+        rangeStart >= rangeEnd
+      ) {
+        return res.status(400).json({ message: "Invalid booking date range" });
+      }
+
+      query.checkInDate = { $lt: rangeEnd };
+      query.checkOutDate = { $gt: rangeStart };
+    }
 
     if (search) {
       const searchRegex = {
@@ -476,15 +518,13 @@ export const getAllBookingsAdmin = async (req, res) => {
       };
       const roomIds = await Room.find({ title: searchRegex }).distinct("_id");
 
-      query = {
-        $or: [
-          { bookingCode: searchRegex },
-          { "customerInfo.fullNameContact": searchRegex },
-          { "customerInfo.emailContact": searchRegex },
-          { "customerInfo.phoneContact": searchRegex },
-          { "bookingItems.roomId": { $in: roomIds } },
-        ],
-      };
+      query.$or = [
+        { bookingCode: searchRegex },
+        { "customerInfo.fullNameContact": searchRegex },
+        { "customerInfo.emailContact": searchRegex },
+        { "customerInfo.phoneContact": searchRegex },
+        { "bookingItems.roomId": { $in: roomIds } },
+      ];
     }
 
     const skip = (page - 1) * limit;

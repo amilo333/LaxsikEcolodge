@@ -1,4 +1,4 @@
-import { SERVICE_CHARGE_RATE } from '../constants';
+import { SERVICE_CHARGE_RATE, TAX_RATE } from '../constants';
 import { useBookingStore } from '../stores';
 import { TAvailableRoom, TBookingPricing } from '../types';
 
@@ -31,12 +31,14 @@ export const useBookingPricing = (
 
   const amountAfterDiscount = Math.max(0, subtotal - discountAmount);
   const serviceCharge = amountAfterDiscount * SERVICE_CHARGE_RATE;
+  const taxAmount = amountAfterDiscount * TAX_RATE;
 
   return {
     subtotal,
     discountAmount,
     serviceCharge,
-    totalAmount: amountAfterDiscount + serviceCharge,
+    taxAmount,
+    totalAmount: amountAfterDiscount + serviceCharge + taxAmount,
     selectedRoomCount,
   };
 };

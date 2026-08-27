@@ -49,3 +49,11 @@ export const getMyBookingsApi = async () => {
 
   return response.data.data;
 };
+
+export const cancelBookingApi = async (bookingId: string) => {
+  const response = await axiosInstance.put<TBookingResponse>(
+    `/booking/${bookingId}/cancel`
+  );
+
+  return response.data.data;
+};

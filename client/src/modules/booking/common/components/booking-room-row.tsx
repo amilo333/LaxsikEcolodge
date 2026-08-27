@@ -86,7 +86,7 @@ export function BookingRoomRow({ room }: TBookingRoomRowProps) {
       <div className='border-t border-[#EEF1F0] px-4 py-3 md:border-t-0 md:border-l md:border-[#E3E8E6] md:py-4'>
         <span className='text-sm font-bold'>{formatCurrency(room.price)}</span>
         <p className='mt-1 text-[10px] text-[#777F7C]'>
-          per night + 5% service charge
+          per night + 5% service charge + 10% tax
         </p>
       </div>
 

@@ -1,5 +1,8 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
+import { toast } from 'sonner';
 import {
+  cancelBookingApi,
   createBookingApi,
   getBookingDetailsApi,
   getMyBookingsApi,
@@ -24,3 +27,23 @@ export const useMyBookingsApi = () =>
     queryFn: getMyBookingsApi,
     retry: false,
   });
+
+export const useCancelBookingApi = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: cancelBookingApi,
+    onSuccess: (booking) => {
+      queryClient.setQueryData(['booking', booking._id], booking);
+      void queryClient.invalidateQueries({ queryKey: ['bookings', 'mine'] });
+      toast.success('Đã hủy đặt phòng thành công.');
+    },
+    onError: (error: unknown) => {
+      const message = axios.isAxiosError<{ message?: string }>(error)
+        ? error.response?.data?.message
+        : null;
+
+      toast.error(message ?? 'Không thể hủy đặt phòng. Vui lòng thử lại.');
+    },
+  });
+};

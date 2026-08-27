@@ -133,13 +133,17 @@ export function BookingDetailPanel({
             <dt>Service charge (5%)</dt>
             <dd>{formatCurrency(pricing.serviceCharge)}</dd>
           </div>
+          <div className='flex justify-between gap-3'>
+            <dt>Tax (10%)</dt>
+            <dd>{formatCurrency(pricing.taxAmount)}</dd>
+          </div>
           <div className='flex justify-between gap-3 border-t border-[#DCE3E0] pt-3 text-sm font-bold'>
             <dt>Total payment</dt>
             <dd>{formatCurrency(pricing.totalAmount)}</dd>
           </div>
         </dl>
         <p className='mt-3 text-[10px] leading-4 text-[#747D79]'>
-          The service charge is calculated after the voucher discount.
+          The service charge and tax are calculated after the voucher discount.
         </p>
       </section>
     </aside>

@@ -41,9 +41,8 @@ export function BookingRoomSelection({
       </div>
 
       <div className='mt-5 rounded-[16px] bg-[#F0F2F1] px-4 py-3 text-[11px] leading-5 text-[#3E4442] sm:text-xs'>
-        A service charge of 5% of the room rate (plus applicable taxes) will be
-        applied to all reservations. This charge is in addition to the room rate
-        per night.
+        A 5% service charge and 10% tax are calculated from the room total after
+        any eligible voucher discount.
       </div>
 
       <h2 className='mt-5 text-sm font-bold sm:text-base'>

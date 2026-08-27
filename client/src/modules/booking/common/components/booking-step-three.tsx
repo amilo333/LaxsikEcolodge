@@ -332,6 +332,10 @@ export function BookingStepThree({
               )}
               <div className='flex justify-between gap-4 text-[#555E5A]'>
                 <dt>Service charge (5%)</dt>
+                <dd>{formatCurrency(booking.serviceChargeAmount)}</dd>
+              </div>
+              <div className='flex justify-between gap-4 text-[#555E5A]'>
+                <dt>Tax (10%)</dt>
                 <dd>{formatCurrency(booking.taxAmount)}</dd>
               </div>
               <div className='flex items-end justify-between gap-4 border-t border-[#D6E0DC] pt-3 text-[#0D4949]'>
