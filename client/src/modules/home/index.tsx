@@ -1,3 +1,23 @@
+import { Footer } from '@/components/layouts';
+import {
+  ExperiencesSection,
+  HeroSection,
+  IntroductionSection,
+  RetreatHighlights,
+  RoomsShowcase,
+  SocialGallery,
+} from './components';
+
 export default function HomePage() {
-  return <div>HomePage</div>;
+  return (
+    <main className='overflow-hidden bg-[#F5F7F5] text-[#183F3C]'>
+      <HeroSection />
+      <IntroductionSection />
+      <RoomsShowcase />
+      <RetreatHighlights />
+      <ExperiencesSection />
+      <SocialGallery />
+      <Footer />
+    </main>
+  );
 }

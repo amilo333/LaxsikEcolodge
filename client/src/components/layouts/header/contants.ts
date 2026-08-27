@@ -1,7 +1,7 @@
 export const MENUS = [
   {
     label: 'OVERVIEW',
-    href: '/',
+    href: '/home',
   },
   {
     label: 'ROOMS',
@@ -10,6 +10,10 @@ export const MENUS = [
   {
     label: 'DINING',
     href: '/dining',
+  },
+  {
+    label: 'TOURS',
+    href: '/tours',
   },
   {
     label: 'SPA & MASSAGE',
