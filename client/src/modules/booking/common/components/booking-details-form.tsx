@@ -121,19 +121,13 @@ export function BookingDetailsForm({
 
     setCreatedBookingId(booking._id);
 
-    if (form.paymentMethod === 'vnpay') {
-      setPaymentRetryBookingId(booking._id);
+    setPaymentRetryBookingId(booking._id);
 
-      try {
-        await vnpayPayment.startPayment(booking._id);
-      } catch (error) {
-        setPaymentError(getPaymentErrorMessage(error));
-      }
-
-      return;
+    try {
+      await vnpayPayment.startPayment(booking._id);
+    } catch (error) {
+      setPaymentError(getPaymentErrorMessage(error));
     }
-
-    onBookingCreated(booking._id);
   };
 
   const isSubmitting = createBooking.isPending || vnpayPayment.isPending;
@@ -216,7 +210,7 @@ export function BookingDetailsForm({
         <Field control={control} name='paymentMethod'>
           {({ field }) => (
             <PaymentMethodSelector
-              value={field?.value ?? 'banking'}
+              value={field?.value ?? 'vnpay'}
               onChange={(value) => field?.onChange(value)}
               error={errors.paymentMethod?.message}
               isDisabled={isSubmitting || Boolean(paymentRetryBookingId)}
@@ -282,7 +276,7 @@ export function BookingDetailsForm({
               ? 'Opening VNPAY…'
               : paymentRetryBookingId
                 ? 'Retry payment'
-                : 'Confirm & book'}
+                : 'Confirm & pay with VNPay'}
         </Button>
       </div>
     </div>

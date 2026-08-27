@@ -43,13 +43,6 @@ export function Navbar(props: TNavbarProps) {
                     className='transition hover:text-white'>
                     {item.label}
                   </Link>
-                  <Image
-                    src='/images/chevron_down.png'
-                    alt=''
-                    width={9}
-                    height={5}
-                    className='h-[5px] w-[9px] opacity-45'
-                  />
                 </li>
               ))}
             </ul>

@@ -20,15 +20,36 @@ export const getAllRooms = async (req, res) => {
       100,
     );
     const search = req.query.search?.trim();
-    const query = search
-      ? {
-          $or: [
-            { title: { $regex: escapeRegExp(search), $options: "i" } },
-            { bed: { $regex: escapeRegExp(search), $options: "i" } },
-            { views: { $regex: escapeRegExp(search), $options: "i" } },
-          ],
-        }
-      : {};
+    const hasMinPrice = req.query.minPrice != null && req.query.minPrice !== "";
+    const hasMaxPrice = req.query.maxPrice != null && req.query.maxPrice !== "";
+    const minPrice = hasMinPrice ? Number(req.query.minPrice) : undefined;
+    const maxPrice = hasMaxPrice ? Number(req.query.maxPrice) : undefined;
+
+    if (
+      (hasMinPrice && (!Number.isFinite(minPrice) || minPrice < 0)) ||
+      (hasMaxPrice && (!Number.isFinite(maxPrice) || maxPrice < 0)) ||
+      (minPrice !== undefined && maxPrice !== undefined && minPrice > maxPrice)
+    ) {
+      return ResponseUtil.badRequest(res, "Invalid room price range");
+    }
+
+    const query = {};
+
+    if (search) {
+      query.$or = [
+        { title: { $regex: escapeRegExp(search), $options: "i" } },
+        { bed: { $regex: escapeRegExp(search), $options: "i" } },
+        { views: { $regex: escapeRegExp(search), $options: "i" } },
+      ];
+    }
+
+    if (minPrice !== undefined || maxPrice !== undefined) {
+      query.price = {
+        ...(minPrice !== undefined ? { $gte: minPrice } : {}),
+        ...(maxPrice !== undefined ? { $lte: maxPrice } : {}),
+      };
+    }
+
     const skip = (page - 1) * limit;
 
     const [rooms, total] = await Promise.all([
@@ -269,12 +290,21 @@ export const deleteRoom = async (req, res) => {
 // @access  Public
 export const getAvailableRooms = async (req, res) => {
   try {
-    const { checkInDate, checkOutDate, guests, rooms: roomCount } = req.query;
+    const {
+      checkInDate,
+      checkOutDate,
+      guests,
+      rooms: roomCount,
+      minPrice,
+      maxPrice,
+    } = req.query;
     const availableRooms = await findAvailableRooms({
       checkInDate,
       checkOutDate,
       guests,
       roomCount,
+      minPrice,
+      maxPrice,
     });
 
     const shouldPaginate = Boolean(req.query.page || req.query.limit);

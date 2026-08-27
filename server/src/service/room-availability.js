@@ -14,6 +14,8 @@ export const findAvailableRooms = async ({
   checkOutDate,
   guests,
   roomCount,
+  minPrice,
+  maxPrice,
 }) => {
   if (!checkInDate || !checkOutDate) {
     throw new RoomAvailabilityError(
@@ -43,6 +45,10 @@ export const findAvailableRooms = async ({
 
   const requestedGuests = guests == null ? undefined : Number(guests);
   const requestedRooms = roomCount == null ? undefined : Number(roomCount);
+  const requestedMinPrice =
+    minPrice == null || minPrice === "" ? undefined : Number(minPrice);
+  const requestedMaxPrice =
+    maxPrice == null || maxPrice === "" ? undefined : Number(maxPrice);
 
   if (
     (requestedGuests !== undefined &&
@@ -53,6 +59,18 @@ export const findAvailableRooms = async ({
     throw new RoomAvailabilityError(
       "Guests and rooms must be positive whole numbers",
     );
+  }
+
+  if (
+    (requestedMinPrice !== undefined &&
+      (!Number.isFinite(requestedMinPrice) || requestedMinPrice < 0)) ||
+    (requestedMaxPrice !== undefined &&
+      (!Number.isFinite(requestedMaxPrice) || requestedMaxPrice < 0)) ||
+    (requestedMinPrice !== undefined &&
+      requestedMaxPrice !== undefined &&
+      requestedMinPrice > requestedMaxPrice)
+  ) {
+    throw new RoomAvailabilityError("Invalid room price range");
   }
 
   const overlappingBookings = await Booking.find({
@@ -69,7 +87,22 @@ export const findAvailableRooms = async ({
     });
   });
 
-  const rooms = await Room.find({ status: "available" }).sort({ price: 1 });
+  const priceFilter =
+    requestedMinPrice !== undefined || requestedMaxPrice !== undefined
+      ? {
+          price: {
+            ...(requestedMinPrice !== undefined
+              ? { $gte: requestedMinPrice }
+              : {}),
+            ...(requestedMaxPrice !== undefined
+              ? { $lte: requestedMaxPrice }
+              : {}),
+          },
+        }
+      : {};
+  const rooms = await Room.find({ status: "available", ...priceFilter }).sort({
+    price: 1,
+  });
 
   return rooms
     .map((room) => {

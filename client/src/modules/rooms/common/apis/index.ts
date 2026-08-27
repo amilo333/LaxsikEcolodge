@@ -5,6 +5,8 @@ import { TRoom } from '../types';
 export type TRoomListParams = {
   page: number;
   limit: number;
+  minPrice?: number;
+  maxPrice?: number;
 };
 
 export const getRoomListApi = async (params: TRoomListParams) => {
@@ -22,6 +24,8 @@ export type TAvailableRoomsParams = {
   rooms?: string;
   page?: number;
   limit?: number;
+  minPrice?: number;
+  maxPrice?: number;
 };
 
 export type TAvailableRoomsResponse = {

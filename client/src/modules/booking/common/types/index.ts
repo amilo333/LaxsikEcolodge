@@ -20,7 +20,7 @@ export type TBookingPricing = {
 };
 
 export type TPaymentMethod = 'banking' | 'vnpay' | 'momo';
-export type TCheckoutPaymentMethod = Exclude<TPaymentMethod, 'momo'>;
+export type TCheckoutPaymentMethod = 'vnpay';
 
 export type TBookingCustomerInfo = {
   fullNameContact: string;

@@ -9,6 +9,18 @@ import Link from 'next/link';
 import { buildRoomDetailUrl } from '@/utils';
 import { useEffect } from 'react';
 
+const PRICE_RANGES: Array<{
+  label: string;
+  minPrice?: number;
+  maxPrice?: number;
+}> = [
+  { label: 'All prices' },
+  { label: 'Under 2M', maxPrice: 2_000_000 },
+  { label: '2M – 3M', minPrice: 2_000_000, maxPrice: 3_000_000 },
+  { label: '3M – 5M', minPrice: 3_000_000, maxPrice: 5_000_000 },
+  { label: '5M+', minPrice: 5_000_000 },
+];
+
 export function RoomListModule() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -16,12 +28,39 @@ export function RoomListModule() {
   const checkOutDate = searchParams.get('checkOutDate');
   const guests = searchParams.get('guests');
   const roomCount = searchParams.get('rooms');
+  const minPriceParam = searchParams.get('minPrice');
+  const maxPriceParam = searchParams.get('maxPrice');
+  const parsedMinPrice = Number(minPriceParam);
+  const parsedMaxPrice = Number(maxPriceParam);
+  const minPrice =
+    minPriceParam !== null &&
+    minPriceParam !== '' &&
+    Number.isFinite(parsedMinPrice) &&
+    parsedMinPrice >= 0
+      ? parsedMinPrice
+      : undefined;
+  const maxPrice =
+    maxPriceParam !== null &&
+    maxPriceParam !== '' &&
+    Number.isFinite(parsedMaxPrice) &&
+    parsedMaxPrice >= 0
+      ? parsedMaxPrice
+      : undefined;
+  const isPriceFiltered = minPrice !== undefined || maxPrice !== undefined;
   const requestedPage = Number(searchParams.get('page'));
   const page =
     Number.isInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
   const pageSize = 5;
   const isSearching = Boolean(checkInDate && checkOutDate);
-  const roomListQuery = useRoomListApi({ page, limit: pageSize }, !isSearching);
+  const roomListQuery = useRoomListApi(
+    {
+      page,
+      limit: pageSize,
+      ...(minPrice !== undefined ? { minPrice } : {}),
+      ...(maxPrice !== undefined ? { maxPrice } : {}),
+    },
+    !isSearching
+  );
   const availableRoomsQuery = useAvailableRoomsApi({
     checkInDate,
     checkOutDate,
@@ -29,6 +68,8 @@ export function RoomListModule() {
     rooms: roomCount,
     page,
     limit: pageSize,
+    minPrice,
+    maxPrice,
   });
   const rooms = isSearching
     ? availableRoomsQuery.data?.data
@@ -68,6 +109,26 @@ export function RoomListModule() {
       params.set('page', String(nextPage));
     }
 
+    const query = params.toString();
+    router.push(`/rooms${query ? `?${query}` : ''}`);
+  };
+
+  const handlePriceRangeChange = (range: (typeof PRICE_RANGES)[number]) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (range.minPrice === undefined) {
+      params.delete('minPrice');
+    } else {
+      params.set('minPrice', String(range.minPrice));
+    }
+
+    if (range.maxPrice === undefined) {
+      params.delete('maxPrice');
+    } else {
+      params.set('maxPrice', String(range.maxPrice));
+    }
+
+    params.delete('page');
     const query = params.toString();
     router.push(`/rooms${query ? `?${query}` : ''}`);
   };
@@ -133,40 +194,103 @@ export function RoomListModule() {
           </div>
         </div>
       )}
-      <div className='my-15 flex flex-col items-center justify-center gap-10'>
-        {isLoading && <p className='text-[#0D4949]'>Searching rooms…</p>}
-        {!isLoading &&
-          rooms?.map((room) => {
-            return (
-              <RoomItem
-                key={room._id}
-                room={room}
-                detailHref={buildRoomDetailUrl(room._id, searchParams)}
-              />
-            );
-          })}
-        {!isLoading && rooms?.length === 0 && (
-          <div className='rounded-xl bg-white px-8 py-12 text-center shadow-lg'>
-            <p className='text-xl font-semibold text-[#0D4949]'>
-              No rooms available
-            </p>
-            <p className='mt-2 text-sm'>Try different dates or fewer guests.</p>
+
+      <div
+        className={`mx-auto grid w-[92%] gap-7 lg:grid-cols-[260px_minmax(0,1fr)] lg:items-start xl:w-[88%] ${
+          isSearching ? 'my-6' : 'my-10'
+        }`}>
+        <aside className='rounded-[18px] border border-[#DCE6E2] bg-white p-4 shadow-[0_12px_32px_rgba(13,73,73,0.07)] sm:p-5 lg:sticky lg:top-5 lg:p-6'>
+          <div className='flex items-center gap-3 border-b border-[#E2EAE7] pb-4'>
+            <span className='flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#EAF3F0] text-[#0D665A]'>
+              <svg
+                aria-hidden='true'
+                viewBox='0 0 24 24'
+                className='h-5 w-5 fill-none stroke-current stroke-[1.8]'>
+                <path d='M4 7h10M18 7h2M4 17h2M10 17h10M14 4v6M6 14v6' />
+              </svg>
+            </span>
+            <div>
+              <p className='mt-0.5 text-sm font-bold text-[#0D4949]'>
+                Price per night
+              </p>
+            </div>
           </div>
-        )}
-        {isError && (
-          <p className='text-red-700'>
-            Unable to load rooms. Please try again.
+
+          <div className='mt-4 flex flex-wrap gap-2 lg:flex-col'>
+            {PRICE_RANGES.map((range) => {
+              const isActive =
+                minPrice === range.minPrice && maxPrice === range.maxPrice;
+
+              return (
+                <button
+                  key={range.label}
+                  type='button'
+                  aria-pressed={isActive}
+                  onClick={() => handlePriceRangeChange(range)}
+                  className={`rounded-full border px-3.5 py-2 text-[10px] font-bold transition-colors focus-visible:ring-2 focus-visible:ring-[#0D4949] focus-visible:ring-offset-2 focus-visible:outline-none sm:text-[11px] lg:w-full lg:px-4 lg:text-left ${
+                    isActive
+                      ? 'border-[#0D4949] bg-[#0D4949] text-white shadow-sm'
+                      : 'border-[#D5E1DD] bg-[#F8FAF9] text-[#52615C] hover:border-[#0D4949]/50 hover:bg-[#EEF5F3]'
+                  }`}>
+                  {range.label}
+                </button>
+              );
+            })}
+          </div>
+
+          <p className='mt-4 border-t border-[#E2EAE7] pt-4 text-[10px] font-semibold text-[#71807B]'>
+            {pagination?.total ?? rooms?.length ?? 0} room
+            {(pagination?.total ?? rooms?.length ?? 0) === 1 ? '' : 's'} found
           </p>
-        )}
-        {!isLoading && !isError && pagination && pagination.totalPages > 1 && (
-          <div className='w-[92%] py-2 lg:w-[75%]'>
-            <Pagination
-              currentPage={Math.min(page, pagination.totalPages)}
-              totalPages={pagination.totalPages}
-              onChangePage={handleChangePage}
-            />
-          </div>
-        )}
+        </aside>
+
+        <div className='flex min-w-0 flex-col gap-7 sm:gap-9'>
+          {isLoading && (
+            <p className='py-12 text-center text-[#0D4949]'>Searching rooms…</p>
+          )}
+          {!isLoading &&
+            rooms?.map((room, index) => {
+              return (
+                <RoomItem
+                  key={room._id}
+                  room={room}
+                  detailHref={buildRoomDetailUrl(room._id, searchParams)}
+                  isPriority={index === 0}
+                />
+              );
+            })}
+          {!isLoading && rooms?.length === 0 && (
+            <div className='rounded-xl bg-white px-8 py-12 text-center shadow-lg'>
+              <p className='text-xl font-semibold text-[#0D4949]'>
+                {isPriceFiltered
+                  ? 'No rooms in this price range'
+                  : 'No rooms available'}
+              </p>
+              <p className='mt-2 text-sm'>
+                {isPriceFiltered
+                  ? 'Try another price range or clear the filter.'
+                  : 'Try different dates or fewer guests.'}
+              </p>
+            </div>
+          )}
+          {isError && (
+            <p className='py-12 text-center text-red-700'>
+              Unable to load rooms. Please try again.
+            </p>
+          )}
+          {!isLoading &&
+            !isError &&
+            pagination &&
+            pagination.totalPages > 1 && (
+              <div className='w-full py-2'>
+                <Pagination
+                  currentPage={Math.min(page, pagination.totalPages)}
+                  totalPages={pagination.totalPages}
+                  onChangePage={handleChangePage}
+                />
+              </div>
+            )}
+        </div>
       </div>
       <Facilities />
       <Policies />

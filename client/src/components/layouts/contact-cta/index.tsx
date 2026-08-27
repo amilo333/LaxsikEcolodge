@@ -14,7 +14,7 @@ export function ContactCta(props: TContactCtaProps) {
 
   return (
     <section
-      className={`mx-auto my-30 flex h-30 w-[80%] max-w-[1600px] items-center rounded-full border border-white/10 bg-[#0D4949] px-3 py-6 text-white shadow-[0_20px_50px_rgba(0,0,0,0.1)] ${className}`}>
+      className={`mx-auto my-30 flex h-30 w-[80%] max-w-[1600px] items-center rounded-full! border border-white/10 bg-[#0D4949] px-3 py-6 text-white shadow-[0_20px_50px_rgba(0,0,0,0.1)] ${className}`}>
       <div className='flex w-full items-center justify-around'>
         <div className='text-[18px] leading-[1.6] sm:text-[20px]'>{title}</div>
 

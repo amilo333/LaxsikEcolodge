@@ -21,13 +21,24 @@ type TAvailableRoomsSearch = {
   rooms?: string | null;
   page?: number;
   limit?: number;
+  minPrice?: number;
+  maxPrice?: number;
 };
 
 export const useAvailableRoomsApi = (
   search: TAvailableRoomsSearch,
   enabled = true
 ) => {
-  const { checkInDate, checkOutDate, guests, rooms, page, limit } = search;
+  const {
+    checkInDate,
+    checkOutDate,
+    guests,
+    rooms,
+    page,
+    limit,
+    minPrice,
+    maxPrice,
+  } = search;
   const canSearch = enabled && Boolean(checkInDate && checkOutDate);
 
   return useQuery({
@@ -39,6 +50,8 @@ export const useAvailableRoomsApi = (
       rooms,
       page,
       limit,
+      minPrice,
+      maxPrice,
     ],
     queryFn: () =>
       getAvailableRoomsApi({
@@ -48,6 +61,8 @@ export const useAvailableRoomsApi = (
         ...(rooms ? { rooms } : {}),
         ...(page ? { page } : {}),
         ...(limit ? { limit } : {}),
+        ...(minPrice !== undefined ? { minPrice } : {}),
+        ...(maxPrice !== undefined ? { maxPrice } : {}),
       }),
     enabled: canSearch,
   });

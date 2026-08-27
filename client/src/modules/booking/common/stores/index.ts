@@ -43,7 +43,7 @@ export const useBookingStore = create<TBookingStore>((set) => ({
   voucherError: '',
   checkoutMessage: '',
   customerInfo: null,
-  paymentMethod: 'banking',
+  paymentMethod: 'vnpay',
   createdBookingId: null,
 
   initializeBooking: ({ bookingKey, roomId, roomQuantity }) =>
@@ -58,7 +58,7 @@ export const useBookingStore = create<TBookingStore>((set) => ({
         voucherError: '',
         checkoutMessage: '',
         customerInfo: null,
-        paymentMethod: 'banking',
+        paymentMethod: 'vnpay',
         createdBookingId: null,
       };
     }),
