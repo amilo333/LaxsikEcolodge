@@ -1,6 +1,22 @@
 'use client';
 
 import { formatCurrency } from '@/utils';
+import Link from 'next/link';
+import {
+  Area,
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  ComposedChart,
+  Line,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
 import { TAdminSummary, useAdminSummaryApi } from '../common';
 
 const formatAdminDate = (date: string) =>
@@ -17,156 +33,146 @@ const STATUS_META = {
   cancelled: { label: 'Đã hủy', color: '#C85A64' },
 } as const;
 
-type TChartPoint = { x: number; y: number };
+const getNumericValue = (value: unknown) => {
+  const resolvedValue = Array.isArray(value) ? value[0] : value;
+  const number = Number(resolvedValue ?? 0);
 
-const createSmoothPath = (points: TChartPoint[]) => {
-  if (points.length === 0) return '';
-  if (points.length === 1) return `M ${points[0].x} ${points[0].y}`;
+  return Number.isFinite(number) ? number : 0;
+};
 
-  let path = `M ${points[0].x} ${points[0].y}`;
+const formatCompactCurrency = (value: unknown) => {
+  const amount = getNumericValue(value);
 
-  for (let index = 0; index < points.length - 1; index += 1) {
-    const previous = points[index - 1] ?? points[index];
-    const current = points[index];
-    const next = points[index + 1];
-    const afterNext = points[index + 2] ?? next;
-    const controlOne = {
-      x: current.x + (next.x - previous.x) / 6,
-      y: current.y + (next.y - previous.y) / 6,
-    };
-    const controlTwo = {
-      x: next.x - (afterNext.x - current.x) / 6,
-      y: next.y - (afterNext.y - current.y) / 6,
-    };
-
-    path += ` C ${controlOne.x} ${controlOne.y}, ${controlTwo.x} ${controlTwo.y}, ${next.x} ${next.y}`;
+  if (amount >= 1_000_000_000) {
+    return `${(amount / 1_000_000_000).toLocaleString('vi-VN', {
+      maximumFractionDigits: 1,
+    })} tỷ`;
   }
 
-  return path;
+  if (amount >= 1_000_000) {
+    return `${(amount / 1_000_000).toLocaleString('vi-VN', {
+      maximumFractionDigits: 1,
+    })} tr`;
+  }
+
+  if (amount >= 1_000) {
+    return `${Math.round(amount / 1_000).toLocaleString('vi-VN')}k`;
+  }
+
+  return amount.toLocaleString('vi-VN');
+};
+
+const tooltipStyle = {
+  border: '1px solid #DDE7E4',
+  borderRadius: '12px',
+  boxShadow: '0 12px 30px rgba(13, 73, 73, 0.12)',
+  color: '#263F3C',
+  fontSize: '11px',
+};
+
+const formatGrowthNote = (growth: number | null | undefined) => {
+  if (growth == null) return 'Chưa có dữ liệu tháng trước';
+
+  return `${growth >= 0 ? '+' : ''}${growth.toLocaleString('vi-VN', {
+    maximumFractionDigits: 1,
+  })}% so với tháng trước`;
 };
 
 function BookingTrendChart({ data }: { data: TAdminSummary['bookingTrend'] }) {
-  const maxRevenue = Math.max(...data.map((item) => item.paidRevenue), 1);
-  const maxActivity = Math.max(
-    ...data.flatMap((item) => [item.bookings, item.guests]),
-    1
-  );
-  const startX = 58;
-  const stepX = 86;
-  const baselineY = 172;
-  const chartHeight = 118;
-  const bookingPoints = data.map((item, index) => ({
-    x: startX + index * stepX,
-    y: baselineY - (item.bookings / maxActivity) * chartHeight,
-  }));
-  const guestPoints = data.map((item, index) => ({
-    x: startX + index * stepX,
-    y: baselineY - (item.guests / maxActivity) * chartHeight,
-  }));
-  const bookingPath = createSmoothPath(bookingPoints);
-  const guestPath = createSmoothPath(guestPoints);
-  const guestAreaPath = guestPath
-    ? `${guestPath} L ${guestPoints.at(-1)?.x} ${baselineY} L ${guestPoints[0].x} ${baselineY} Z`
-    : '';
-
   return (
     <div className='overflow-x-auto'>
-      <svg
-        viewBox='0 0 550 220'
+      <div
         role='img'
         aria-label='Biểu đồ booking, khách và doanh thu 6 tháng gần nhất'
-        className='min-w-[520px]'>
-        <defs>
-          <linearGradient id='guest-area' x1='0' x2='0' y1='0' y2='1'>
-            <stop offset='0%' stopColor='#D18A17' stopOpacity='0.2' />
-            <stop offset='100%' stopColor='#D18A17' stopOpacity='0' />
-          </linearGradient>
-        </defs>
-        {[54, 93, 132, 172].map((y) => (
-          <line
-            key={y}
-            x1='38'
-            x2='528'
-            y1={y}
-            y2={y}
-            stroke='#E7EEEB'
-            strokeWidth='1'
-          />
-        ))}
-
-        {data.map((item, index) => {
-          const x = startX + index * stepX;
-          const barHeight = (item.paidRevenue / maxRevenue) * chartHeight;
-
-          return (
-            <g key={item.month}>
-              <rect
-                x={x - 16}
-                y={baselineY - barHeight}
-                width='32'
-                height={barHeight}
-                rx='9'
-                fill='#DCECE7'>
-                <title>{`${item.label}: ${formatCurrency(item.paidRevenue)} doanh thu`}</title>
-              </rect>
-              <text
-                x={x}
-                y='202'
-                textAnchor='middle'
-                fill='#71807B'
-                fontSize='11'
-                fontWeight='600'>
-                {item.label}
-              </text>
-            </g>
-          );
-        })}
-
-        {data.length > 1 && (
-          <>
-            <path d={guestAreaPath} fill='url(#guest-area)' />
-            <path
-              d={bookingPath}
-              fill='none'
-              stroke='#0D5A56'
-              strokeWidth='3'
-              strokeLinecap='round'
-              strokeLinejoin='round'
+        className='h-[260px] min-w-[560px]'>
+        <ResponsiveContainer width='100%' height='100%'>
+          <ComposedChart
+            accessibilityLayer
+            data={data}
+            margin={{ top: 12, right: 4, bottom: 4, left: -18 }}>
+            <defs>
+              <linearGradient id='guest-area' x1='0' x2='0' y1='0' y2='1'>
+                <stop offset='0%' stopColor='#D18A17' stopOpacity='0.2' />
+                <stop offset='100%' stopColor='#D18A17' stopOpacity='0.01' />
+              </linearGradient>
+            </defs>
+            <CartesianGrid
+              vertical={false}
+              stroke='#E7EEEB'
+              strokeDasharray='4 4'
             />
-            <path
-              d={guestPath}
-              fill='none'
+            <XAxis
+              dataKey='label'
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: '#71807B', fontSize: 11, fontWeight: 600 }}
+              tickMargin={10}
+            />
+            <YAxis
+              yAxisId='activity'
+              allowDecimals={false}
+              axisLine={false}
+              tickLine={false}
+              width={42}
+              tick={{ fill: '#8A9692', fontSize: 10 }}
+            />
+            <YAxis
+              yAxisId='revenue'
+              orientation='right'
+              axisLine={false}
+              tickLine={false}
+              width={64}
+              tick={{ fill: '#8A9692', fontSize: 10 }}
+              tickFormatter={formatCompactCurrency}
+            />
+            <Tooltip
+              contentStyle={tooltipStyle}
+              cursor={{ fill: '#F2F6F4', opacity: 0.7 }}
+              labelStyle={{ color: '#163D3B', fontWeight: 800 }}
+              formatter={(value, name) => {
+                const amount = getNumericValue(value);
+                const label = String(name ?? '');
+
+                return [
+                  label === 'Doanh thu'
+                    ? formatCurrency(amount)
+                    : amount.toLocaleString('vi-VN'),
+                  label,
+                ];
+              }}
+            />
+            <Bar
+              yAxisId='revenue'
+              dataKey='paidRevenue'
+              name='Doanh thu'
+              fill='#DCECE7'
+              maxBarSize={34}
+              radius={[9, 9, 2, 2]}
+            />
+            <Area
+              yAxisId='activity'
+              type='monotone'
+              dataKey='guests'
+              name='Khách'
               stroke='#D18A17'
-              strokeWidth='3'
-              strokeLinecap='round'
-              strokeLinejoin='round'
+              strokeWidth={3}
+              fill='url(#guest-area)'
+              dot={{ fill: '#D18A17', r: 4, stroke: '#FFFFFF', strokeWidth: 2 }}
+              activeDot={{ r: 6, stroke: '#FFFFFF', strokeWidth: 3 }}
             />
-          </>
-        )}
-
-        {data.map((item, index) => (
-          <g key={`${item.month}-points`}>
-            <circle
-              cx={bookingPoints[index].x}
-              cy={bookingPoints[index].y}
-              r='4.5'
-              fill='#0D5A56'
-              stroke='white'
-              strokeWidth='2'>
-              <title>{`${item.bookings} booking`}</title>
-            </circle>
-            <circle
-              cx={guestPoints[index].x}
-              cy={guestPoints[index].y}
-              r='4.5'
-              fill='#D18A17'
-              stroke='white'
-              strokeWidth='2'>
-              <title>{`${item.guests} khách đặt phòng`}</title>
-            </circle>
-          </g>
-        ))}
-      </svg>
+            <Line
+              yAxisId='activity'
+              type='monotone'
+              dataKey='bookings'
+              name='Booking'
+              stroke='#0D5A56'
+              strokeWidth={3}
+              dot={{ fill: '#0D5A56', r: 4, stroke: '#FFFFFF', strokeWidth: 2 }}
+              activeDot={{ r: 6, stroke: '#FFFFFF', strokeWidth: 3 }}
+            />
+          </ComposedChart>
+        </ResponsiveContainer>
+      </div>
     </div>
   );
 }
@@ -177,23 +183,52 @@ function BookingStatusChart({
   data: TAdminSummary['bookingStatus'];
 }) {
   const total = data.reduce((sum, item) => sum + item.count, 0);
-  let currentPercent = 0;
-  const gradientSegments = data.map((item) => {
-    const start = currentPercent;
-    const value = total > 0 ? (item.count / total) * 100 : 0;
-    currentPercent += value;
-    return `${STATUS_META[item.status].color} ${start}% ${currentPercent}%`;
-  });
-  const background = total
-    ? `conic-gradient(${gradientSegments.join(', ')})`
-    : '#E8EFED';
+  const chartData = total
+    ? data.map((item) => ({
+        name: STATUS_META[item.status].label,
+        value: item.count,
+        color: STATUS_META[item.status].color,
+      }))
+    : [{ name: 'Chưa có dữ liệu', value: 1, color: '#E8EFED' }];
 
   return (
     <div className='grid items-center gap-6 sm:grid-cols-[170px_1fr]'>
       <div
-        className='relative mx-auto flex h-40 w-40 items-center justify-center rounded-full'
-        style={{ background }}>
-        <div className='flex h-[106px] w-[106px] flex-col items-center justify-center rounded-full bg-white shadow-[inset_0_0_0_1px_#E7EEEB]'>
+        role='img'
+        aria-label='Biểu đồ tỷ lệ trạng thái booking'
+        className='relative mx-auto h-44 w-44'>
+        <ResponsiveContainer width='100%' height='100%'>
+          <PieChart accessibilityLayer>
+            <Pie
+              data={chartData}
+              dataKey='value'
+              nameKey='name'
+              cx='50%'
+              cy='50%'
+              innerRadius={53}
+              outerRadius={76}
+              paddingAngle={total ? 2 : 0}
+              cornerRadius={5}
+              stroke='#FFFFFF'
+              strokeWidth={2}>
+              {chartData.map((item) => (
+                <Cell key={item.name} fill={item.color} />
+              ))}
+            </Pie>
+            {total > 0 && (
+              <Tooltip
+                contentStyle={tooltipStyle}
+                cursor={false}
+                formatter={(value, name) => [
+                  `${getNumericValue(value).toLocaleString('vi-VN')} booking`,
+                  String(name ?? ''),
+                ]}
+              />
+            )}
+          </PieChart>
+        </ResponsiveContainer>
+
+        <div className='pointer-events-none absolute inset-0 flex flex-col items-center justify-center'>
           <span className='text-2xl font-black text-[#163D3B]'>
             {total.toLocaleString('vi-VN')}
           </span>
@@ -202,23 +237,99 @@ function BookingStatusChart({
       </div>
 
       <div className='space-y-3'>
-        {data.map((item) => (
-          <div
-            key={item.status}
-            className='flex items-center justify-between gap-4'>
-            <span className='flex items-center gap-2 text-[11px] text-[#556560]'>
-              <span
-                className='h-2.5 w-2.5 rounded-full'
-                style={{ backgroundColor: STATUS_META[item.status].color }}
-              />
-              {STATUS_META[item.status].label}
-            </span>
-            <span className='text-xs font-extrabold text-[#263F3C]'>
-              {item.count.toLocaleString('vi-VN')}
-            </span>
-          </div>
-        ))}
+        {data.length > 0 ? (
+          data.map((item) => (
+            <div
+              key={item.status}
+              className='flex items-center justify-between gap-4'>
+              <span className='flex items-center gap-2 text-[11px] text-[#556560]'>
+                <span
+                  className='h-2.5 w-2.5 rounded-full'
+                  style={{ backgroundColor: STATUS_META[item.status].color }}
+                />
+                {STATUS_META[item.status].label}
+              </span>
+              <span className='text-xs font-extrabold text-[#263F3C]'>
+                {item.count.toLocaleString('vi-VN')}
+              </span>
+            </div>
+          ))
+        ) : (
+          <p className='text-center text-xs text-[#7A8682] sm:text-left'>
+            Chưa có dữ liệu trạng thái.
+          </p>
+        )}
       </div>
+    </div>
+  );
+}
+
+function RoomOccupancyChart({
+  data,
+}: {
+  data: TAdminSummary['roomPerformance'];
+}) {
+  if (data.length === 0) {
+    return (
+      <div className='flex h-[260px] items-center justify-center rounded-[16px] bg-[#F7F9F8] text-xs text-[#7A8682]'>
+        Chưa có phòng đang mở bán.
+      </div>
+    );
+  }
+
+  return (
+    <div
+      role='img'
+      aria-label='Biểu đồ công suất phòng trong tháng hiện tại'
+      className='h-[260px] w-full'>
+      <ResponsiveContainer width='100%' height='100%'>
+        <BarChart
+          accessibilityLayer
+          data={data}
+          layout='vertical'
+          margin={{ top: 4, right: 16, bottom: 4, left: 8 }}>
+          <CartesianGrid
+            horizontal={false}
+            stroke='#E7EEEB'
+            strokeDasharray='4 4'
+          />
+          <XAxis
+            type='number'
+            domain={[0, 100]}
+            axisLine={false}
+            tickLine={false}
+            tick={{ fill: '#8A9692', fontSize: 10 }}
+            tickFormatter={(value) => `${getNumericValue(value)}%`}
+          />
+          <YAxis
+            type='category'
+            dataKey='title'
+            axisLine={false}
+            tickLine={false}
+            width={118}
+            tick={{ fill: '#556560', fontSize: 10, fontWeight: 600 }}
+            tickFormatter={(value) => {
+              const label = String(value);
+              return label.length > 18 ? `${label.slice(0, 17)}…` : label;
+            }}
+          />
+          <Tooltip
+            contentStyle={tooltipStyle}
+            cursor={{ fill: '#F2F6F4', opacity: 0.75 }}
+            formatter={(value) => [
+              `${getNumericValue(value).toLocaleString('vi-VN')}%`,
+              'Công suất',
+            ]}
+          />
+          <Bar
+            dataKey='occupancyRate'
+            name='Công suất'
+            fill='#0D5A56'
+            maxBarSize={28}
+            radius={[0, 8, 8, 0]}
+          />
+        </BarChart>
+      </ResponsiveContainer>
     </div>
   );
 }
@@ -229,38 +340,61 @@ export function AdminOverview() {
   const bookings = summary?.recentBookings ?? [];
   const bookingTrend = summary?.bookingTrend ?? [];
   const bookingStatus = summary?.bookingStatus ?? [];
+  const roomPerformance = summary?.roomPerformance ?? [];
   const stats = [
     {
-      label: 'Người dùng',
+      label: 'Doanh thu tháng',
       value: summaryQuery.isLoading
         ? '—'
-        : (summary?.totalUsers ?? 0).toLocaleString('vi-VN'),
-      note: `${summary?.activeUsers ?? 0} đang hoạt động`,
+        : formatCurrency(summary?.currentMonthRevenue ?? 0),
+      note: formatGrowthNote(summary?.revenueGrowthPercent),
       color: 'bg-[#EAF4F1] text-[#0D665A]',
     },
     {
-      label: 'Tổng số phòng',
+      label: 'Công suất phòng',
       value: summaryQuery.isLoading
         ? '—'
-        : (summary?.totalRooms ?? 0).toLocaleString('vi-VN'),
-      note: `${summary?.availableRooms ?? 0} đang mở bán`,
+        : `${(summary?.occupancyRate ?? 0).toLocaleString('vi-VN')}%`,
+      note: `${summary?.occupiedRoomNights ?? 0}/${summary?.availableRoomNights ?? 0} đêm phòng`,
       color: 'bg-[#EAF1FB] text-[#245D9C]',
     },
     {
-      label: 'Booking',
+      label: 'Booking tháng',
       value: summaryQuery.isLoading
         ? '—'
-        : (summary?.totalBookings ?? 0).toLocaleString('vi-VN'),
-      note: `${summary?.pendingBookings ?? 0} chờ xác nhận`,
+        : (summary?.currentMonthBookings ?? 0).toLocaleString('vi-VN'),
+      note: formatGrowthNote(summary?.bookingGrowthPercent),
       color: 'bg-[#FFF3DB] text-[#97610B]',
     },
     {
-      label: 'Doanh thu đã trả',
+      label: 'Giá trị booking TB',
       value: summaryQuery.isLoading
         ? '—'
-        : formatCurrency(summary?.paidRevenue ?? 0),
-      note: 'Từ booking đã thanh toán',
+        : formatCurrency(summary?.averageBookingValue ?? 0),
+      note: `${summary?.currentMonthPaidBookings ?? 0} booking đã thanh toán`,
       color: 'bg-[#F0ECFA] text-[#6745A1]',
+    },
+  ];
+  const operationalItems = [
+    {
+      label: 'Check-in hôm nay',
+      value: summary?.checkInsToday ?? 0,
+      color: 'bg-[#EAF4F1] text-[#0D665A]',
+    },
+    {
+      label: 'Check-out hôm nay',
+      value: summary?.checkOutsToday ?? 0,
+      color: 'bg-[#EAF1FB] text-[#245D9C]',
+    },
+    {
+      label: 'Chờ xác nhận',
+      value: summary?.pendingBookings ?? 0,
+      color: 'bg-[#FFF3DB] text-[#97610B]',
+    },
+    {
+      label: 'Chưa thanh toán',
+      value: summary?.unpaidBookings ?? 0,
+      color: 'bg-[#FCEBEC] text-[#A33A43]',
     },
   ];
 
@@ -332,6 +466,68 @@ export function AdminOverview() {
               <BookingStatusChart data={bookingStatus} />
             )}
           </div>
+        </section>
+      </div>
+
+      <div className='grid gap-6 xl:grid-cols-[1.35fr_1fr]'>
+        <section className='rounded-[16px] border border-[#DDE7E4] bg-white p-5 shadow-[0_12px_38px_rgba(13,73,73,0.06)] sm:p-6'>
+          <div>
+            <h2 className='font-lora text-lg font-semibold text-[#163D3B]'>
+              Công suất theo loại phòng
+            </h2>
+            <p className='mt-1 text-[11px] text-[#7A8682]'>
+              Top 5 loại phòng trong tháng hiện tại
+            </p>
+          </div>
+          <div className='mt-5'>
+            {summaryQuery.isLoading ? (
+              <div className='h-[260px] animate-pulse rounded-[16px] bg-[#F2F6F4]' />
+            ) : (
+              <RoomOccupancyChart data={roomPerformance} />
+            )}
+          </div>
+        </section>
+
+        <section className='rounded-[16px] border border-[#DDE7E4] bg-white p-5 shadow-[0_12px_38px_rgba(13,73,73,0.06)] sm:p-6'>
+          <div className='flex items-start justify-between gap-4'>
+            <div>
+              <h2 className='font-lora text-lg font-semibold text-[#163D3B]'>
+                Cần xử lý hôm nay
+              </h2>
+              <p className='mt-1 text-[11px] text-[#7A8682]'>
+                Các đầu việc vận hành cần chú ý
+              </p>
+            </div>
+            <Link
+              href='/admin?section=bookings'
+              className='shrink-0 rounded-full border border-[#C9D8D4] px-3 py-2 text-[10px] font-bold text-[#0D665A] hover:bg-[#EAF4F1]'>
+              Xem booking
+            </Link>
+          </div>
+
+          <div className='mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2'>
+            {operationalItems.map((item) => (
+              <article
+                key={item.label}
+                className='rounded-[14px] border border-[#E4ECE9] bg-[#FAFCFB] p-4'>
+                <span
+                  className={`inline-flex rounded-full px-2.5 py-1 text-[9px] font-extrabold ${item.color}`}>
+                  {item.label}
+                </span>
+                <p className='mt-3 text-2xl font-black text-[#163D3B]'>
+                  {summaryQuery.isLoading
+                    ? '—'
+                    : item.value.toLocaleString('vi-VN')}
+                </p>
+              </article>
+            ))}
+          </div>
+
+          <p className='mt-4 rounded-xl bg-[#F5F8F7] px-4 py-3 text-[11px] text-[#65736F]'>
+            {summaryQuery.isLoading
+              ? 'Đang kiểm tra tình trạng phòng…'
+              : `${summary?.maintenanceRooms ?? 0} phòng đang bảo trì.`}
+          </p>
         </section>
       </div>
 

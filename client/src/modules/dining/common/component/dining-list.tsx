@@ -1,6 +1,6 @@
 import Image from 'next/image';
 
-export type TDiningItem = {
+type TDiningItem = {
   id: string;
   title: string;
   description: string;

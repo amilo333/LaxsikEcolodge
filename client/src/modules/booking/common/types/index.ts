@@ -20,7 +20,7 @@ export type TBookingPricing = {
   selectedRoomCount: number;
 };
 
-export type TPaymentMethod = 'banking' | 'vnpay' | 'momo';
+type TPaymentMethod = 'banking' | 'vnpay' | 'momo';
 export type TCheckoutPaymentMethod = 'vnpay';
 
 export type TBookingCustomerInfo = {
@@ -47,7 +47,7 @@ export type TCreateBookingPayload = {
   customerInfo: TBookingCustomerInfo;
 };
 
-export type TBookingItem = {
+type TBookingItem = {
   roomId: string | TRoom;
   quantity: number;
   pricePerNight: number;

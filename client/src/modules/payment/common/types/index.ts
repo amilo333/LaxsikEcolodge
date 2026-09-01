@@ -1,4 +1,4 @@
-export type TPaymentProvider = 'vnpay';
+type TPaymentProvider = 'vnpay';
 
 export type TVnpayPayment = {
   paymentId: string;

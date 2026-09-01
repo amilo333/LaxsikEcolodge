@@ -12,6 +12,7 @@ import {
   BookingsManagement,
   ExperienceManagement,
   RoomsManagement,
+  ToursManagement,
   UsersManagement,
   VouchersManagement,
 } from './components';
@@ -20,6 +21,7 @@ const SECTIONS: TAdminSection[] = [
   'overview',
   'users',
   'rooms',
+  'tours',
   'bookings',
   'vouchers',
   'dining',
@@ -30,6 +32,7 @@ const TITLES: Record<TAdminSection, string> = {
   overview: 'Tổng quan hệ thống',
   users: 'Quản lý người dùng',
   rooms: 'Quản lý phòng',
+  tours: 'Quản lý tour',
   bookings: 'Quản lý booking',
   vouchers: 'Quản lý voucher',
   dining: 'Quản lý Dining',
@@ -130,6 +133,7 @@ export default function AdminModule() {
     overview: <AdminOverview />,
     users: <UsersManagement currentUser={user} />,
     rooms: <RoomsManagement />,
+    tours: <ToursManagement />,
     bookings: <BookingsManagement />,
     vouchers: <VouchersManagement />,
     dining: <ExperienceManagement kind='dining' />,
@@ -147,7 +151,7 @@ export default function AdminModule() {
               <p className='text-[9px] font-extrabold text-[#7B8B86] uppercase'>
                 Admin Dashboard
               </p>
-              <h1 className='mt-1 truncate font-[family-name:var(--font-lora)] text-lg font-bold text-[#0D4949] sm:text-xl'>
+              <h1 className='mt-1 truncate font-[family-name:var(--font-lora)] text-lg font-bold text-[#0D4949] uppercase sm:text-xl'>
                 {TITLES[activeSection]}
               </h1>
             </div>

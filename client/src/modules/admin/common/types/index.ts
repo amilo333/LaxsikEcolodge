@@ -6,6 +6,7 @@ export type TAdminSection =
   | 'overview'
   | 'users'
   | 'rooms'
+  | 'tours'
   | 'bookings'
   | 'vouchers'
   | 'dining'
@@ -53,6 +54,27 @@ export type TAdminSummary = {
     status: TBooking['bookingStatus'];
     count: number;
   }>;
+  currentMonthRevenue: number;
+  revenueGrowthPercent: number | null;
+  currentMonthBookings: number;
+  bookingGrowthPercent: number | null;
+  currentMonthPaidBookings: number;
+  averageBookingValue: number;
+  occupancyRate: number;
+  occupiedRoomNights: number;
+  availableRoomNights: number;
+  roomPerformance: Array<{
+    roomId: string;
+    title: string;
+    bookings: number;
+    bookedRoomNights: number;
+    availableRoomNights: number;
+    occupancyRate: number;
+  }>;
+  checkInsToday: number;
+  checkOutsToday: number;
+  unpaidBookings: number;
+  maintenanceRooms: number;
 };
 
 export type TAdminExperienceKind = 'dining' | 'spa';

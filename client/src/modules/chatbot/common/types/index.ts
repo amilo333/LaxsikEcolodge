@@ -1,4 +1,4 @@
-export type TChatRole = 'user' | 'assistant';
+type TChatRole = 'user' | 'assistant';
 
 export type TChatMessage = {
   id: string;

@@ -7,6 +7,7 @@ import { imageRouter } from "./image-router.js";
 import { roomRouter } from "./room-router.js";
 import { spaRouter } from "./spa-router.js";
 import { spaServiceRouter } from "./spa-service-router.js";
+import { tourRouter } from "./tour-router.js";
 import { userRouter } from "./userRoutes.js";
 import { vnpayRouter } from "./vnpay-router.js";
 import { voucherRouter } from "./voucher-router.js";
@@ -20,6 +21,7 @@ export function route(app) {
   app.use("/api/dining-services", diningServiceRouter);
   app.use("/api/spa-massage", spaRouter);
   app.use("/api/spa-services", spaServiceRouter);
+  app.use("/api/tours", tourRouter);
   app.use("/api/voucher", voucherRouter);
   app.use("/api/booking", bookingRouter);
   app.use("/api/chat", chatRouter);

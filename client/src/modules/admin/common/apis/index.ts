@@ -1,6 +1,7 @@
 import { axiosInstance } from '@/apis/axios';
 import { TPaginationResponse } from '@/types';
 import { TRoom } from '@/modules/rooms/common/types';
+import { TTour } from '@/modules/tours/types';
 import {
   TAdminBooking,
   TAdminExperience,
@@ -83,6 +84,43 @@ export const deleteAdminRoomApi = async (roomId: string) => {
     success: boolean;
     message: string;
   }>(`/rooms/${roomId}`);
+  return response.data;
+};
+
+export const getAdminToursApi = async (params: TAdminListParams) => {
+  const response = await axiosInstance.get<TPaginationResponse<TTour[]>>(
+    '/tours',
+    { params }
+  );
+  return response.data;
+};
+
+export const createAdminTourApi = async (data: FormData) => {
+  const response = await axiosInstance.post<TDataResponse<TTour>>(
+    '/tours',
+    data
+  );
+  return response.data.data;
+};
+
+export const updateAdminTourApi = async ({
+  tourId,
+  data,
+}: {
+  tourId: string;
+  data: FormData;
+}) => {
+  const response = await axiosInstance.put<TDataResponse<TTour>>(
+    `/tours/${tourId}`,
+    data
+  );
+  return response.data.data;
+};
+
+export const deleteAdminTourApi = async (tourId: string) => {
+  const response = await axiosInstance.delete<TDataResponse<null>>(
+    `/tours/${tourId}`
+  );
   return response.data;
 };
 

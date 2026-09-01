@@ -164,7 +164,7 @@ const getCurrentUserProfile = async (req, res) => {
       _id: user._id,
       full_name: user.full_name,
       email: user.email,
-      phone: user.phone,
+      phone: user.phone || "",
       role: user.role,
     });
   } else {
@@ -222,7 +222,7 @@ const updateCurrentProfile = async (req, res) => {
       _id: updateUser._id,
       full_name: updateUser.full_name,
       email: updateUser.email,
-      phone: updateUser.phone,
+      phone: updateUser.phone || "",
       role: updateUser.role,
     });
   } catch (error) {
@@ -269,7 +269,7 @@ const getUserById = async (req, res) => {
       _id: user._id,
       full_name: user.full_name,
       email: user.email,
-      phone: user.phone,
+      phone: user.phone || "",
       role: user.role,
     });
   } else {

@@ -5,7 +5,7 @@ import { createVnpayPaymentApi, getVnpayPaymentStatusApi } from '../apis';
 import { usePaymentStore } from '../stores';
 import { getTrustedVnpayUrl } from '../utils';
 
-export const useCreateVnpayPaymentApi = () =>
+const useCreateVnpayPaymentApi = () =>
   useMutation({ mutationFn: createVnpayPaymentApi });
 
 export const useVnpayPaymentStatusApi = (

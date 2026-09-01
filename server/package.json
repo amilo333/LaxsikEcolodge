@@ -2,10 +2,16 @@
   "name": "server",
   "version": "1.0.0",
   "type": "module",
-  "main": "server.js",
+  "main": "src/server.js",
   "scripts": {
     "test": "node --test",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "knowledge:index": "node src/scripts/create-vector-index.js",
+    "knowledge:sync": "node src/scripts/sync-knowledge.js",
+    "knowledge:check": "node src/scripts/check-knowledge-search.js",
+    "chat:check": "node src/scripts/check-chatbot.js",
+    "auth:migrate-indexes": "node src/scripts/migrate-auth-indexes.js",
+    "tours:seed": "node src/scripts/seed-tours.js"
   },
   "author": "LocNM",
   "license": "ISC",
@@ -17,10 +23,12 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "google-auth-library": "^11.0.2",
     "jsonwebtoken": "^9.0.3",
     "moment": "^2.30.1",
     "mongoose": "^9.7.4",
     "multer": "^2.2.0",
+    "nodemailer": "^9.0.6",
     "qs": "^6.15.3",
     "vnpay": "^2.5.0"
   },

@@ -1,10 +1,21 @@
 import { axiosInstance } from '@/apis/axios';
-import { LoginRequest, RegisterRequest } from '@/types/auth';
+import {
+  ForgotPasswordRequest,
+  GoogleAccountLinkRequest,
+  GoogleLoginRequest,
+  LoginRequest,
+  RegisterRequest,
+  ResetPasswordRequest,
+} from '@/types/auth';
 import { TUpdateProfilePayload, TUser } from '../types';
 
-type TAuthResponse = {
+export type TAuthResponse = {
   message: string;
   data: TUser;
+};
+
+export type TMessageResponse = {
+  message: string;
 };
 
 export const registerApi = async (data: RegisterRequest) => {
@@ -15,6 +26,35 @@ export const registerApi = async (data: RegisterRequest) => {
 export const loginApi = async (data: LoginRequest) => {
   const res = await axiosInstance.post<TAuthResponse>('/auth/login', data);
   return res;
+};
+
+export const googleLoginApi = async (data: GoogleLoginRequest) => {
+  const res = await axiosInstance.post<TAuthResponse>('/auth/google', data);
+  return res;
+};
+
+export const linkGoogleAccountApi = async (data: GoogleAccountLinkRequest) => {
+  const res = await axiosInstance.post<TAuthResponse>(
+    '/auth/google/link',
+    data
+  );
+  return res;
+};
+
+export const forgotPasswordApi = async (data: ForgotPasswordRequest) => {
+  const res = await axiosInstance.post<TMessageResponse>(
+    '/auth/forgot-password',
+    data
+  );
+  return res.data;
+};
+
+export const resetPasswordApi = async (data: ResetPasswordRequest) => {
+  const res = await axiosInstance.post<TMessageResponse>(
+    '/auth/reset-password',
+    data
+  );
+  return res.data;
 };
 
 export const logoutApi = async () => {

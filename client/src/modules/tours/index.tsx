@@ -1,53 +1,8 @@
+'use client';
+
 import { Footer, Header } from '@/components/layouts';
 import Image from 'next/image';
-
-const TOURS = [
-  {
-    title: 'Hau Chu Ngai Highland Trail',
-    eyebrow: 'Remote paths & mountain villages',
-    description:
-      'Take the old buffalo trails through bamboo forest and the highland villages of Hau Chu Ngai, Hau Thao and Giang Ta Chai, with lunch in Giang Ta Chai or Ta Van.',
-    image: '/images/slider3.png',
-    icon: '/images/icon/ic_hiking.png',
-    duration: '5–8 hours',
-    rhythm: 'Challenging',
-    highlights: [
-      'Buffalo trails & bamboo forest',
-      'Four highland communities',
-      'Village lunch along the route',
-    ],
-  },
-  {
-    title: 'Bamboo Forest & Cau May Waterfall',
-    eyebrow: 'Forest paths & riverside views',
-    description:
-      'Walk through a lush bamboo forest to Cau May Waterfall, then continue to Giang Ta Chai, a Red Dao village perched above Muong Hoa River.',
-    image: '/images/img2.png',
-    icon: '/images/icon/ic_hiking.png',
-    duration: '3–5 hours',
-    rhythm: 'Moderate',
-    highlights: [
-      'Lush bamboo forest',
-      'Cau May Waterfall',
-      'Giang Ta Chai Red Dao village',
-    ],
-  },
-  {
-    title: 'Lao Chai & Ta Van Valley Stroll',
-    eyebrow: 'Gentle paths & village life',
-    description:
-      'A gentle introduction to Muong Hoa Valley, following easy village paths around Lao Chai and Ta Van with time to enjoy the terraces and everyday local life.',
-    image: '/images/slider1.png',
-    icon: '/images/icon/ic_hiking.png',
-    duration: '2–3 hours',
-    rhythm: 'Easy',
-    highlights: [
-      'Lao Chai village',
-      'Ta Van village',
-      'Easy rice terrace paths',
-    ],
-  },
-] as const;
+import { useTourListApi } from './hooks';
 
 const TRAVEL_NOTES = [
   {
@@ -78,6 +33,9 @@ const PRACTICAL_NOTES = [
 ] as const;
 
 export function ToursModule() {
+  const toursQuery = useTourListApi();
+  const tours = toursQuery.data?.data ?? [];
+
   return (
     <div className="min-h-screen bg-[url('/images/bg-screen.jpg')] bg-[length:720px_720px] text-[#163E3B]">
       <main>
@@ -129,20 +87,59 @@ export function ToursModule() {
             </h2>
             <p className='mx-auto mt-6 max-w-2xl text-sm leading-7 text-[#60746F] sm:text-base sm:leading-8'>
               From a gentle village stroll to a full-day highland challenge,
-              these three routes reveal Sa Pa through forest paths, waterfalls,
-              rice terraces and local communities.
+              these routes reveal Sa Pa through forest paths, waterfalls, rice
+              terraces and local communities.
             </p>
           </div>
 
           <div className='mx-auto mt-14 flex max-w-6xl flex-col gap-8 sm:mt-18 lg:gap-12'>
-            {TOURS.map((tour, index) => (
+            {toursQuery.isLoading &&
+              Array.from({ length: 3 }).map((_, index) => (
+                <div
+                  key={index}
+                  aria-hidden='true'
+                  className='grid animate-pulse overflow-hidden rounded-[28px] border border-[#DDE6E1] bg-white lg:grid-cols-2'>
+                  <div className='min-h-[340px] bg-[#DDE8E4] sm:min-h-[440px] lg:min-h-[560px]' />
+                  <div className='space-y-5 px-7 py-10 sm:px-12 sm:py-14 lg:px-16'>
+                    <div className='h-14 w-14 rounded-2xl bg-[#E7EFEC]' />
+                    <div className='h-9 w-3/4 rounded bg-[#E7EFEC]' />
+                    <div className='h-24 rounded bg-[#EEF3F1]' />
+                    <div className='h-20 rounded-2xl bg-[#EEF3F1]' />
+                  </div>
+                </div>
+              ))}
+
+            {toursQuery.isError && (
+              <div className='rounded-[24px] border border-[#E7D8D8] bg-white px-6 py-12 text-center'>
+                <p className='text-sm font-semibold text-[#8A4040]'>
+                  We could not load the journeys right now.
+                </p>
+                <button
+                  type='button'
+                  onClick={() => void toursQuery.refetch()}
+                  className='mt-5 rounded-full bg-[#0D4949] px-6 py-3 text-xs font-bold text-white'>
+                  Try again
+                </button>
+              </div>
+            )}
+
+            {!toursQuery.isLoading &&
+              !toursQuery.isError &&
+              tours.length === 0 && (
+                <div className='rounded-[24px] border border-[#DDE6E1] bg-white px-6 py-12 text-center text-sm leading-7 text-[#60746F]'>
+                  New seasonal journeys are being prepared. Please ask our local
+                  team for the best routes during your stay.
+                </div>
+              )}
+
+            {tours.map((tour, index) => (
               <article
-                key={tour.title}
+                key={tour._id}
                 className='grid overflow-hidden rounded-[28px] border border-[#DDE6E1] bg-white shadow-[0_22px_70px_rgba(23,66,62,0.08)] lg:grid-cols-2'>
                 <div
                   className={`relative min-h-[340px] sm:min-h-[440px] lg:min-h-[560px] ${index % 2 === 1 ? 'lg:order-2' : ''}`}>
                   <Image
-                    src={tour.image}
+                    src={tour.thumbnail}
                     alt={tour.title}
                     fill
                     loading={index === 0 ? 'eager' : 'lazy'}
@@ -158,7 +155,7 @@ export function ToursModule() {
                 <div
                   className={`flex flex-col justify-center px-7 py-10 sm:px-12 sm:py-14 lg:px-16 ${index % 2 === 1 ? 'lg:order-1' : ''}`}>
                   <Image
-                    src={tour.icon}
+                    src='/images/icon/ic_hiking.png'
                     alt=''
                     width={64}
                     height={64}

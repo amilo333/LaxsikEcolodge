@@ -451,7 +451,8 @@ export const cancelBooking = async (req, res) => {
 
     if (Date.now() > cancellationDeadline.getTime()) {
       return res.status(400).json({
-        message: "Booking can only be cancelled at least 48 hours before check-in",
+        message:
+          "Booking can only be cancelled at least 48 hours before check-in",
       });
     }
 
@@ -566,6 +567,35 @@ export const getAllBookingsAdmin = async (req, res) => {
 export const getAdminDashboardSummary = async (_req, res) => {
   try {
     const now = new Date();
+    const vietnamOffsetMs = 7 * 60 * 60 * 1000;
+    const vietnamNow = new Date(now.getTime() + vietnamOffsetMs);
+    const toVietnamBoundary = (year, month, day) =>
+      new Date(Date.UTC(year, month, day) - vietnamOffsetMs);
+    const currentMonthStart = toVietnamBoundary(
+      vietnamNow.getUTCFullYear(),
+      vietnamNow.getUTCMonth(),
+      1,
+    );
+    const nextMonthStart = toVietnamBoundary(
+      vietnamNow.getUTCFullYear(),
+      vietnamNow.getUTCMonth() + 1,
+      1,
+    );
+    const previousMonthStart = toVietnamBoundary(
+      vietnamNow.getUTCFullYear(),
+      vietnamNow.getUTCMonth() - 1,
+      1,
+    );
+    const todayStart = toVietnamBoundary(
+      vietnamNow.getUTCFullYear(),
+      vietnamNow.getUTCMonth(),
+      vietnamNow.getUTCDate(),
+    );
+    const tomorrowStart = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
+    const daysInCurrentMonth = Math.round(
+      (nextMonthStart.getTime() - currentMonthStart.getTime()) /
+        (24 * 60 * 60 * 1000),
+    );
     const trendStart = new Date(
       Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - 5, 1),
     );
@@ -580,6 +610,12 @@ export const getAdminDashboardSummary = async (_req, res) => {
       recentBookings,
       trendResult,
       statusResult,
+      monthlyMetricsResult,
+      roomsForOccupancy,
+      occupancyBookings,
+      checkInsToday,
+      checkOutsToday,
+      unpaidBookings,
     ] = await Promise.all([
       User.countDocuments(),
       User.countDocuments({ status: true }),
@@ -634,6 +670,55 @@ export const getAdminDashboardSummary = async (_req, res) => {
       Booking.aggregate([
         { $group: { _id: "$bookingStatus", count: { $sum: 1 } } },
       ]),
+      Booking.aggregate([
+        {
+          $match: {
+            createdAt: { $gte: previousMonthStart, $lt: nextMonthStart },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              $cond: [
+                { $gte: ["$createdAt", currentMonthStart] },
+                "current",
+                "previous",
+              ],
+            },
+            bookings: { $sum: 1 },
+            paidBookings: {
+              $sum: { $cond: [{ $eq: ["$paymentStatus", "paid"] }, 1, 0] },
+            },
+            paidRevenue: {
+              $sum: {
+                $cond: [{ $eq: ["$paymentStatus", "paid"] }, "$totalAmount", 0],
+              },
+            },
+          },
+        },
+      ]),
+      Room.find({ status: { $in: ["available", "maintenance"] } })
+        .select("title quantity status")
+        .lean(),
+      Booking.find({
+        bookingStatus: { $in: ["confirmed", "completed"] },
+        checkInDate: { $lt: nextMonthStart },
+        checkOutDate: { $gt: currentMonthStart },
+      })
+        .select("checkInDate checkOutDate bookingItems")
+        .lean(),
+      Booking.countDocuments({
+        bookingStatus: "confirmed",
+        checkInDate: { $gte: todayStart, $lt: tomorrowStart },
+      }),
+      Booking.countDocuments({
+        bookingStatus: { $in: ["confirmed", "completed"] },
+        checkOutDate: { $gte: todayStart, $lt: tomorrowStart },
+      }),
+      Booking.countDocuments({
+        bookingStatus: { $ne: "cancelled" },
+        paymentStatus: { $in: ["unpaid", "pending"] },
+      }),
     ]);
 
     const bookingTrend = Array.from({ length: 6 }, (_, index) => {
@@ -670,6 +755,101 @@ export const getAdminDashboardSummary = async (_req, res) => {
       status,
       count: statusResult.find((entry) => entry._id === status)?.count ?? 0,
     }));
+    const currentMonthMetrics = monthlyMetricsResult.find(
+      (item) => item._id === "current",
+    );
+    const previousMonthMetrics = monthlyMetricsResult.find(
+      (item) => item._id === "previous",
+    );
+    const currentMonthRevenue = currentMonthMetrics?.paidRevenue ?? 0;
+    const previousMonthRevenue = previousMonthMetrics?.paidRevenue ?? 0;
+    const currentMonthBookings = currentMonthMetrics?.bookings ?? 0;
+    const previousMonthBookings = previousMonthMetrics?.bookings ?? 0;
+    const currentMonthPaidBookings = currentMonthMetrics?.paidBookings ?? 0;
+    const getGrowthPercent = (current, previous) =>
+      previous > 0
+        ? Math.round(((current - previous) / previous) * 1000) / 10
+        : null;
+
+    const roomPerformanceMap = new Map(
+      roomsForOccupancy
+        .filter((room) => room.status === "available")
+        .map((room) => [
+          room._id.toString(),
+          {
+            roomId: room._id,
+            title: room.title,
+            bookedRoomNights: 0,
+            availableRoomNights: room.quantity * daysInCurrentMonth,
+            bookingIds: new Set(),
+          },
+        ]),
+    );
+
+    occupancyBookings.forEach((booking) => {
+      const overlapStart = Math.max(
+        booking.checkInDate.getTime(),
+        currentMonthStart.getTime(),
+      );
+      const overlapEnd = Math.min(
+        booking.checkOutDate.getTime(),
+        nextMonthStart.getTime(),
+      );
+      const nights = Math.max(
+        0,
+        Math.ceil((overlapEnd - overlapStart) / (24 * 60 * 60 * 1000)),
+      );
+
+      booking.bookingItems.forEach((item) => {
+        const roomMetric = roomPerformanceMap.get(item.roomId.toString());
+        if (!roomMetric || nights === 0) return;
+
+        roomMetric.bookedRoomNights += item.quantity * nights;
+        roomMetric.bookingIds.add(booking._id.toString());
+      });
+    });
+
+    const allRoomPerformance = Array.from(roomPerformanceMap.values())
+      .map((room) => ({
+        roomId: room.roomId,
+        title: room.title,
+        bookings: room.bookingIds.size,
+        bookedRoomNights: room.bookedRoomNights,
+        availableRoomNights: room.availableRoomNights,
+        occupancyRate:
+          room.availableRoomNights > 0
+            ? Math.min(
+                100,
+                Math.round(
+                  (room.bookedRoomNights / room.availableRoomNights) * 1000,
+                ) / 10,
+              )
+            : 0,
+      }))
+      .sort(
+        (first, second) =>
+          second.occupancyRate - first.occupancyRate ||
+          second.bookedRoomNights - first.bookedRoomNights,
+      );
+    const roomPerformance = allRoomPerformance.slice(0, 5);
+    const availableRoomNights = allRoomPerformance.reduce(
+      (total, room) => total + room.availableRoomNights,
+      0,
+    );
+    const occupiedRoomNights = allRoomPerformance.reduce(
+      (total, room) => total + room.bookedRoomNights,
+      0,
+    );
+    const occupancyRate =
+      availableRoomNights > 0
+        ? Math.min(
+            100,
+            Math.round((occupiedRoomNights / availableRoomNights) * 1000) / 10,
+          )
+        : 0;
+    const maintenanceRooms = roomsForOccupancy
+      .filter((room) => room.status === "maintenance")
+      .reduce((total, room) => total + room.quantity, 0);
 
     return res.status(200).json({
       message: "Get admin dashboard summary successfully",
@@ -684,6 +864,29 @@ export const getAdminDashboardSummary = async (_req, res) => {
         recentBookings,
         bookingTrend,
         bookingStatus,
+        currentMonthRevenue,
+        revenueGrowthPercent: getGrowthPercent(
+          currentMonthRevenue,
+          previousMonthRevenue,
+        ),
+        currentMonthBookings,
+        bookingGrowthPercent: getGrowthPercent(
+          currentMonthBookings,
+          previousMonthBookings,
+        ),
+        currentMonthPaidBookings,
+        averageBookingValue:
+          currentMonthPaidBookings > 0
+            ? Math.round(currentMonthRevenue / currentMonthPaidBookings)
+            : 0,
+        occupancyRate,
+        occupiedRoomNights,
+        availableRoomNights,
+        roomPerformance,
+        checkInsToday,
+        checkOutsToday,
+        unpaidBookings,
+        maintenanceRooms,
       },
     });
   } catch (error) {

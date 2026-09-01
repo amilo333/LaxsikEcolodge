@@ -2,10 +2,14 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { toast } from 'sonner';
 import {
+  forgotPasswordApi,
   getProfileApi,
+  googleLoginApi,
   loginApi,
+  linkGoogleAccountApi,
   logoutApi,
   registerApi,
+  resetPasswordApi,
   TUpdateProfilePayload,
   TUser,
   updateProfileApi,
@@ -63,6 +67,85 @@ export const useLoginApi = () => {
     },
   });
 };
+
+export const useGoogleLoginApi = () => {
+  const setUser = useAuthStore((state) => state.setUser);
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: googleLoginApi,
+    onSuccess: (response) => {
+      setUser(response.data.data);
+      queryClient.setQueryData(['profile'], response.data.data);
+    },
+    onError: (error) => {
+      if (
+        axios.isAxiosError<{ code?: string }>(error) &&
+        error.response?.data?.code === 'ACCOUNT_LINK_REQUIRED'
+      ) {
+        return;
+      }
+
+      if (axios.isAxiosError<{ message?: string }>(error)) {
+        toast.error(error.response?.data?.message ?? 'Google sign-in failed.');
+      } else {
+        toast.error('Google sign-in failed.');
+      }
+    },
+  });
+};
+
+export const useGoogleAccountLinkApi = () => {
+  const setUser = useAuthStore((state) => state.setUser);
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: linkGoogleAccountApi,
+    onSuccess: (response) => {
+      setUser(response.data.data);
+      queryClient.setQueryData(['profile'], response.data.data);
+      toast.success('Google sign-in has been linked to your account.');
+    },
+    onError: (error) => {
+      if (axios.isAxiosError<{ message?: string }>(error)) {
+        toast.error(
+          error.response?.data?.message ?? 'Unable to link Google sign-in.'
+        );
+      } else {
+        toast.error('Unable to link Google sign-in.');
+      }
+    },
+  });
+};
+
+export const useForgotPasswordApi = () =>
+  useMutation({
+    mutationFn: forgotPasswordApi,
+    onError: (error) => {
+      if (axios.isAxiosError(error)) {
+        toast.error(
+          error.response?.data?.message ??
+            'Unable to send the password reset email.'
+        );
+      } else {
+        toast.error('Unable to send the password reset email.');
+      }
+    },
+  });
+
+export const useResetPasswordApi = () =>
+  useMutation({
+    mutationFn: resetPasswordApi,
+    onError: (error) => {
+      if (axios.isAxiosError(error)) {
+        toast.error(
+          error.response?.data?.message ?? 'Unable to reset password.'
+        );
+      } else {
+        toast.error('Unable to reset password.');
+      }
+    },
+  });
 
 export const useLogoutApi = () => {
   const { reset } = useAuthStore((state) => state);

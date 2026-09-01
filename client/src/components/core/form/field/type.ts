@@ -29,7 +29,7 @@ export type TFieldProps<
 };
 
 // [Type] Function to render field
-export type TRenderFieldFunction<
+type TRenderFieldFunction<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 > = (form: TFieldState<TFieldValues, TName>) => React.ReactElement;

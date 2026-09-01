@@ -6,7 +6,8 @@ import { getSafeInternalRedirect } from '@/utils';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
-import { useLoginApi } from '../../common';
+import { TUser, useLoginApi } from '../../common';
+import { GoogleSignInButton } from './google-sign-in-button';
 import { LOGIN_FORM_DEFAULT_VALUES } from '../constants';
 import { loginSchema } from '../schema';
 import { TLoginForm } from '../types';
@@ -20,6 +21,7 @@ export function LoginForm() {
     redirectParam && redirectTo === redirectParam
       ? `/auth/register?redirect=${encodeURIComponent(redirectTo)}`
       : '/auth/register';
+  const forgotPasswordHref = '/auth/forgot-password';
 
   const { mutate, isPending } = useLoginApi();
 
@@ -32,33 +34,35 @@ export function LoginForm() {
     defaultValues: LOGIN_FORM_DEFAULT_VALUES,
   });
 
+  const handleLoginSuccess = (user: TUser) => {
+    const hasRequestedRedirect = Boolean(
+      redirectParam && redirectTo === redirectParam
+    );
+    const destination = hasRequestedRedirect
+      ? redirectTo
+      : user.role === 'admin'
+        ? '/admin'
+        : redirectTo;
+
+    router.replace(destination);
+  };
+
   const onSubmit = (data: TLoginForm) => {
     mutate(data, {
-      onSuccess: (response) => {
-        const hasRequestedRedirect = Boolean(
-          redirectParam && redirectTo === redirectParam
-        );
-        const destination = hasRequestedRedirect
-          ? redirectTo
-          : response.data.data.role === 'admin'
-            ? '/admin'
-            : redirectTo;
-
-        router.replace(destination);
-      },
+      onSuccess: (response) => handleLoginSuccess(response.data.data),
     });
   };
 
   return (
-    <div className='flex flex-col gap-6'>
-      <div className='flex flex-col gap-5'>
+    <div className='flex flex-col gap-4'>
+      <div className='flex flex-col gap-3.5'>
         <Field control={control} name='email' label='Email'>
           <Textfield
             label='Email'
             placeholder='you@example.com'
             autoComplete='email'
-            className='gap-2'
-            inputClassName='h-[52px]! rounded-[16px]! bg-[#F7F9F8]! shadow-none! ring-1 ring-[#DDE6E3] transition focus-within:ring-2 focus-within:ring-[#0D4949]/45 [&_input]:px-4!'
+            className='gap-1.5'
+            inputClassName='h-[48px]! rounded-[14px]! bg-[#F7F9F8]! shadow-none! ring-1 ring-[#DDE6E3] transition focus-within:ring-2 focus-within:ring-[#0D4949]/45 [&_input]:px-4!'
             error={errors.email?.message}
           />
         </Field>
@@ -69,28 +73,44 @@ export function LoginForm() {
             type='password'
             placeholder='Enter your password'
             autoComplete='current-password'
-            className='gap-2'
-            inputClassName='h-[52px]! rounded-[16px]! bg-[#F7F9F8]! shadow-none! ring-1 ring-[#DDE6E3] transition focus-within:ring-2 focus-within:ring-[#0D4949]/45 [&_input]:px-4!'
+            className='gap-1.5'
+            inputClassName='h-[48px]! rounded-[14px]! bg-[#F7F9F8]! shadow-none! ring-1 ring-[#DDE6E3] transition focus-within:ring-2 focus-within:ring-[#0D4949]/45 [&_input]:px-4!'
             error={errors.password?.message}
           />
         </Field>
+
+        <div className='-mt-1.5 text-right'>
+          <Link
+            href={forgotPasswordHref}
+            className='text-xs font-semibold text-[#0D4949] underline-offset-4 hover:underline sm:text-[13px]'>
+            Forgot password?
+          </Link>
+        </div>
       </div>
 
       <Button
         type='submit'
         isDisabled={isPending}
-        className='h-[52px]! w-full! rounded-full! bg-[#0D4949]! text-base! font-bold! text-white! shadow-[0_12px_28px_rgba(13,73,73,0.24)] transition hover:bg-[#0A3B3B]!'
+        className='h-[48px]! w-full! rounded-full! bg-[#0D4949]! text-sm! font-bold! text-white! shadow-[0_10px_24px_rgba(13,73,73,0.2)] transition hover:bg-[#0A3B3B]!'
         onClick={handleSubmit(onSubmit)}>
         {isPending ? 'Signing in…' : 'Sign in'}
       </Button>
 
-      <div className='flex items-center gap-3 text-[10px] font-bold text-[#87938F] uppercase'>
+      <div className='flex items-center gap-3 text-[9px] font-bold text-[#87938F] uppercase'>
+        <span className='h-px flex-1 bg-[#E3E9E7]' />
+        Or continue with
+        <span className='h-px flex-1 bg-[#E3E9E7]' />
+      </div>
+
+      <GoogleSignInButton onSuccess={handleLoginSuccess} />
+
+      <div className='flex items-center gap-3 text-[9px] font-bold text-[#87938F] uppercase'>
         <span className='h-px flex-1 bg-[#E3E9E7]' />
         New to Laxsik?
         <span className='h-px flex-1 bg-[#E3E9E7]' />
       </div>
 
-      <div className='text-center text-sm text-[#687570]'>
+      <div className='text-center text-xs text-[#687570] sm:text-[13px]'>
         Don&apos;t have an account?{' '}
         <Link
           href={registerHref}

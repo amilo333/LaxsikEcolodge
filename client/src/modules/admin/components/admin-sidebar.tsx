@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import { TAdminSection } from '../common';
 import Link from 'next/link';
 
@@ -17,6 +18,7 @@ const NAV_ITEMS: Array<{
   { value: 'vouchers', label: 'Voucher', description: 'Mã ưu đãi' },
   { value: 'dining', label: 'Dining', description: 'Nhà hàng & dịch vụ' },
   { value: 'spa', label: 'Spa', description: 'Spa & massage' },
+  { value: 'tours', label: 'Tour', description: 'Hành trình trải nghiệm' },
 ];
 
 const SECTION_ICONS: Record<TAdminSection, React.ReactNode> = {
@@ -43,6 +45,14 @@ const SECTION_ICONS: Record<TAdminSection, React.ReactNode> = {
       viewBox='0 0 24 24'
       className='h-5 w-5 fill-none stroke-current stroke-2'>
       <path d='M3 20V8l9-5 9 5v12M3 20h18M8 20v-7h8v7' />
+    </svg>
+  ),
+  tours: (
+    <svg
+      viewBox='0 0 24 24'
+      className='h-5 w-5 fill-none stroke-current stroke-2'>
+      <path d='M4 20 9.5 9l3.5 7 2.5-5L20 20H4Z' />
+      <path d='m6.5 14.8 3-2.3 3.5 3.5 2.5-2 2.2 2.2M17 4h4v4' />
     </svg>
   ),
   bookings: (
@@ -80,22 +90,30 @@ const SECTION_ICONS: Record<TAdminSection, React.ReactNode> = {
 
 export function AdminSidebar({ activeSection }: TAdminSidebarProps) {
   return (
-    <aside className='border-b border-white/10 bg-[#093C3C] px-3 py-4 text-white lg:fixed lg:inset-y-0 lg:left-0 lg:z-30 lg:w-[258px] lg:border-r lg:border-b-0 lg:px-4 lg:py-6'>
-      <Link href='/admin' className='hidden items-center gap-3 px-3 lg:flex'>
-        <span className='flex h-11 w-11 items-center justify-center rounded-[14px] bg-white text-sm font-black text-[#0D4949]'>
-          LA
-        </span>
+    <aside className='border-b border-white/10 bg-[#093C3C] px-3 py-4 text-white lg:fixed lg:inset-y-0 lg:left-0 lg:z-30 lg:w-[258px] lg:border-r lg:border-b-0 lg:px-4 lg:py-5'>
+      <Link
+        href='/admin'
+        className='mb-8 hidden items-center gap-3 px-3 lg:flex'>
+        <Image
+          src='/images/logo/logo_2.png'
+          alt='Laxsik Ecolodge'
+          width={44}
+          height={44}
+          priority
+          className='size-11 shrink-0 object-contain'
+        />
+
         <span>
-          <span className='block font-[family-name:var(--font-lora)] text-lg font-semibold'>
-            Laxsik
+          <span className='block font-[family-name:var(--font-lora)] text-base font-semibold'>
+            Laxsik Ecolodge
           </span>
           <span className='block text-[9px] font-bold text-white/55 uppercase'>
-            Admin Console
+            Admin Dashboard
           </span>
         </span>
       </Link>
 
-      <nav className='flex gap-2 overflow-x-auto lg:mt-8 lg:max-h-[calc(100vh-190px)] lg:flex-col lg:overflow-y-auto lg:pr-1'>
+      <nav className='flex gap-[8px]! overflow-x-auto lg:mt-5 lg:flex-col lg:gap-1 lg:overflow-visible'>
         {NAV_ITEMS.map((item) => {
           const isActive = activeSection === item.value;
 
@@ -107,7 +125,7 @@ export function AdminSidebar({ activeSection }: TAdminSidebarProps) {
                   ? '/admin'
                   : `/admin?section=${item.value}`
               }
-              className={`flex shrink-0 items-center gap-3 rounded-[14px] px-4 py-3 transition lg:w-full ${
+              className={`flex shrink-0 items-center gap-3 rounded-[14px] px-4 py-3 transition lg:w-full lg:gap-2.5 lg:rounded-xl lg:px-3 lg:py-2.5 ${
                 isActive
                   ? 'bg-white text-[#0D4949] shadow-[0_10px_28px_rgba(0,0,0,0.14)]'
                   : 'text-white/70 hover:bg-white/10 hover:text-white'

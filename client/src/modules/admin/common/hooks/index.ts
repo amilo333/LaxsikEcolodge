@@ -5,18 +5,21 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import {
   createAdminRoomApi,
+  createAdminTourApi,
   createAdminExperienceApi,
   createAdminExperienceServiceApi,
   createAdminVoucherApi,
   deleteAdminExperienceApi,
   deleteAdminExperienceServiceApi,
   deleteAdminRoomApi,
+  deleteAdminTourApi,
   deleteAdminUserApi,
   deleteAdminVoucherApi,
   getAdminBookingsApi,
   getAdminExperiencesApi,
   getAdminExperienceServicesApi,
   getAdminRoomsApi,
+  getAdminToursApi,
   getAdminSummaryApi,
   getAdminUsersApi,
   getAdminVouchersApi,
@@ -24,6 +27,7 @@ import {
   updateAdminExperienceApi,
   updateAdminExperienceServiceApi,
   updateAdminRoomApi,
+  updateAdminTourApi,
   updateAdminUserApi,
   updateAdminVoucherApi,
 } from '../apis';
@@ -128,6 +132,56 @@ export const useDeleteAdminRoomApi = () => {
       void queryClient.invalidateQueries({ queryKey: ['admin', 'summary'] });
       void queryClient.invalidateQueries({ queryKey: ['roomList'] });
       toast.success('Đã xóa phòng.');
+    },
+    onError: showAdminError,
+  });
+};
+
+export const useAdminToursApi = (params: TAdminListParams) =>
+  useQuery({
+    queryKey: ['admin', 'tours', params],
+    queryFn: () => getAdminToursApi(params),
+    placeholderData: (previousData) => previousData,
+    retry: false,
+  });
+
+export const useCreateAdminTourApi = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: createAdminTourApi,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['admin', 'tours'] });
+      void queryClient.invalidateQueries({ queryKey: ['tourList'] });
+      toast.success('Đã tạo tour.');
+    },
+    onError: showAdminError,
+  });
+};
+
+export const useUpdateAdminTourApi = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateAdminTourApi,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['admin', 'tours'] });
+      void queryClient.invalidateQueries({ queryKey: ['tourList'] });
+      toast.success('Đã cập nhật tour.');
+    },
+    onError: showAdminError,
+  });
+};
+
+export const useDeleteAdminTourApi = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: deleteAdminTourApi,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['admin', 'tours'] });
+      void queryClient.invalidateQueries({ queryKey: ['tourList'] });
+      toast.success('Đã xóa tour.');
     },
     onError: showAdminError,
   });

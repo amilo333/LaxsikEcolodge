@@ -13,6 +13,9 @@
 # testing
 /coverage
 
+# temporary upload files (removed after Cloudinary upload)
+/uploads/
+
 # next.js
 /.next/
 /out/

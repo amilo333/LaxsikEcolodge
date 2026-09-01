@@ -1,6 +1,6 @@
 import Image from 'next/image';
 
-export type TServiceItem = {
+type TServiceItem = {
   id: string;
   title: string;
   description: string;

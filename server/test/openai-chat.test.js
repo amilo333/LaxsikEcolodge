@@ -35,7 +35,12 @@ test("uses the low-cost OpenAI model and Responses API function schemas", async 
   assert.equal(requestBody.parallel_tool_calls, false);
   assert.deepEqual(
     requestBody.tools.map((tool) => tool.name),
-    ["list_rooms", "search_available_rooms", "get_room_details"],
+    [
+      "list_rooms",
+      "search_available_rooms",
+      "get_room_details",
+      "search_laxsik_knowledge",
+    ],
   );
   assert.equal(reply.message, "Xin chào! Tôi có thể giúp bạn tìm phòng.");
   assert.deepEqual(reply.toolsUsed, []);
@@ -71,6 +76,7 @@ test("renders live MongoDB tool output without letting the model rewrite prices"
           pricePerNight: 150000,
           capacity: 2,
           bed: "1 King Bed",
+          views: "Mountain",
           availableQuantity: 2,
         },
       ],
@@ -90,8 +96,66 @@ test("renders live MongoDB tool output without letting the model rewrite prices"
   );
 
   assert.match(reply.message, /150\.000 VND\/đêm/);
+  assert.match(reply.message, /view Mountain/);
   assert.match(reply.message, /còn 2 phòng/);
   assert.deepEqual(reply.toolsUsed, ["search_available_rooms"]);
+});
+
+test("uses retrieved Laxsik knowledge as function output before answering", async () => {
+  const requestBodies = [];
+  const fetchImpl = async (_url, options) => {
+    const body = JSON.parse(options.body);
+    requestBodies.push(body);
+
+    if (requestBodies.length === 1) {
+      return jsonResponse({
+        output: [
+          {
+            type: "function_call",
+            call_id: "call_knowledge_1",
+            name: "search_laxsik_knowledge",
+            arguments:
+              '{"query":"phòng có view núi","category":"room"}',
+          },
+        ],
+      });
+    }
+
+    return jsonResponse({
+      output_text:
+        "Phòng Mountain Retreat có view núi và phù hợp tối đa 2 khách.",
+      output: [],
+    });
+  };
+  const toolExecutor = async (name, args) => {
+    assert.equal(name, "search_laxsik_knowledge");
+    assert.equal(args.category, "room");
+
+    return {
+      ok: true,
+      matches: [
+        {
+          title: "Mountain Retreat",
+          content: "Room name: Mountain Retreat. Capacity: 2. View: Mountain.",
+          category: "room",
+        },
+      ],
+    };
+  };
+
+  const reply = await createOpenAIChatReply(
+    [{ role: "user", content: "Phòng nào có virew núi?" }],
+    { fetchImpl, toolExecutor, apiKey: "test-key" },
+  );
+
+  assert.equal(requestBodies.length, 2);
+  assert.equal(
+    requestBodies[1].input.at(-1).type,
+    "function_call_output",
+  );
+  assert.match(requestBodies[1].input.at(-1).output, /Mountain Retreat/);
+  assert.match(reply.message, /Mountain Retreat/);
+  assert.deepEqual(reply.toolsUsed, ["search_laxsik_knowledge"]);
 });
 
 test("removes links and Markdown from general model answers", async () => {

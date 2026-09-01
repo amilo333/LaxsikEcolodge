@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import React from 'react';
-export type TSpaItem = {
+type TSpaItem = {
   id: string;
   title: string;
   description: string;

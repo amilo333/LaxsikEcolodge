@@ -5,6 +5,7 @@ import {
   findAvailableRooms,
   RoomAvailabilityError,
 } from "./room-availability.js";
+import { searchLaxsikKnowledge } from "./knowledge-search.js";
 
 const ROOM_LIMIT = 6;
 
@@ -88,6 +89,41 @@ export const CHAT_TOOLS = [
       additionalProperties: false,
     },
   },
+  {
+    type: "function",
+    name: "search_laxsik_knowledge",
+    description:
+      "Search the official Laxsik Ecolodge knowledge base with semantic search. Use for Laxsik-specific questions about room preferences or views, location, contact details, policies, dining, spa, tours, experiences, facilities, and other property information. Do not use it to claim date-specific room availability.",
+    strict: true,
+    parameters: {
+      type: "object",
+      properties: {
+        query: {
+          type: "string",
+          description:
+            "A self-contained semantic search query based on the guest's question, preserving important names and preferences.",
+        },
+        category: {
+          type: ["string", "null"],
+          enum: [
+            "overview",
+            "contact",
+            "policy",
+            "room",
+            "dining",
+            "spa",
+            "tour",
+            "experience",
+            null,
+          ],
+          description:
+            "Optional Laxsik knowledge category, or null to search every category.",
+        },
+      },
+      required: ["query", "category"],
+      additionalProperties: false,
+    },
+  },
 ];
 
 const listRooms = async () => {
@@ -159,6 +195,8 @@ export const executeChatTool = async (name, args = {}) => {
       return searchAvailableRooms(args);
     case "get_room_details":
       return getRoomDetails(args);
+    case "search_laxsik_knowledge":
+      return searchLaxsikKnowledge(args);
     default:
       return { ok: false, error: `Unknown tool: ${name}` };
   }

@@ -1,4 +1,4 @@
-export type TSocialItem = {
+type TSocialItem = {
   icon: string;
   alt: string;
   href: string;
