@@ -1,5 +1,6 @@
 import { Footer, Header } from '@/components/layouts';
 import { ContactCta } from '@/components/layouts/contact-cta';
+import { getUpscaledCloudinaryImageUrl } from '@/utils';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { DetailFacilities, ImageSlider, RoomCard } from '../common';
@@ -24,16 +25,24 @@ export function DetailRoomModule() {
   if (!data) {
     return <div>Room not found</div>;
   }
+
+  const heroImage = getUpscaledCloudinaryImageUrl(
+    data.images.find(Boolean) ?? data.thumbnail
+  );
+
   return (
     <div className="min-h-screen bg-[url('/images/bg-screen.jpg')] bg-[length:720px_720px] text-[#151515]">
       <Header />
       <div className='relative z-0'>
         <Image
-          height={400}
-          width={1600}
-          src={data.thumbnail}
-          alt='room-detail'
-          className='object-fit h-200 w-full'
+          height={800}
+          width={1920}
+          src={heroImage}
+          alt={data.title}
+          preload
+          sizes='100vw'
+          quality={90}
+          className='h-200 w-full object-cover object-center'
         />
 
         <div className='absolute top-162.5 left-1/2 w-4/5 -translate-x-1/2'>

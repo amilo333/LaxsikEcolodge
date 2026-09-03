@@ -69,6 +69,7 @@ export function ImageSlider({ images, title }: ImageSliderProps) {
                     alt={`Room gallery ${index + 1}`}
                     fill
                     sizes='(max-width: 768px) 90vw, (max-width: 1280px) 70vw, 700px'
+                    quality={90}
                     className='object-cover'
                   />
                 </div>

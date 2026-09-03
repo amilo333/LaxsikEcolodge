@@ -34,6 +34,7 @@ export function RoomItem({
           alt={room.title}
           {...(isPriority ? { preload: true } : { loading: 'lazy' as const })}
           sizes='(min-width: 1024px) 35vw, (min-width: 768px) 46vw, 92vw'
+          quality={90}
           className='object-cover transition-transform duration-500 group-hover:scale-[1.03]'
         />
         <span className='absolute inset-0 bg-gradient-to-t from-black/15 via-transparent to-transparent' />

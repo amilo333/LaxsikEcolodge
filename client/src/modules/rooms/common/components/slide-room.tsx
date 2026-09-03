@@ -186,6 +186,7 @@ export function SlideRoom(props: SlideRoomProps) {
                             (max-width: 1280px) 380px,
                             380px
                           '
+                        quality={90}
                         className='object-cover transition-transform duration-700'
                       />
                     </div>

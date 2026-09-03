@@ -33,6 +33,25 @@ type TRoomFormModalProps = {
 const inputClassName =
   'mt-1.5 h-11 w-full rounded-xl border border-[#DCE6E3] bg-[#F8FAF9] px-3.5 text-xs outline-none focus:border-[#0D4949] focus:ring-2 focus:ring-[#0D4949]/10';
 
+const MIN_ROOM_IMAGE_WIDTH = 1600;
+const MIN_ROOM_IMAGE_HEIGHT = 900;
+
+const getImageDimensions = (file: File) =>
+  new Promise<{ width: number; height: number }>((resolve, reject) => {
+    const objectUrl = URL.createObjectURL(file);
+    const image = new Image();
+
+    image.onload = () => {
+      resolve({ width: image.naturalWidth, height: image.naturalHeight });
+      URL.revokeObjectURL(objectUrl);
+    };
+    image.onerror = () => {
+      reject(new Error('Không thể đọc kích thước ảnh.'));
+      URL.revokeObjectURL(objectUrl);
+    };
+    image.src = objectUrl;
+  });
+
 export function RoomFormModal({ room, onClose }: TRoomFormModalProps) {
   const createRoom = useCreateAdminRoomApi();
   const updateRoom = useUpdateAdminRoomApi();
@@ -82,6 +101,28 @@ export function RoomFormModal({ room, onClose }: TRoomFormModalProps) {
         return;
       }
 
+      const selectedImages = [thumbnail, ...images];
+      const imageDimensions = await Promise.all(
+        selectedImages.map(async (image) => ({
+          image,
+          dimensions: await getImageDimensions(image),
+        }))
+      );
+      const lowResolutionImage = imageDimensions.find(
+        ({ dimensions }) =>
+          dimensions.width < MIN_ROOM_IMAGE_WIDTH ||
+          dimensions.height < MIN_ROOM_IMAGE_HEIGHT
+      );
+
+      if (lowResolutionImage) {
+        const { image, dimensions } = lowResolutionImage;
+        setFileError(
+          `${image.name} chỉ có ${dimensions.width}×${dimensions.height}px. ` +
+            `Ảnh phòng cần tối thiểu ${MIN_ROOM_IMAGE_WIDTH}×${MIN_ROOM_IMAGE_HEIGHT}px.`
+        );
+        return;
+      }
+
       const formData = new FormData();
       Object.entries(data).forEach(([key, value]) => {
         formData.append(key, String(value));
@@ -91,8 +132,10 @@ export function RoomFormModal({ room, onClose }: TRoomFormModalProps) {
 
       await createRoom.mutateAsync(formData);
       onClose();
-    } catch {
-      // Mutation hooks display the API error.
+    } catch (error) {
+      if (error instanceof Error) {
+        setFileError(error.message);
+      }
     }
   };
 
@@ -249,7 +292,7 @@ export function RoomFormModal({ room, onClose }: TRoomFormModalProps) {
             {!isEditing && (
               <>
                 <label className='text-xs font-bold text-[#344B47]'>
-                  Ảnh đại diện
+                  Ảnh đại diện (tối thiểu 1600×900px)
                   <input
                     type='file'
                     accept='image/*'
@@ -260,7 +303,7 @@ export function RoomFormModal({ room, onClose }: TRoomFormModalProps) {
                   />
                 </label>
                 <label className='text-xs font-bold text-[#344B47]'>
-                  Ảnh chi tiết (tối đa 5)
+                  Ảnh chi tiết (tối đa 5, tối thiểu 1600×900px)
                   <input
                     type='file'
                     accept='image/*'
