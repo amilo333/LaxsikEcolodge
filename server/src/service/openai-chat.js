@@ -1,4 +1,5 @@
 import { CHAT_TOOLS, executeChatTool } from "./chat-tools.js";
+import { buildChatRoomCards, getToolRoomCards } from "./chat-room-results.js";
 
 const OPENAI_RESPONSES_URL = "https://api.openai.com/v1/responses";
 const DEFAULT_MODEL = "gpt-5.6-luna";
@@ -8,7 +9,9 @@ const SYSTEM_INSTRUCTIONS = `You are Laxsik Assistant, the guest-facing assistan
 Reply in the same language as the user's latest message and keep answers concise and friendly.
 For every question asking for facts, recommendations, policies, services, experiences, contact information, location, or other information specifically about Laxsik Ecolodge, you must use an appropriate tool before answering. Never answer Laxsik-specific facts from memory.
 Use search_laxsik_knowledge for semantic questions about Laxsik, including room preferences and views, dining, spa, tours, policies, experiences, contact details, and location. Treat spelling mistakes and Vietnamese or English wording as possible references to the same Laxsik concepts.
-Use the live room tools whenever the user asks about current prices, room capacity, inventory, exact room details, or availability. For room preferences such as mountain views, quiet rooms, or romantic rooms, search the knowledge base first.
+Use list_rooms for a general room/price list, get_room_details for one exact room, and search_available_rooms for date-specific availability. For room recommendations with preferences such as views, guest capacity, budget, or facilities, search the knowledge base first. Its rooms array contains current public room details from the database; use these to select only rooms meeting all stated requirements.
+For preferences (including a named room) combined with stay dates, first find matching room IDs with knowledge search, then pass those IDs and any guest count, room count, and budget to search_available_rooms. Never drop the preferences when checking availability.
+When a structured answer is requested, put the guest-facing answer in message and the IDs of ONLY the rooms you actually recommend or describe positively in roomIds. Every selected room must meet all explicit requirements supported by the data and be mentioned by name in message. Return an empty roomIds array for no matches, unrelated questions, negative examples, or clarification without recommendations. Do not select all retrieved rooms by default. Room cards will be rendered separately; do not write URLs.
 Never invent room names, prices, quantities, facilities, availability, booking status, policies, URLs, or contact details.
 When dates needed for availability are missing, ask for both check-in and check-out dates instead of guessing.
 Do not claim availability based on list_rooms because only search_available_rooms checks bookings for the requested dates.
@@ -161,7 +164,13 @@ const parseToolArguments = (value) => {
   }
 };
 
-const requestOpenAI = async ({ apiKey, model, input, fetchImpl }) => {
+const requestOpenAI = async ({
+  apiKey,
+  model,
+  input,
+  fetchImpl,
+  roomIds = [],
+}) => {
   const response = await fetchImpl(OPENAI_RESPONSES_URL, {
     method: "POST",
     headers: {
@@ -177,8 +186,31 @@ const requestOpenAI = async ({ apiKey, model, input, fetchImpl }) => {
       tool_choice: "auto",
       parallel_tool_calls: false,
       reasoning: { effort: "low" },
-      text: { verbosity: "low" },
-      max_output_tokens: 700,
+      text: {
+        verbosity: "low",
+        ...(roomIds.length
+          ? {
+              format: {
+                type: "json_schema",
+                name: "room_recommendation",
+                strict: true,
+                schema: {
+                  type: "object",
+                  properties: {
+                    message: { type: "string" },
+                    roomIds: {
+                      type: "array",
+                      items: { type: "string", enum: roomIds },
+                    },
+                  },
+                  required: ["message", "roomIds"],
+                  additionalProperties: false,
+                },
+              },
+            }
+          : {}),
+      },
+      max_output_tokens: 1200,
       store: false,
     }),
   });
@@ -221,6 +253,7 @@ export const createOpenAIChatReply = async (
   let currentResponse = response;
   let currentInput = messages.map(({ role, content }) => ({ role, content }));
   const toolsUsed = [];
+  let candidateRooms = [];
   const latestUserMessage = [...messages]
     .reverse()
     .find((message) => message.role === "user")?.content;
@@ -246,6 +279,7 @@ export const createOpenAIChatReply = async (
         ),
         model,
         toolsUsed: [...new Set(toolsUsed)],
+        rooms: getToolRoomCards(call.name, result),
       };
     }
 
@@ -258,9 +292,11 @@ export const createOpenAIChatReply = async (
         ),
         model,
         toolsUsed: [...new Set(toolsUsed)],
+        rooms: [],
       };
     }
 
+    candidateRooms = buildChatRoomCards(result.rooms);
     currentInput = [
       ...currentInput,
       ...(currentResponse.output || []),
@@ -275,16 +311,39 @@ export const createOpenAIChatReply = async (
       model,
       input: currentInput,
       fetchImpl,
+      roomIds: candidateRooms.map((room) => room.id),
     });
   }
 
-  const message = sanitizeText(getOutputText(currentResponse));
+  const outputText = getOutputText(currentResponse);
+  let selectedRooms = [];
+  let answer = outputText;
+  if (candidateRooms.length) {
+    const structured = JSON.parse(outputText);
+    if (
+      typeof structured.message !== "string" ||
+      !Array.isArray(structured.roomIds)
+    ) {
+      throw new Error("OpenAI returned an invalid room recommendation.");
+    }
+    answer = structured.message;
+    const roomsById = new Map(candidateRooms.map((room) => [room.id, room]));
+    selectedRooms = [...new Set(structured.roomIds)]
+      .map((id) => roomsById.get(id))
+      .filter(Boolean);
+  }
+  const message = sanitizeText(answer);
 
   if (!message) {
     throw new Error("OpenAI returned an empty response.");
   }
 
-  return { message, model, toolsUsed: [...new Set(toolsUsed)] };
+  return {
+    message,
+    model,
+    toolsUsed: [...new Set(toolsUsed)],
+    rooms: selectedRooms,
+  };
 };
 
 export { DEFAULT_MODEL };

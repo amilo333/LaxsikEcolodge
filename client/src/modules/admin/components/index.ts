@@ -5,4 +5,5 @@ export { ExperienceManagement } from './experience-management';
 export { RoomsManagement } from './rooms-management';
 export { ToursManagement } from './tours-management';
 export { UsersManagement } from './users-management';
+export { UserFormModal } from './user-form-modal';
 export { VouchersManagement } from './vouchers-management';

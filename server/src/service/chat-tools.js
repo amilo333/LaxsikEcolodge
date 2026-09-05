@@ -6,26 +6,15 @@ import {
   RoomAvailabilityError,
 } from "./room-availability.js";
 import { searchLaxsikKnowledge } from "./knowledge-search.js";
+import {
+  hydrateRoomKnowledge,
+  isChatRoomId,
+  serializeChatRoom as serializeRoom,
+} from "./chat-room-results.js";
 
 const ROOM_LIMIT = 6;
 
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
-const serializeRoom = (room, extra = {}) => ({
-  id: room._id.toString(),
-  title: room.title,
-  description: room.description,
-  pricePerNight: room.price,
-  bed: room.bed,
-  capacity: room.capacity,
-  area: room.area,
-  bathroom: room.bathroom || null,
-  fireplace: room.fireplace || null,
-  views: room.views || null,
-  quantity: room.quantity,
-  status: room.status,
-  ...extra,
-});
 
 export const CHAT_TOOLS = [
   {
@@ -66,8 +55,30 @@ export const CHAT_TOOLS = [
           type: ["integer", "null"],
           description: "Number of rooms requested, or null when not supplied.",
         },
+        minPrice: {
+          type: ["number", "null"],
+          description: "Minimum nightly room price in VND, or null.",
+        },
+        maxPrice: {
+          type: ["number", "null"],
+          description: "Maximum nightly room price in VND, or null.",
+        },
+        roomIds: {
+          type: ["array", "null"],
+          items: { type: "string" },
+          description:
+            "Only check these room IDs selected from knowledge results when the guest has room preferences. Null means no room restriction; an empty array means no matching rooms.",
+        },
       },
-      required: ["checkInDate", "checkOutDate", "guests", "roomCount"],
+      required: [
+        "checkInDate",
+        "checkOutDate",
+        "guests",
+        "roomCount",
+        "minPrice",
+        "maxPrice",
+        "roomIds",
+      ],
       additionalProperties: false,
     },
   },
@@ -142,9 +153,24 @@ const listRooms = async () => {
   };
 };
 
-const searchAvailableRooms = async (args) => {
+export const searchAvailableRooms = async (
+  args,
+  { findRooms = findAvailableRooms } = {},
+) => {
   try {
-    const rooms = await findAvailableRooms(args);
+    if (
+      args.roomIds != null &&
+      (!Array.isArray(args.roomIds) || !args.roomIds.every(isChatRoomId))
+    ) {
+      throw new RoomAvailabilityError("Invalid room IDs");
+    }
+    const availableRooms = await findRooms(args);
+    const rooms =
+      args.roomIds == null
+        ? availableRooms
+        : availableRooms.filter((room) =>
+            args.roomIds.includes(room._id.toString()),
+          );
     const returnedRooms = rooms.slice(0, ROOM_LIMIT);
 
     return {
@@ -180,7 +206,7 @@ const getRoomDetails = async ({ roomIdOrTitle }) => {
   const query = mongoose.Types.ObjectId.isValid(value)
     ? { _id: value }
     : { title: { $regex: `^${escapeRegExp(value)}$`, $options: "i" } };
-  const room = await Room.findOne(query);
+  const room = await Room.findOne({ ...query, status: "available" });
 
   return room
     ? { ok: true, found: true, room: serializeRoom(room) }
@@ -196,7 +222,7 @@ export const executeChatTool = async (name, args = {}) => {
     case "get_room_details":
       return getRoomDetails(args);
     case "search_laxsik_knowledge":
-      return searchLaxsikKnowledge(args);
+      return hydrateRoomKnowledge(await searchLaxsikKnowledge(args));
     default:
       return { ok: false, error: `Unknown tool: ${name}` };
   }

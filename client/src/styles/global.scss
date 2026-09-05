@@ -2,3 +2,62 @@
 @use './_variants';
 @use './_theme.t';
 @use './_default.t';
+
+@keyframes laxsik-pet-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-1.5px) rotate(-1.5deg);
+  }
+}
+
+@keyframes laxsik-pet-blink {
+  0%,
+  44%,
+  48%,
+  100% {
+    transform: scaleY(1);
+  }
+  46% {
+    transform: scaleY(0.12);
+  }
+}
+
+@keyframes laxsik-pet-working {
+  0%,
+  100% {
+    transform: rotate(-3deg) translateY(0);
+  }
+  50% {
+    transform: rotate(3deg) translateY(-1px);
+  }
+}
+
+.laxsik-pet-icon {
+  animation: laxsik-pet-float 3.2s ease-in-out infinite;
+  transform-origin: 50% 82%;
+}
+
+.laxsik-pet-eyes {
+  animation: laxsik-pet-blink 4.6s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.laxsik-pet-working {
+  animation: laxsik-pet-working 0.55s ease-in-out infinite;
+}
+
+.chatbot-launcher:hover .laxsik-pet-icon {
+  animation-duration: 1.5s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .laxsik-pet-icon,
+  .laxsik-pet-eyes,
+  .laxsik-pet-working {
+    animation: none;
+  }
+}

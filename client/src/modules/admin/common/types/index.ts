@@ -20,7 +20,8 @@ export type TAdminListParams = {
   dateTo?: string;
 };
 
-export type TAdminUser = TUser & {
+export type TAdminUser = Omit<TUser, 'phone'> & {
+  phone: string | null;
   status: boolean;
   createdAt: string;
   updatedAt: string;

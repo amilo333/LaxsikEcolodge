@@ -73,6 +73,7 @@ export const createChatResponse = async (req, res) => {
           mode: "fallback",
           model: null,
           toolsUsed: [],
+          rooms: [],
         },
       });
     }

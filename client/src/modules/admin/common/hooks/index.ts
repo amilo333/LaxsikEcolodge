@@ -64,6 +64,7 @@ export const useUpdateAdminUserApi = () => {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
       void queryClient.invalidateQueries({ queryKey: ['admin', 'summary'] });
+      void queryClient.invalidateQueries({ queryKey: ['profile'] });
       toast.success('Đã cập nhật người dùng.');
     },
     onError: showAdminError,

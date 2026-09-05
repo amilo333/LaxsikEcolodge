@@ -1,10 +1,12 @@
 'use client';
 
 import axios from 'axios';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { FormEvent, useEffect, useRef, useState } from 'react';
 
 import { TChatMessage, TChatResponse, useSendChatMessageApi } from './common';
+import { ChatRoomCard } from './common/components/chat-room-card';
 
 const WELCOME_MESSAGE: TChatMessage = {
   id: 'welcome',
@@ -22,15 +24,22 @@ const QUICK_PROMPTS = [
 const createMessageId = () =>
   `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
-function ChatIcon() {
+function StandingRobotIcon({
+  className = 'h-14 w-14',
+  isWorking = false,
+}: {
+  className?: string;
+  isWorking?: boolean;
+}) {
   return (
-    <svg
-      viewBox='0 0 24 24'
+    <Image
+      src='/images/chatbot3.png'
+      width={119}
+      height={119}
+      alt=''
       aria-hidden='true'
-      className='h-6 w-6 fill-none stroke-current stroke-2'>
-      <path d='M5 18.5A8.5 8.5 0 1 1 8 21l-5 1 2-3.5Z' />
-      <path d='M8 10h8M8 14h5' />
-    </svg>
+      className={`laxsik-pet-icon ${isWorking ? 'laxsik-pet-working' : ''} ${className} object-contain`}
+    />
   );
 }
 
@@ -54,11 +63,20 @@ export function ChatbotWidget() {
   const [chatMeta, setChatMeta] = useState<TChatResponse | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const latestMessageRef = useRef<HTMLDivElement>(null);
   const sendMessage = useSendChatMessageApi();
 
   useEffect(() => {
     if (isOpen) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      const latestMessage = messages.at(-1);
+      if (!sendMessage.isPending && latestMessage?.rooms?.length) {
+        latestMessageRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      } else {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   }, [isOpen, messages, sendMessage.isPending]);
 
@@ -95,6 +113,7 @@ export function ChatbotWidget() {
               id: createMessageId(),
               role: 'assistant',
               content: response.message,
+              rooms: response.rooms ?? [],
             },
           ]);
         },
@@ -130,8 +149,11 @@ export function ChatbotWidget() {
           <header className="relative overflow-hidden bg-[linear-gradient(rgba(8,61,61,0.9),rgba(8,61,61,0.9)),url('/images/banner/bg_header.png')] bg-cover bg-center px-5 py-4 text-white">
             <div className='flex items-center justify-between gap-3'>
               <div className='flex min-w-0 items-center gap-3'>
-                <span className='font-lora flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-sm font-bold text-[#0D4949]'>
-                  LA
+                <span className='flex h-12 w-11 shrink-0 items-center justify-center'>
+                  <StandingRobotIcon
+                    className='h-11 w-11'
+                    isWorking={sendMessage.isPending}
+                  />
                 </span>
                 <span className='min-w-0'>
                   <span className='font-lora block truncate text-base font-semibold'>
@@ -147,9 +169,10 @@ export function ChatbotWidget() {
                 <button
                   type='button'
                   onClick={clearConversation}
+                  disabled={sendMessage.isPending}
                   title='Xóa hội thoại'
                   aria-label='Xóa hội thoại'
-                  className='flex h-9 w-9 items-center justify-center rounded-full text-lg text-white/75 transition hover:bg-white/10 hover:text-white'>
+                  className='flex h-9 w-9 items-center justify-center rounded-full text-lg text-white/75 transition hover:bg-white/10 hover:text-white disabled:opacity-40'>
                   ↻
                 </button>
                 <button
@@ -164,20 +187,33 @@ export function ChatbotWidget() {
           </header>
 
           <div className='flex-1 space-y-4 overflow-y-auto px-4 py-5'>
-            {messages.map((message) => (
+            {messages.map((message, index) => (
               <div
                 key={message.id}
-                className={`flex ${
-                  message.role === 'user' ? 'justify-end' : 'justify-start'
+                ref={index === messages.length - 1 ? latestMessageRef : null}
+                className={`flex min-w-0 flex-col gap-3 ${
+                  message.role === 'user' ? 'items-end' : 'items-start'
                 }`}>
                 <div
-                  className={`max-w-[84%] px-4 py-3 text-xs leading-5 whitespace-pre-wrap shadow-sm ${
+                  className={`max-w-[84%] px-4 py-3 text-xs leading-5 break-words whitespace-pre-wrap shadow-sm ${
                     message.role === 'user'
                       ? 'rounded-[16px_16px_4px_16px] bg-[#0D5653] text-white'
                       : 'rounded-[16px_16px_16px_4px] border border-[#E0E9E6] bg-white text-[#314B47]'
                   }`}>
                   {message.content}
                 </div>
+                {message.role === 'assistant' && !!message.rooms?.length && (
+                  <ul aria-label='Phòng phù hợp' className='w-full space-y-2'>
+                    {message.rooms.map((room) => (
+                      <li key={room.id}>
+                        <ChatRoomCard
+                          room={room}
+                          onNavigate={() => setIsOpen(false)}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             ))}
 
@@ -260,8 +296,11 @@ export function ChatbotWidget() {
         onClick={() => setIsOpen((current) => !current)}
         aria-label={isOpen ? 'Đóng chatbot' : 'Mở chatbot'}
         aria-expanded={isOpen}
-        className='ml-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#0D5653] text-white shadow-[0_14px_36px_rgba(4,45,45,0.35)] transition hover:-translate-y-0.5 hover:bg-[#083E3D] sm:h-16 sm:w-16'>
-        {isOpen ? <span className='text-2xl'>×</span> : <ChatIcon />}
+        className='chatbot-launcher relative ml-auto flex h-20 w-16 items-center justify-center bg-transparent drop-shadow-[0_10px_9px_rgba(4,45,45,0.42)] transition hover:-translate-y-1 hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D5653]'>
+        <StandingRobotIcon
+          className='h-20 w-16'
+          isWorking={sendMessage.isPending}
+        />
       </button>
     </div>
   );

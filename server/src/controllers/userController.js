@@ -3,6 +3,10 @@ import User from "../models/User.js";
 import Booking from "../models/Booking.js";
 import { generateToken } from "../utils/generate-token.js";
 import { ResponseUtil } from "../utils/response.util.js";
+import {
+  AdminUserUpdateError,
+  normalizeAdminUserUpdate,
+} from "../service/admin-user-update.js";
 
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -133,7 +137,7 @@ const getAllUsers = async (req, res) => {
     const skip = (page - 1) * limit;
     const [users, total] = await Promise.all([
       User.find(query)
-        .select("-password")
+        .select("_id full_name email phone role status createdAt updatedAt")
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit),
@@ -285,29 +289,36 @@ const updateUserById = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    const update = normalizeAdminUserUpdate(req.body);
     const isCurrentAdmin = user._id.equals(req.user._id);
 
-    if (
-      isCurrentAdmin &&
-      (req.body.role === "user" || req.body.status === false)
-    ) {
+    if (isCurrentAdmin && (update.role === "user" || update.status === false)) {
       return res.status(400).json({
         message: "You cannot remove your own admin access",
       });
     }
 
-    if (req.body.role && !["user", "admin"].includes(req.body.role)) {
-      return res.status(400).json({ message: "Invalid user role" });
+    if (update.email && update.email !== user.email) {
+      const emailOwner = await User.exists({
+        email: update.email,
+        _id: { $ne: user._id },
+      });
+      if (emailOwner) {
+        return res.status(409).json({ message: "Email already exists" });
+      }
     }
 
-    if (typeof req.body.status !== "undefined") {
-      user.status = Boolean(req.body.status);
+    if (update.phone && update.phone !== user.phone) {
+      const phoneOwner = await User.exists({
+        phone: update.phone,
+        _id: { $ne: user._id },
+      });
+      if (phoneOwner) {
+        return res.status(409).json({ message: "Phone already exists" });
+      }
     }
 
-    user.full_name = req.body.full_name?.trim() || user.full_name;
-    user.email = req.body.email?.trim().toLowerCase() || user.email;
-    user.phone = req.body.phone?.trim() || user.phone;
-    user.role = req.body.role || user.role;
+    Object.assign(user, update);
 
     const updateUser = await user.save();
 
@@ -323,6 +334,14 @@ const updateUserById = async (req, res) => {
     });
   } catch (error) {
     console.error("Update user error:", error);
+
+    if (error instanceof AdminUserUpdateError) {
+      return res.status(400).json({ message: error.message });
+    }
+
+    if (error?.name === "ValidationError" || error?.name === "CastError") {
+      return res.status(400).json({ message: "Invalid user data" });
+    }
 
     if (error?.code === 11000) {
       return res.status(409).json({

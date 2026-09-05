@@ -44,6 +44,7 @@ test("uses the low-cost OpenAI model and Responses API function schemas", async 
   );
   assert.equal(reply.message, "Xin chào! Tôi có thể giúp bạn tìm phòng.");
   assert.deepEqual(reply.toolsUsed, []);
+  assert.deepEqual(reply.rooms, []);
 });
 
 test("renders live MongoDB tool output without letting the model rewrite prices", async () => {
@@ -71,8 +72,10 @@ test("renders live MongoDB tool output without letting the model rewrite prices"
       totalAvailableUnits: 2,
       rooms: [
         {
-          id: "room-1",
+          id: "aaaaaaaaaaaaaaaaaaaaaaaa",
           title: "Homestay Ami",
+          status: "available",
+          thumbnail: "https://example.com/ami.jpg",
           pricePerNight: 150000,
           capacity: 2,
           bed: "1 King Bed",
@@ -88,8 +91,7 @@ test("renders live MongoDB tool output without letting the model rewrite prices"
     [
       {
         role: "user",
-        content:
-          "Tìm phòng từ 2026-09-10 đến 2026-09-12 cho 2 khách, 1 phòng",
+        content: "Tìm phòng từ 2026-09-10 đến 2026-09-12 cho 2 khách, 1 phòng",
       },
     ],
     { fetchImpl, toolExecutor, apiKey: "test-key" },
@@ -99,6 +101,23 @@ test("renders live MongoDB tool output without letting the model rewrite prices"
   assert.match(reply.message, /view Mountain/);
   assert.match(reply.message, /còn 2 phòng/);
   assert.deepEqual(reply.toolsUsed, ["search_available_rooms"]);
+  assert.deepEqual(reply.rooms, [
+    {
+      id: "aaaaaaaaaaaaaaaaaaaaaaaa",
+      title: "Homestay Ami",
+      thumbnail: "https://example.com/ami.jpg",
+      pricePerNight: 150000,
+      capacity: 2,
+      views: "Mountain",
+      stay: {
+        checkInDate: "2026-09-10",
+        checkOutDate: "2026-09-12",
+        guests: 2,
+        roomCount: 1,
+        availableQuantity: 2,
+      },
+    },
+  ]);
 });
 
 test("uses retrieved Laxsik knowledge as function output before answering", async () => {
@@ -114,8 +133,7 @@ test("uses retrieved Laxsik knowledge as function output before answering", asyn
             type: "function_call",
             call_id: "call_knowledge_1",
             name: "search_laxsik_knowledge",
-            arguments:
-              '{"query":"phòng có view núi","category":"room"}',
+            arguments: '{"query":"phòng có view núi","category":"room"}',
           },
         ],
       });
@@ -149,13 +167,174 @@ test("uses retrieved Laxsik knowledge as function output before answering", asyn
   );
 
   assert.equal(requestBodies.length, 2);
-  assert.equal(
-    requestBodies[1].input.at(-1).type,
-    "function_call_output",
-  );
+  assert.equal(requestBodies[1].input.at(-1).type, "function_call_output");
   assert.match(requestBodies[1].input.at(-1).output, /Mountain Retreat/);
   assert.match(reply.message, /Mountain Retreat/);
   assert.deepEqual(reply.toolsUsed, ["search_laxsik_knowledge"]);
+  assert.deepEqual(reply.rooms, []);
+});
+
+const mountainRoom = {
+  id: "aaaaaaaaaaaaaaaaaaaaaaaa",
+  title: "Mountain Retreat",
+  pricePerNight: 150000,
+  thumbnail: "https://example.com/mountain.jpg",
+  capacity: 2,
+  views: "Mountain",
+  status: "available",
+};
+const gardenRoom = {
+  ...mountainRoom,
+  id: "bbbbbbbbbbbbbbbbbbbbbbbb",
+  title: "Garden Retreat",
+  views: "Garden",
+};
+
+const knowledgeCall = {
+  type: "function_call",
+  call_id: "knowledge_1",
+  name: "search_laxsik_knowledge",
+  arguments: '{"query":"phòng view núi","category":"room"}',
+};
+const roomKnowledge = {
+  ok: true,
+  matches: [
+    { title: mountainRoom.title, category: "room", content: "Mountain view" },
+  ],
+  rooms: [mountainRoom, gardenRoom],
+};
+
+test("RAG cards use only selected, known IDs and authoritative database fields", async () => {
+  const requests = [];
+  const reply = await createOpenAIChatReply(
+    [{ role: "user", content: "Phòng nào có view núi?" }],
+    {
+      apiKey: "test-key",
+      toolExecutor: async () => roomKnowledge,
+      fetchImpl: async (_url, options) => {
+        requests.push(JSON.parse(options.body));
+        return jsonResponse(
+          requests.length === 1
+            ? { output: [knowledgeCall] }
+            : {
+                output_text: JSON.stringify({
+                  message: "Mountain Retreat có view núi.",
+                  roomIds: [
+                    mountainRoom.id,
+                    "cccccccccccccccccccccccc",
+                    mountainRoom.id,
+                  ],
+                  rooms: [
+                    {
+                      id: mountainRoom.id,
+                      pricePerNight: 1,
+                      href: "https://evil.example",
+                    },
+                  ],
+                }),
+              },
+        );
+      },
+    },
+  );
+
+  assert.equal(requests[1].text.format.type, "json_schema");
+  assert.equal(requests[1].text.format.strict, true);
+  assert.deepEqual(
+    requests[1].text.format.schema.properties.roomIds.items.enum,
+    [mountainRoom.id, gardenRoom.id],
+  );
+  assert.equal(reply.rooms.length, 1);
+  assert.equal(reply.rooms[0].id, mountainRoom.id);
+  assert.equal(reply.rooms[0].pricePerNight, 150000);
+  assert.equal(reply.rooms[0].thumbnail, mountainRoom.thumbnail);
+  assert.equal(reply.rooms[0].stay, null);
+  assert.equal(reply.rooms[0].href, undefined);
+});
+
+test("RAG does not attach retrieved rooms to a no-match or negative answer", async () => {
+  let calls = 0;
+  const reply = await createOpenAIChatReply(
+    [{ role: "user", content: "Có phòng view biển không?" }],
+    {
+      apiKey: "test-key",
+      toolExecutor: async () => roomKnowledge,
+      fetchImpl: async () =>
+        jsonResponse(
+          ++calls === 1
+            ? { output: [knowledgeCall] }
+            : {
+                output_text: JSON.stringify({
+                  message:
+                    "Mountain Retreat không có view biển. Mình chưa tìm được phòng đáp ứng yêu cầu.",
+                  roomIds: [],
+                }),
+              },
+        ),
+    },
+  );
+  assert.deepEqual(reply.rooms, []);
+});
+
+test("availability after RAG replaces suggestions with the checked rooms and stay", async () => {
+  let calls = 0;
+  const reply = await createOpenAIChatReply(
+    [{ role: "user", content: "Phòng view núi từ 2026-09-10 đến 2026-09-12" }],
+    {
+      apiKey: "test-key",
+      fetchImpl: async () =>
+        jsonResponse({
+          output: [
+            ++calls === 1
+              ? knowledgeCall
+              : {
+                  type: "function_call",
+                  call_id: "availability_1",
+                  name: "search_available_rooms",
+                  arguments: JSON.stringify({
+                    checkInDate: "2026-09-10",
+                    checkOutDate: "2026-09-12",
+                    roomIds: [mountainRoom.id],
+                  }),
+                },
+          ],
+        }),
+      toolExecutor: async (name, args) => {
+        if (name === "search_laxsik_knowledge") return roomKnowledge;
+        assert.deepEqual(args.roomIds, [mountainRoom.id]);
+        return {
+          ok: true,
+          criteria: args,
+          rooms: [{ ...mountainRoom, availableQuantity: 1 }],
+          roomTypeCount: 1,
+          availabilityChecked: true,
+        };
+      },
+    },
+  );
+  assert.deepEqual(reply.toolsUsed, [
+    "search_laxsik_knowledge",
+    "search_available_rooms",
+  ]);
+  assert.equal(reply.rooms.length, 1);
+  assert.equal(reply.rooms[0].stay.checkInDate, "2026-09-10");
+  assert.equal(reply.rooms[0].stay.availableQuantity, 1);
+});
+
+test("invalid structured room output fails closed instead of showing invented cards", async () => {
+  let calls = 0;
+  await assert.rejects(() =>
+    createOpenAIChatReply([{ role: "user", content: "Tư vấn phòng" }], {
+      apiKey: "test-key",
+      toolExecutor: async () => roomKnowledge,
+      fetchImpl: async () =>
+        jsonResponse(
+          ++calls === 1
+            ? { output: [knowledgeCall] }
+            : { output_text: '{"message":"truncated' },
+        ),
+    }),
+  );
 });
 
 test("removes links and Markdown from general model answers", async () => {
