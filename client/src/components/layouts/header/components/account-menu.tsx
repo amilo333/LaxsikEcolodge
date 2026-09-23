@@ -4,6 +4,7 @@ import { useLogoutApi, useProfileApi } from '@/modules/auth/common';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 const getInitials = (fullName: string) =>
   fullName
@@ -14,6 +15,7 @@ const getInitials = (fullName: string) =>
     .join('');
 
 function GuestActions() {
+  const t = useTranslations('AccountMenu');
   const pathname = usePathname();
   const redirect =
     pathname === '/' ? '' : `?redirect=${encodeURIComponent(pathname)}`;
@@ -23,7 +25,7 @@ function GuestActions() {
       <Link
         href={`/auth/login${redirect}`}
         className='inline-flex h-9 items-center gap-1.5 rounded-full bg-[#DDF2FF] px-3 text-[11px] font-bold text-[#075A93] transition hover:bg-[#C9EAFF] sm:h-10 sm:px-4 sm:text-xs'>
-        <span>Đăng nhập</span>
+        <span>{t('signIn')}</span>
         <svg
           viewBox='0 0 24 24'
           aria-hidden='true'
@@ -35,7 +37,7 @@ function GuestActions() {
       <Link
         href={`/auth/register${redirect}`}
         className='inline-flex h-9 items-center rounded-full bg-[#159DE5] px-3 text-[11px] font-bold text-white shadow-[0_7px_18px_rgba(21,157,229,0.22)] transition hover:bg-[#0D8DD1] sm:h-10 sm:px-4 sm:text-xs'>
-        Đăng ký
+        {t('register')}
       </Link>
     </div>
   );
@@ -43,6 +45,7 @@ function GuestActions() {
 
 export function AccountMenu() {
   const router = useRouter();
+  const t = useTranslations('AccountMenu');
   const profileQuery = useProfileApi();
   const logout = useLogoutApi();
   const [isOpen, setIsOpen] = useState(false);
@@ -73,7 +76,7 @@ export function AccountMenu() {
     return (
       <div
         className='h-10 w-[136px] animate-pulse rounded-full bg-white/15'
-        aria-label='Loading account'
+        aria-label={t('loading')}
       />
     );
   }
@@ -145,7 +148,7 @@ export function AccountMenu() {
                   <rect x='3' y='14' width='7' height='7' rx='1' />
                   <rect x='14' y='14' width='7' height='7' rx='1' />
                 </svg>
-                Admin Dashboard
+                {t('adminDashboard')}
               </Link>
             )}
             <Link
@@ -159,7 +162,7 @@ export function AccountMenu() {
                 className='h-5 w-5 fill-none stroke-[#0D4949] stroke-2'>
                 <path d='M4 5h16v15H4zM8 3v4m8-4v4M4 10h16' />
               </svg>
-              Phòng đã đặt
+              {t('bookings')}
             </Link>
             <Link
               role='menuitem'
@@ -173,7 +176,7 @@ export function AccountMenu() {
                 <circle cx='12' cy='8' r='4' />
                 <path d='M4.5 21a7.5 7.5 0 0 1 15 0' />
               </svg>
-              Thông tin cá nhân
+              {t('profile')}
             </Link>
           </div>
 
@@ -191,7 +194,7 @@ export function AccountMenu() {
                 <path d='M14 8V5a2 2 0 0 0-2-2H5v18h7a2 2 0 0 0 2-2v-3' />
                 <path d='M10 12h11m0 0-4-4m4 4-4 4' />
               </svg>
-              {logout.isPending ? 'Đang đăng xuất…' : 'Đăng xuất'}
+              {logout.isPending ? t('signingOut') : t('signOut')}
             </button>
           </div>
         </div>

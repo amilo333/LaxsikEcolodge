@@ -4,6 +4,8 @@ import { useBookingPricing } from '../hooks';
 import { useBookingStore } from '../stores';
 import { TAvailableRoom } from '../types';
 import { formatCurrency, formatStayDate } from '../utils';
+import { localizeRoomContent } from '@/utils';
+import { useLocale, useTranslations } from 'next-intl';
 
 type TBookingDetailPanelProps = {
   checkInDate: string;
@@ -20,48 +22,52 @@ export function BookingDetailPanel({
   requestedGuests,
   rooms,
 }: TBookingDetailPanelProps) {
+  const t = useTranslations('Booking.detailPanel');
+  const locale = useLocale();
   const quantities = useBookingStore((state) => state.quantities);
   const appliedVoucher = useBookingStore((state) => state.appliedVoucher);
   const pricing = useBookingPricing(rooms, numberOfNights);
-  const selectedRooms = rooms.filter((room) => quantities[room._id] > 0);
+  const selectedRooms = rooms
+    .filter((room) => quantities[room._id] > 0)
+    .map((room) => localizeRoomContent(room, locale));
 
   return (
     <aside className='space-y-6'>
       <section>
         <p className='text-[11px] font-bold text-[#0D4949]/60 uppercase'>
-          Your booking details
+          {t('title')}
         </p>
 
         <div className='mt-4 grid grid-cols-2 gap-3'>
           <div className='rounded-[16px] bg-[#F4F7F6] p-3'>
-            <p className='text-[10px] text-[#69726E]'>Check-in</p>
+            <p className='text-[10px] text-[#69726E]'>{t('checkIn')}</p>
             <p className='mt-1 text-xs font-bold'>
-              {formatStayDate(checkInDate)}
+              {formatStayDate(checkInDate, locale)}
             </p>
           </div>
           <div className='rounded-[16px] bg-[#F4F7F6] p-3'>
-            <p className='text-[10px] text-[#69726E]'>Check-out</p>
+            <p className='text-[10px] text-[#69726E]'>{t('checkOut')}</p>
             <p className='mt-1 text-xs font-bold'>
-              {formatStayDate(checkOutDate)}
+              {formatStayDate(checkOutDate, locale)}
             </p>
           </div>
         </div>
 
         <dl className='mt-4 space-y-2 text-xs'>
           <div className='flex justify-between gap-3'>
-            <dt className='text-[#68726E]'>Length of stay</dt>
+            <dt className='text-[#68726E]'>{t('lengthOfStay')}</dt>
             <dd className='font-bold'>
-              {numberOfNights} night{numberOfNights === 1 ? '' : 's'}
+              {t('nightCount', { count: numberOfNights })}
             </dd>
           </div>
           {requestedGuests && (
             <div className='flex justify-between gap-3'>
-              <dt className='text-[#68726E]'>Guests</dt>
+              <dt className='text-[#68726E]'>{t('guests')}</dt>
               <dd className='font-bold'>{requestedGuests}</dd>
             </div>
           )}
           <div className='flex justify-between gap-3'>
-            <dt className='text-[#68726E]'>Rooms</dt>
+            <dt className='text-[#68726E]'>{t('rooms')}</dt>
             <dd className='font-bold'>{pricing.selectedRoomCount}</dd>
           </div>
         </dl>
@@ -69,10 +75,10 @@ export function BookingDetailPanel({
         <div className='mt-4 overflow-hidden rounded-[16px] border border-[#DCE6E2] bg-[#F4F7F6]'>
           <div className='flex items-center justify-between gap-3 border-b border-[#DCE6E2] px-4 py-3'>
             <p className='text-[10px] font-bold text-[#56615D] uppercase'>
-              Room details
+              {t('roomDetails')}
             </p>
             <p className='text-[10px] text-[#68726E]'>
-              {numberOfNights} night{numberOfNights === 1 ? '' : 's'}
+              {t('nightCount', { count: numberOfNights })}
             </p>
           </div>
           <div className='divide-y divide-[#DCE6E2] px-4'>
@@ -89,11 +95,15 @@ export function BookingDetailPanel({
                       {room.title}
                     </p>
                     <p className='mt-1 text-[10px] leading-4 text-[#68726E]'>
-                      {quantity} room{quantity === 1 ? '' : 's'} ×{' '}
-                      {numberOfNights} night{numberOfNights === 1 ? '' : 's'}
+                      {t('lineQuantity', {
+                        rooms: quantity,
+                        nights: numberOfNights,
+                      })}
                     </p>
                     <p className='text-[10px] leading-4 text-[#68726E]'>
-                      {formatCurrency(room.price)} / room / night
+                      {t('nightlyRate', {
+                        price: formatCurrency(room.price),
+                      })}
                     </p>
                   </div>
                   <p className='shrink-0 text-xs font-bold text-[#0D4949]'>
@@ -108,11 +118,11 @@ export function BookingDetailPanel({
 
       <section className='border-t border-[#E3E9E7] pt-5'>
         <p className='text-[11px] font-bold text-[#0D4949]/60 uppercase'>
-          Price summary
+          {t('priceSummary')}
         </p>
         <dl className='mt-3 space-y-2 text-xs'>
           <div className='flex justify-between gap-3'>
-            <dt>Room subtotal</dt>
+            <dt>{t('subtotal')}</dt>
             <dd>{formatCurrency(pricing.subtotal)}</dd>
           </div>
           {appliedVoucher && (
@@ -122,7 +132,7 @@ export function BookingDetailPanel({
                 <dd>− {formatCurrency(pricing.discountAmount)}</dd>
               </div>
               <div className='flex justify-between gap-3 text-[#68726E]'>
-                <dt>After discount</dt>
+                <dt>{t('afterDiscount')}</dt>
                 <dd>
                   {formatCurrency(pricing.subtotal - pricing.discountAmount)}
                 </dd>
@@ -130,20 +140,28 @@ export function BookingDetailPanel({
             </>
           )}
           <div className='flex justify-between gap-3'>
-            <dt>Service charge (5%)</dt>
+            <dt>{t('serviceCharge')}</dt>
             <dd>{formatCurrency(pricing.serviceCharge)}</dd>
           </div>
           <div className='flex justify-between gap-3'>
-            <dt>Tax (10%)</dt>
+            <dt>{t('tax')}</dt>
             <dd>{formatCurrency(pricing.taxAmount)}</dd>
           </div>
           <div className='flex justify-between gap-3 border-t border-[#DCE3E0] pt-3 text-sm font-bold'>
-            <dt>Total payment</dt>
+            <dt>{t('total')}</dt>
             <dd>{formatCurrency(pricing.totalAmount)}</dd>
+          </div>
+          <div className='flex justify-between gap-3 font-bold text-[#0D4949]'>
+            <dt>{t('deposit')}</dt>
+            <dd>{formatCurrency(pricing.depositAmount)}</dd>
+          </div>
+          <div className='flex justify-between gap-3 text-[#68726E]'>
+            <dt>{t('balance')}</dt>
+            <dd>{formatCurrency(pricing.balanceAmount)}</dd>
           </div>
         </dl>
         <p className='mt-3 text-[10px] leading-4 text-[#747D79]'>
-          The service charge and tax are calculated after the voucher discount.
+          {t('feeNote')}
         </p>
       </section>
     </aside>

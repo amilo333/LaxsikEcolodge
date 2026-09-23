@@ -12,8 +12,10 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { usePaymentStore } from './common';
+import { useTranslations } from 'next-intl';
 
 export function PaymentResultModule() {
+  const t = useTranslations('Payment.result');
   const router = useRouter();
   const handoff = usePaymentStore((state) => state.handoff);
   const clearHandoff = usePaymentStore((state) => state.clearHandoff);
@@ -71,16 +73,15 @@ export function PaymentResultModule() {
                 !
               </span>
               <h1 className='mt-5 text-2xl font-bold text-[#0D4949]'>
-                Payment session not found
+                {t('notFound')}
               </h1>
               <p className='mx-auto mt-2 max-w-[520px] text-sm leading-6 text-[#68726E]'>
-                Open the payment gateway from your booking page in this browser
-                so we can securely match the result with your booking.
+                {t('description')}
               </p>
               <Button
                 onClick={() => router.push('/rooms')}
                 className='mx-auto mt-7 h-12! w-auto! min-w-[180px]! rounded-full! px-8! text-sm!'>
-                View rooms
+                {t('viewRooms')}
               </Button>
             </div>
           </section>

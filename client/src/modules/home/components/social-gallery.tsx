@@ -1,15 +1,19 @@
+'use client';
+
 import Image from 'next/image';
 import { GALLERY_IMAGES } from '../constant';
 import { SectionHeading } from './section-heading';
+import { useTranslations } from 'next-intl';
 
 export function SocialGallery() {
+  const t = useTranslations('Home.gallery');
   return (
     <section
       id='gallery'
       className='relative mb-[70px] min-h-[720px] w-full overflow-hidden px-4 py-20 sm:px-6 lg:py-28'>
       <Image
         src='/images/banner/banner-str.png'
-        alt='Terraced rice fields in Sa Pa'
+        alt={t('imageAlt')}
         fill
         sizes='100vw'
         className='object-cover'
@@ -27,9 +31,9 @@ export function SocialGallery() {
       <div className='relative z-10 mx-auto flex min-h-[560px] w-full max-w-[1500px] flex-col justify-end'>
         <div className='[&_h2]:text-[clamp(1.35rem,6vw,3rem)]'>
           <SectionHeading
-            eyebrow='Stories from the valley'
+            eyebrow={t('eyebrow')}
             title='#LAXSIK_ECOLODGE_SAPA'
-            description='A glimpse of the landscape, local culture and quiet moments around Laxsik Ecolodge.'
+            description={t('description')}
             light
           />
         </div>
@@ -41,7 +45,7 @@ export function SocialGallery() {
               className='relative aspect-square overflow-hidden rounded-[16px] border border-white/25 bg-white/10'>
               <Image
                 src={image}
-                alt={`Laxsik Ecolodge gallery ${index + 1}`}
+                alt={t('itemAlt', { index: index + 1 })}
                 fill
                 sizes='(max-width: 639px) 154px, (max-width: 1023px) 166px, 150px'
                 className='object-cover transition duration-500 hover:scale-105'

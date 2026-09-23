@@ -1,4 +1,14 @@
 import mongoose from "mongoose";
+import { createTranslationsSchema } from "./translation-schema.js";
+
+const tourTranslationsSchema = createTranslationsSchema({
+  title: { type: String, required: true, trim: true },
+  eyebrow: { type: String, required: true, trim: true },
+  description: { type: String, required: true, trim: true },
+  duration: { type: String, required: true, trim: true },
+  rhythm: { type: String, required: true, trim: true },
+  highlights: [{ type: String, trim: true }],
+});
 
 const tourSchema = new mongoose.Schema(
   {
@@ -50,6 +60,10 @@ const tourSchema = new mongoose.Schema(
         validator: (items) => items.length <= 8,
         message: "A tour can have at most 8 highlights",
       },
+    },
+    translations: {
+      type: tourTranslationsSchema,
+      default: undefined,
     },
     sortOrder: {
       type: Number,

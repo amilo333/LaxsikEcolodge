@@ -17,6 +17,8 @@ export type TBookingPricing = {
   serviceCharge: number;
   taxAmount: number;
   totalAmount: number;
+  depositAmount: number;
+  balanceAmount: number;
   selectedRoomCount: number;
 };
 
@@ -66,8 +68,16 @@ export type TBooking = {
   serviceChargeAmount: number;
   taxAmount: number;
   totalAmount: number;
+  depositAmount?: number;
+  paidAmount?: number;
   bookingStatus: 'pending' | 'confirmed' | 'cancelled' | 'completed';
-  paymentStatus: 'unpaid' | 'pending' | 'paid' | 'failed' | 'refunded';
+  paymentStatus:
+    | 'unpaid'
+    | 'pending'
+    | 'deposit_paid'
+    | 'paid'
+    | 'failed'
+    | 'refunded';
   paymentMethod: TPaymentMethod;
   customerInfo: TBookingCustomerInfo;
   createdAt: string;

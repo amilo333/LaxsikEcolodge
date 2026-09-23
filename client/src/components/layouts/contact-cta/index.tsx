@@ -1,12 +1,16 @@
+'use client';
+
 import Link from 'next/link';
 import type { TContactCtaProps } from './type';
+import { useTranslations } from 'next-intl';
 
 export function ContactCta(props: TContactCtaProps) {
+  const t = useTranslations('ContactCta');
   const {
-    title = 'We can help you with any questions or information.',
+    title = t('title'),
     phone = '+84 214 3892 999',
-    phoneLabel = 'CALL',
-    contactLabel = 'CONTACT',
+    phoneLabel = t('call'),
+    contactLabel = t('contact'),
     phoneHref = 'tel:+842143892999',
     contactHref = '/contact',
     className = '',

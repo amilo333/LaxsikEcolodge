@@ -1,4 +1,10 @@
 import mongoose from "mongoose";
+import { createTranslationsSchema } from "./translation-schema.js";
+
+const spaServiceTranslationsSchema = createTranslationsSchema({
+  title: { type: String, required: true, trim: true },
+  description: { type: String, required: true, trim: true },
+});
 
 const spaServiceSchema = new mongoose.Schema(
   {
@@ -18,6 +24,11 @@ const spaServiceSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+    },
+
+    translations: {
+      type: spaServiceTranslationsSchema,
+      default: undefined,
     },
 
     icon: {

@@ -1,46 +1,50 @@
+'use client';
+
 import Image from 'next/image';
 import { TRoom } from '../types/room-type';
+import { useTranslations } from 'next-intl';
 
 type DetailFacilitiesProps = {
   room: TRoom;
 };
 
 export function DetailFacilities({ room }: DetailFacilitiesProps) {
+  const t = useTranslations('Rooms.detailFacilities');
   const details = [
     {
       id: 'bed',
       icon: '/images/icon/ic-room-bed.png',
-      label: 'BEDS',
+      label: t('beds'),
       value: room.bed,
     },
     {
       id: 'capacity',
       icon: '/images/icon/ic-room-occupancy.png',
-      label: 'OCCUPANCY',
-      value: `${room.capacity} adults`,
+      label: t('occupancy'),
+      value: t('adults', { count: room.capacity }),
     },
     {
       id: 'area',
       icon: '/images/icon/ic-room-size.png',
-      label: 'SIZE',
-      value: `${room.area} m² floor plan`,
+      label: t('size'),
+      value: t('floorPlan', { area: room.area }),
     },
     {
       id: 'bathroom',
       icon: '/images/icon/ic-room-bathroom.png',
-      label: 'BATHROOM',
+      label: t('bathroom'),
       value: room.bathroom,
     },
     {
       id: 'fireplace',
       icon: '/images/icon/ic-room-fireplace.png',
-      label: 'FIREPLACE',
+      label: t('fireplace'),
       value: room.fireplace,
     },
     {
       id: 'views',
       icon: '/images/icon/ic-room-views.png',
-      label: 'VIEWS',
+      label: t('views'),
       value: room.views,
     },
   ];
@@ -50,7 +54,7 @@ export function DetailFacilities({ room }: DetailFacilitiesProps) {
   return (
     <section className='my-40'>
       <h2 className='font-lora text-center text-[32px] font-medium font-semibold text-[#0D4949]'>
-        FACILITIES
+        {t('title')}
       </h2>
 
       <div className='mx-auto mt-12 max-w-[1130px]'>

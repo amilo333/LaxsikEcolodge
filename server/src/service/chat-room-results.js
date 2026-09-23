@@ -2,7 +2,7 @@ import Room from "../models/Room.js";
 
 const ROOM_ID_PATTERN = /^[a-f\d]{24}$/i;
 const PUBLIC_ROOM_FIELDS =
-  "title description price thumbnail bed capacity area bathroom fireplace views quantity status";
+  "title description price thumbnail bed capacity area bathroom fireplace views quantity status translations";
 
 export const isChatRoomId = (value) =>
   typeof value === "string" && ROOM_ID_PATTERN.test(value);
@@ -21,6 +21,7 @@ export const serializeChatRoom = (room, extra = {}) => ({
   views: room.views || null,
   quantity: room.quantity,
   status: room.status,
+  ...(room.translations ? { translations: room.translations } : {}),
   ...extra,
 });
 
@@ -105,6 +106,7 @@ export const buildChatRoomCards = (rooms = [], criteria = null) => {
         : null,
       capacity: Number.isFinite(room.capacity) ? room.capacity : null,
       views: room.views || null,
+      ...(room.translations ? { translations: room.translations } : {}),
       stay: criteria
         ? {
             checkInDate: criteria.checkInDate,

@@ -9,6 +9,7 @@ import {
   useAdminVouchersApi,
   useDeleteAdminVoucherApi,
 } from '../common';
+import { AdminItemDetailDialog } from './admin-item-detail-dialog';
 import { VoucherFormModal } from './voucher-form-modal';
 
 const formatDate = (value: string) =>
@@ -43,6 +44,9 @@ export function VouchersManagement() {
   const [editingVoucher, setEditingVoucher] = useState<
     TAdminVoucher | null | undefined
   >();
+  const [selectedVoucher, setSelectedVoucher] = useState<TAdminVoucher | null>(
+    null
+  );
   const vouchersQuery = useAdminVouchersApi({
     page,
     limit: 8,
@@ -138,11 +142,20 @@ export function VouchersManagement() {
                     const state = getVoucherState(voucher);
 
                     return (
-                      <tr key={voucher._id} className='hover:bg-[#FAFCFB]'>
+                      <tr
+                        key={voucher._id}
+                        onClick={() => setSelectedVoucher(voucher)}
+                        className='cursor-pointer hover:bg-[#FAFCFB]'>
                         <td className='px-6 py-4'>
-                          <span className='inline-flex rounded-full border border-dashed border-[#8EB8AD] bg-[#F0F7F4] px-4 py-2 font-extrabold text-[#0D5A56]'>
+                          <button
+                            type='button'
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              setSelectedVoucher(voucher);
+                            }}
+                            className='inline-flex rounded-full border border-dashed border-[#8EB8AD] bg-[#F0F7F4] px-4 py-2 font-extrabold text-[#0D5A56] hover:underline'>
                             {voucher.code}
-                          </span>
+                          </button>
                         </td>
                         <td className='px-4 py-4 font-extrabold text-[#173F3D]'>
                           {voucher.discountType === 'percent'
@@ -166,7 +179,9 @@ export function VouchersManagement() {
                             {state.label}
                           </span>
                         </td>
-                        <td className='px-6 py-4'>
+                        <td
+                          className='px-6 py-4'
+                          onClick={(event) => event.stopPropagation()}>
                           <div className='flex justify-end gap-2'>
                             <button
                               type='button'
@@ -216,6 +231,38 @@ export function VouchersManagement() {
         <VoucherFormModal
           voucher={editingVoucher}
           onClose={() => setEditingVoucher(undefined)}
+        />
+      )}
+      {selectedVoucher && (
+        <AdminItemDetailDialog
+          category='voucher'
+          title={selectedVoucher.code}
+          fields={[
+            {
+              label: 'Mức giảm',
+              value:
+                selectedVoucher.discountType === 'percent'
+                  ? `${selectedVoucher.discountValue}%`
+                  : formatCurrency(selectedVoucher.discountValue),
+            },
+            {
+              label: 'Số lượt còn lại',
+              value: selectedVoucher.quantity.toLocaleString('vi-VN'),
+            },
+            { label: 'Bắt đầu', value: formatDate(selectedVoucher.startDate) },
+            { label: 'Kết thúc', value: formatDate(selectedVoucher.endDate) },
+            {
+              label: 'Trạng thái',
+              value: getVoucherState(selectedVoucher).label,
+            },
+            {
+              label: 'Ngày tạo',
+              value: new Date(selectedVoucher.createdAt).toLocaleString(
+                'vi-VN'
+              ),
+            },
+          ]}
+          onClose={() => setSelectedVoucher(null)}
         />
       )}
     </>

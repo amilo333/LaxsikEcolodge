@@ -1,10 +1,13 @@
 'use client';
 
-import { useDeferredValue, useMemo, useState } from 'react';
+import { useDeferredValue, useMemo, useState, type FormEvent } from 'react';
 import type { TRoom } from '@/modules/rooms/common/types';
-import { useAdminBookingsApi, useUpdateAdminBookingApi } from '../common';
+import {
+  useAdminBookingsApi,
+  useAdminRoomOccupancyApi,
+  useUpdateAdminBookingApi,
+} from '../common';
 import type { TAdminBooking, TUpdateAdminBookingPayload } from '../common';
-import { AdminSelect } from './admin-select';
 import { BookingDetailDialog } from './booking-detail-dialog';
 
 const DAY_IN_MS = 86_400_000;
@@ -21,11 +24,6 @@ const WEEKDAY_LABELS = [
   'Thứ 6',
   'Thứ 7',
 ];
-const DAY_VIEW_OPTIONS = [
-  { value: 14 as const, label: '14 ngày', description: 'Xem 2 tuần' },
-  { value: 30 as const, label: '30 ngày', description: 'Xem toàn tháng' },
-];
-
 type TTimelineBar = {
   booking: TAdminBooking;
   quantity: number;
@@ -33,6 +31,8 @@ type TTimelineBar = {
   duration: number;
   lane: number;
 };
+
+type TTimelineRoom = Pick<TRoom, '_id' | 'title' | 'quantity' | 'status'>;
 
 const BOOKING_STATUS_CONFIG: Record<
   TAdminBooking['bookingStatus'],
@@ -80,10 +80,10 @@ const differenceInDays = (later: string, earlier: string) =>
   );
 
 const getTodayKey = () => {
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
+  const date = new Date(Date.now() + 7 * 60 * 60 * 1000);
+  const year = date.getUTCFullYear();
+  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const day = String(date.getUTCDate()).padStart(2, '0');
   return `${year}-${month}-${day}`;
 };
 
@@ -167,18 +167,6 @@ function SearchIcon() {
   );
 }
 
-function TimelineViewIcon() {
-  return (
-    <svg
-      viewBox='0 0 24 24'
-      aria-hidden='true'
-      className='h-4 w-4 fill-none stroke-current stroke-2'>
-      <rect x='3' y='5' width='18' height='14' rx='2' />
-      <path d='M8 5v14M3 10h18M13 10v9' />
-    </svg>
-  );
-}
-
 function ChevronIcon({ direction }: { direction: 'left' | 'right' }) {
   return (
     <svg
@@ -203,7 +191,12 @@ export default function BookingsManagement() {
   const [rangeStart, setRangeStart] = useState(() =>
     addDays(getTodayKey(), -2)
   );
-  const [daysInView, setDaysInView] = useState<14 | 30>(14);
+  const [daysInView, setDaysInView] = useState(14);
+  const [draftStart, setDraftStart] = useState(() =>
+    addDays(getTodayKey(), -2)
+  );
+  const [draftDays, setDraftDays] = useState('14');
+  const [rangeError, setRangeError] = useState('');
   const [search, setSearch] = useState('');
   const [selectedBooking, setSelectedBooking] = useState<TAdminBooking | null>(
     null
@@ -225,6 +218,11 @@ export default function BookingsManagement() {
     dateTo: rangeEnd,
     ...(deferredSearch ? { search: deferredSearch } : {}),
   });
+  const occupancyQuery = useAdminRoomOccupancyApi({
+    dateFrom: rangeStart,
+    days: daysInView,
+  });
+  const occupancy = occupancyQuery.data;
   const updateBooking = useUpdateAdminBookingApi();
   const bookings = useMemo(
     () => bookingsQuery.data?.data ?? [],
@@ -232,7 +230,16 @@ export default function BookingsManagement() {
   );
 
   const timelineRooms = useMemo(() => {
-    const roomMap = new Map<string, TRoom>();
+    const roomMap = new Map<string, TTimelineRoom>();
+
+    occupancy?.roomPerformance.forEach((room) => {
+      roomMap.set(room.roomId, {
+        _id: room.roomId,
+        title: room.title,
+        quantity: room.quantity,
+        status: 'available',
+      });
+    });
 
     bookings.forEach((booking) => {
       booking.bookingItems.forEach((item) => {
@@ -242,10 +249,17 @@ export default function BookingsManagement() {
       });
     });
 
-    return Array.from(roomMap.values()).sort((left, right) =>
-      left.title.localeCompare(right.title, 'vi')
-    );
-  }, [bookings]);
+    return Array.from(roomMap.values())
+      .map((room) => ({
+        ...room,
+        bars: buildTimelineBars(room._id, bookings, rangeStart, rangeEnd),
+      }))
+      .sort(
+        (left, right) =>
+          Number(right.bars.length > 0) - Number(left.bars.length > 0) ||
+          left.title.localeCompare(right.title, 'vi')
+      );
+  }, [bookings, occupancy, rangeStart, rangeEnd]);
 
   const activeBookings = bookings.filter(
     (booking) => booking.bookingStatus !== 'cancelled'
@@ -257,21 +271,6 @@ export default function BookingsManagement() {
   const pendingBookings = bookings.filter(
     (booking) => booking.bookingStatus === 'pending'
   ).length;
-  const occupiedRoomNights = activeBookings.reduce((total, booking) => {
-    const checkIn = booking.checkInDate.slice(0, 10);
-    const checkOut = booking.checkOutDate.slice(0, 10);
-    const visibleStart = checkIn < rangeStart ? rangeStart : checkIn;
-    const visibleEnd = checkOut > rangeEnd ? rangeEnd : checkOut;
-    const visibleNights = Math.max(
-      0,
-      differenceInDays(visibleEnd, visibleStart)
-    );
-    const roomCount = booking.bookingItems.reduce(
-      (sum, item) => sum + item.quantity,
-      0
-    );
-    return total + visibleNights * roomCount;
-  }, 0);
   const isLoading = bookingsQuery.isLoading;
   const isError = bookingsQuery.isError;
   const timelineWidth = daysInView * DAY_WIDTH;
@@ -287,6 +286,23 @@ export default function BookingsManagement() {
       { bookingId: selectedBooking._id, data },
       { onSuccess: () => setSelectedBooking(null) }
     );
+  };
+
+  const showRangeStart = (value: string) => {
+    setRangeStart(value);
+    setDraftStart(value);
+  };
+
+  const applyRange = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const days = Number(draftDays);
+    if (!draftStart || !Number.isInteger(days) || days < 1 || days > 366) {
+      setRangeError('Chọn ngày bắt đầu và số ngày từ 1 đến 366.');
+      return;
+    }
+    setRangeError('');
+    setRangeStart(draftStart);
+    setDaysInView(days);
   };
 
   return (
@@ -318,25 +334,57 @@ export default function BookingsManagement() {
               className='h-11 w-full rounded-full border border-slate-200 bg-white pr-4 pl-10 text-xs transition outline-none focus:border-[#0D4949] focus:ring-4 focus:ring-[#0D4949]/10'
             />
           </label>
-
-          <AdminSelect
-            value={daysInView}
-            options={DAY_VIEW_OPTIONS}
-            onChange={setDaysInView}
-            ariaLabel='Số ngày hiển thị'
-            leadingIcon={<TimelineViewIcon />}
-            rounded='pill'
-            className='w-full sm:w-[160px]'
-          />
         </div>
       </div>
 
-      <div className='grid gap-3 sm:grid-cols-2 xl:grid-cols-4'>
+      <form
+        onSubmit={applyRange}
+        className='flex flex-wrap items-end gap-3 rounded-[16px] border border-[#DCE7E3] bg-white p-4'>
+        <label className='text-[10px] font-bold text-[#556560]'>
+          Ngày bắt đầu
+          <input
+            type='date'
+            required
+            value={draftStart}
+            onChange={(event) => setDraftStart(event.target.value)}
+            className='mt-1 block h-10 rounded-lg border border-[#D5E2DE] px-3 text-xs'
+          />
+        </label>
+        <label className='text-[10px] font-bold text-[#556560]'>
+          Số ngày muốn xem
+          <input
+            type='number'
+            min={1}
+            max={366}
+            required
+            value={draftDays}
+            onChange={(event) => setDraftDays(event.target.value)}
+            className='mt-1 block h-10 w-28 rounded-lg border border-[#D5E2DE] px-3 text-xs'
+          />
+        </label>
+        <button
+          type='submit'
+          className='h-10 rounded-lg bg-[#0D4949] px-5 text-xs font-bold text-white'>
+          Áp dụng
+        </button>
+        <p className='text-[10px] text-[#71807B]'>
+          Số phòng trống và đã đặt tính trên toàn bộ booking trong kỳ, không
+          theo ô tìm kiếm.
+        </p>
+        {rangeError && (
+          <p className='w-full text-xs text-red-700'>{rangeError}</p>
+        )}
+      </form>
+
+      <div className='grid gap-3 sm:grid-cols-2 xl:grid-cols-5'>
         {[
           {
             label: 'Booking trong kỳ',
-            value: bookings.length,
-            note: `${activeBookings.length} đang hoạt động`,
+            value: bookingsQuery.data?.pagination.total ?? bookings.length,
+            note:
+              (bookingsQuery.data?.pagination.total ?? 0) > 500
+                ? 'Lịch hiển thị 500 booking đầu tiên'
+                : `${activeBookings.length} đang hoạt động`,
             color: 'bg-[#E6F2EE] text-[#0D665A]',
           },
           {
@@ -346,10 +394,16 @@ export default function BookingsManagement() {
             color: 'bg-[#E9F1FA] text-[#31658B]',
           },
           {
-            label: 'Đêm phòng sử dụng',
-            value: occupiedRoomNights,
-            note: 'Không gồm booking đã hủy',
+            label: 'Đêm phòng đã đặt',
+            value: occupancy?.occupiedRoomNights ?? '—',
+            note: 'Gồm phòng đang giữ, không gồm đã hủy',
             color: 'bg-[#F3ECFA] text-[#76509A]',
+          },
+          {
+            label: 'Đêm phòng còn trống',
+            value: occupancy?.freeRoomNights ?? '—',
+            note: `${occupancy?.totalRooms ?? '—'} phòng mở bán mỗi ngày`,
+            color: 'bg-[#E6F2EE] text-[#0D665A]',
           },
           {
             label: 'Chờ xác nhận',
@@ -374,26 +428,37 @@ export default function BookingsManagement() {
           </article>
         ))}
       </div>
+      {occupancyQuery.isError && (
+        <p className='rounded-xl bg-[#FFF2F2] px-4 py-3 text-xs text-[#9A3838]'>
+          Không thể tải số phòng trống.{' '}
+          <button
+            type='button'
+            onClick={() => void occupancyQuery.refetch()}
+            className='font-bold underline'>
+            Thử lại
+          </button>
+        </p>
+      )}
 
       <div className='overflow-hidden rounded-[20px] border border-[#D8E4E0] bg-white shadow-[0_18px_55px_rgba(15,71,69,0.07)]'>
         <div className='flex flex-col gap-3 border-b border-[#E0E9E6] bg-[#FAFBFB] px-4 py-3 sm:flex-row sm:items-center sm:justify-between'>
           <div className='flex items-center gap-2'>
             <button
               type='button'
-              onClick={() => setRangeStart(addDays(rangeStart, -daysInView))}
+              onClick={() => showRangeStart(addDays(rangeStart, -daysInView))}
               aria-label='Xem khoảng thời gian trước'
               className='flex h-9 w-9 items-center justify-center rounded-full border border-[#D8E4E0] bg-white text-[#315A55] transition hover:border-[#0D4949]'>
               <ChevronIcon direction='left' />
             </button>
             <button
               type='button'
-              onClick={() => setRangeStart(addDays(todayKey, -2))}
+              onClick={() => showRangeStart(addDays(todayKey, -2))}
               className='h-9 rounded-full border border-[#D8E4E0] bg-white px-4 text-[10px] font-extrabold text-[#315A55] transition hover:border-[#0D4949]'>
               Hôm nay
             </button>
             <button
               type='button'
-              onClick={() => setRangeStart(addDays(rangeStart, daysInView))}
+              onClick={() => showRangeStart(addDays(rangeStart, daysInView))}
               aria-label='Xem khoảng thời gian sau'
               className='flex h-9 w-9 items-center justify-center rounded-full border border-[#D8E4E0] bg-white text-[#315A55] transition hover:border-[#0D4949]'>
               <ChevronIcon direction='right' />
@@ -496,12 +561,7 @@ export default function BookingsManagement() {
 
               <div>
                 {timelineRooms.map((room) => {
-                  const bars = buildTimelineBars(
-                    room._id,
-                    bookings,
-                    rangeStart,
-                    rangeEnd
-                  );
+                  const bars = room.bars;
                   const laneCount = Math.max(
                     1,
                     ...bars.map((bar) => bar.lane + 1)
@@ -538,7 +598,8 @@ export default function BookingsManagement() {
                             </p>
                           </div>
                           <p className='mt-1 pl-4 text-[9px] text-slate-400'>
-                            Tổng {room.quantity} phòng · {bars.length} booking
+                            Tổng {room.quantity} phòng
+                            {bars.length > 0 && ` · ${bars.length} booking`}
                           </p>
                         </div>
                       </div>
@@ -597,12 +658,6 @@ export default function BookingsManagement() {
                             </button>
                           );
                         })}
-
-                        {bars.length === 0 && (
-                          <p className='absolute top-1/2 left-4 -translate-y-1/2 text-[9px] text-slate-300'>
-                            Không có booking trong khoảng này
-                          </p>
-                        )}
                       </div>
                     </div>
                   );

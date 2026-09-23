@@ -1,15 +1,19 @@
+'use client';
+
 import { FACILITES } from '../constants/facilites';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 export function Facilities() {
+  const t = useTranslations('Rooms.facilities');
   return (
     <section className='flex min-h-[250px] flex-col items-center justify-center gap-5 bg-[#0D4949] px-4 py-8 text-white sm:gap-7 sm:px-6 sm:py-10'>
       <div className='text-center'>
         <p className='text-[10px] font-bold tracking-[0.2em] text-white/55 uppercase'>
-          Everything you need
+          {t('eyebrow')}
         </p>
         <h2 className='font-lora mt-2 text-2xl font-semibold sm:text-[32px]'>
-          FACILITIES
+          {t('title')}
         </h2>
       </div>
 
@@ -22,12 +26,12 @@ export function Facilities() {
               <Image
                 height={40}
                 width={40}
-                alt={facility.name}
+                alt={t(`items.${facility.name}`)}
                 src={facility.image}
                 className='h-9 w-9 object-contain opacity-90 sm:h-10 sm:w-10'
               />
               <div className='text-center text-[10px] font-semibold tracking-[0.04em] uppercase sm:text-[11px]'>
-                {facility.name}
+                {t(`items.${facility.name}`)}
               </div>
             </div>
           );

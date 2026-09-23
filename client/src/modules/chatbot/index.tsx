@@ -7,19 +7,7 @@ import { FormEvent, useEffect, useRef, useState } from 'react';
 
 import { TChatMessage, TChatResponse, useSendChatMessageApi } from './common';
 import { ChatRoomCard } from './common/components/chat-room-card';
-
-const WELCOME_MESSAGE: TChatMessage = {
-  id: 'welcome',
-  role: 'assistant',
-  content:
-    'Xin chào! Tôi là trợ lý của Laxsik Ecolodge. Tôi có thể giúp bạn tìm phòng, xem giá và chuẩn bị kỳ nghỉ tại Sa Pa.',
-};
-
-const QUICK_PROMPTS = [
-  'Tôi muốn tìm phòng cho 2 khách',
-  'Giá phòng hiện tại thế nào?',
-  'Tư vấn phòng có view đẹp',
-];
+import { useTranslations } from 'next-intl';
 
 const createMessageId = () =>
   `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -32,14 +20,28 @@ function StandingRobotIcon({
   isWorking?: boolean;
 }) {
   return (
-    <Image
-      src='/images/chatbot3.png'
-      width={119}
-      height={119}
-      alt=''
+    <span
       aria-hidden='true'
-      className={`laxsik-pet-icon ${isWorking ? 'laxsik-pet-working' : ''} ${className} object-contain`}
-    />
+      className={`laxsik-pet-icon inline-flex items-center justify-center ${isWorking ? 'laxsik-pet-working' : ''} ${className}`}>
+      <span className='relative block h-full' style={{ aspectRatio: '3 / 4' }}>
+        <Image
+          src='/images/chatbot5.png'
+          width={1440}
+          height={1920}
+          alt=''
+          draggable={false}
+          className='laxsik-pet-frame laxsik-pet-frame-primary pointer-events-none h-full w-full object-contain select-none'
+        />
+        <Image
+          src='/images/chatbotsl.png'
+          width={2250}
+          height={3000}
+          alt=''
+          draggable={false}
+          className='laxsik-pet-frame laxsik-pet-frame-secondary pointer-events-none h-full w-full object-contain select-none'
+        />
+      </span>
+    </span>
   );
 }
 
@@ -56,10 +58,21 @@ function SendIcon() {
 }
 
 export function ChatbotWidget() {
+  const t = useTranslations('Chatbot');
+  const welcomeMessage: TChatMessage = {
+    id: 'welcome',
+    role: 'assistant',
+    content: t('welcome'),
+  };
+  const quickPrompts = [
+    t('quick.findForTwo'),
+    t('quick.prices'),
+    t('quick.bestView'),
+  ];
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
-  const [messages, setMessages] = useState<TChatMessage[]>([WELCOME_MESSAGE]);
+  const [messages, setMessages] = useState<TChatMessage[]>([welcomeMessage]);
   const [chatMeta, setChatMeta] = useState<TChatResponse | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -119,8 +132,8 @@ export function ChatbotWidget() {
         },
         onError: (error) => {
           const message = axios.isAxiosError<{ message?: string }>(error)
-            ? (error.response?.data?.message ?? 'Không thể gửi tin nhắn.')
-            : 'Không thể gửi tin nhắn.';
+            ? (error.response?.data?.message ?? t('sendError'))
+            : t('sendError');
           setErrorMessage(message);
         },
       }
@@ -133,7 +146,7 @@ export function ChatbotWidget() {
   };
 
   const clearConversation = () => {
-    setMessages([WELCOME_MESSAGE]);
+    setMessages([welcomeMessage]);
     setChatMeta(null);
     setErrorMessage('');
     setInput('');
@@ -144,7 +157,7 @@ export function ChatbotWidget() {
       {isOpen && (
         <section
           role='dialog'
-          aria-label='Laxsik Assistant'
+          aria-label={t('label')}
           className='mb-3 flex h-[min(570px,calc(100vh-100px))] w-[min(390px,calc(100vw-24px))] flex-col overflow-hidden rounded-[16px] border border-white/40 bg-[#F7FAF8] shadow-[0_24px_80px_rgba(4,45,45,0.3)]'>
           <header className="relative overflow-hidden bg-[linear-gradient(rgba(8,61,61,0.9),rgba(8,61,61,0.9)),url('/images/banner/bg_header.png')] bg-cover bg-center px-5 py-4 text-white">
             <div className='flex items-center justify-between gap-3'>
@@ -161,7 +174,7 @@ export function ChatbotWidget() {
                   </span>
                   <span className='mt-0.5 flex items-center gap-1.5 text-[10px] text-white/75'>
                     <span className='h-2 w-2 rounded-full bg-[#8EE0B8]' />
-                    Trợ lý phòng và kỳ nghỉ
+                    {t('subtitle')}
                   </span>
                 </span>
               </div>
@@ -170,15 +183,15 @@ export function ChatbotWidget() {
                   type='button'
                   onClick={clearConversation}
                   disabled={sendMessage.isPending}
-                  title='Xóa hội thoại'
-                  aria-label='Xóa hội thoại'
+                  title={t('clear')}
+                  aria-label={t('clear')}
                   className='flex h-9 w-9 items-center justify-center rounded-full text-lg text-white/75 transition hover:bg-white/10 hover:text-white disabled:opacity-40'>
                   ↻
                 </button>
                 <button
                   type='button'
                   onClick={() => setIsOpen(false)}
-                  aria-label='Đóng chatbot'
+                  aria-label={t('close')}
                   className='flex h-9 w-9 items-center justify-center rounded-full text-xl text-white/75 transition hover:bg-white/10 hover:text-white'>
                   ×
                 </button>
@@ -203,7 +216,9 @@ export function ChatbotWidget() {
                   {message.content}
                 </div>
                 {message.role === 'assistant' && !!message.rooms?.length && (
-                  <ul aria-label='Phòng phù hợp' className='w-full space-y-2'>
+                  <ul
+                    aria-label={t('matchingRooms')}
+                    className='w-full space-y-2'>
                     {message.rooms.map((room) => (
                       <li key={room.id}>
                         <ChatRoomCard
@@ -219,7 +234,7 @@ export function ChatbotWidget() {
 
             {messages.length === 1 && (
               <div className='flex flex-wrap gap-2'>
-                {QUICK_PROMPTS.map((prompt) => (
+                {quickPrompts.map((prompt) => (
                   <button
                     key={prompt}
                     type='button'
@@ -256,7 +271,7 @@ export function ChatbotWidget() {
           <footer className='border-t border-[#DFE8E5] bg-white p-3'>
             <form onSubmit={handleSubmit} className='flex items-end gap-2'>
               <label className='flex-1'>
-                <span className='sr-only'>Nhập tin nhắn</span>
+                <span className='sr-only'>{t('inputLabel')}</span>
                 <textarea
                   rows={1}
                   value={input}
@@ -268,24 +283,24 @@ export function ChatbotWidget() {
                       submitMessage(input);
                     }
                   }}
-                  placeholder='Nhập câu hỏi của bạn…'
+                  placeholder={t('placeholder')}
                   className='max-h-24 min-h-11 w-full resize-none rounded-[16px] border border-[#D5E2DE] bg-[#F7FAF8] px-4 py-3 text-xs outline-none focus:border-[#0D5653] focus:ring-2 focus:ring-[#0D5653]/10'
                 />
               </label>
               <button
                 type='submit'
                 disabled={!input.trim() || sendMessage.isPending}
-                aria-label='Gửi tin nhắn'
+                aria-label={t('send')}
                 className='flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#0D5653] text-white transition hover:bg-[#083E3D] disabled:cursor-not-allowed disabled:opacity-40'>
                 <SendIcon />
               </button>
             </form>
             <p className='mt-2 text-center text-[9px] text-[#85928E]'>
               {!chatMeta
-                ? 'Hỏi đáp về Laxsik Ecolodge'
+                ? t('footer.default')
                 : chatMeta.mode === 'openai'
-                  ? 'Thông tin phòng được kiểm tra trực tiếp từ hệ thống'
-                  : 'Chế độ cơ bản · Chưa cấu hình OpenAI API'}
+                  ? t('footer.live')
+                  : t('footer.basic')}
             </p>
           </footer>
         </section>
@@ -294,7 +309,7 @@ export function ChatbotWidget() {
       <button
         type='button'
         onClick={() => setIsOpen((current) => !current)}
-        aria-label={isOpen ? 'Đóng chatbot' : 'Mở chatbot'}
+        aria-label={isOpen ? t('close') : t('open')}
         aria-expanded={isOpen}
         className='chatbot-launcher relative ml-auto flex h-20 w-16 items-center justify-center bg-transparent drop-shadow-[0_10px_9px_rgba(4,45,45,0.42)] transition hover:-translate-y-1 hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D5653]'>
         <StandingRobotIcon

@@ -66,17 +66,18 @@ export function RoomFormModal({ room, onClose }: TRoomFormModalProps) {
   } = useForm<TAdminRoomPayload>({
     resolver: zodResolver(roomSchema),
     defaultValues: {
-      title: room?.title ?? '',
-      description: room?.description ?? '',
+      title: room?.translations?.vi?.title ?? room?.title ?? '',
+      description:
+        room?.translations?.vi?.description ?? room?.description ?? '',
       price: room?.price ?? 0,
-      bed: room?.bed ?? '',
+      bed: room?.translations?.vi?.bed ?? room?.bed ?? '',
       area: room?.area ?? 1,
       capacity: room?.capacity ?? 1,
       quantity: room?.quantity ?? 1,
       status: room?.status ?? 'available',
-      bathroom: room?.bathroom ?? '',
-      fireplace: room?.fireplace ?? '',
-      views: room?.views ?? '',
+      bathroom: room?.translations?.vi?.bathroom ?? room?.bathroom ?? '',
+      fireplace: room?.translations?.vi?.fireplace ?? room?.fireplace ?? '',
+      views: room?.translations?.vi?.views ?? room?.views ?? '',
     },
   });
   const isPending = createRoom.isPending || updateRoom.isPending;
@@ -154,9 +155,8 @@ export function RoomFormModal({ room, onClose }: TRoomFormModalProps) {
               {isEditing ? 'Chỉnh sửa phòng' : 'Thêm phòng mới'}
             </h2>
             <p className='mt-1 text-[11px] text-[#75827E]'>
-              {isEditing
-                ? 'Cập nhật thông tin và trạng thái phòng.'
-                : 'Ảnh sẽ được tải lên Cloudinary qua API hiện có.'}
+              Nhập nội dung bằng tiếng Việt. Hệ thống sẽ tự tạo bản tiếng Anh
+              khi lưu.
             </p>
           </div>
           <button
@@ -174,7 +174,7 @@ export function RoomFormModal({ room, onClose }: TRoomFormModalProps) {
               Tên phòng
               <input
                 {...register('title')}
-                placeholder='Ví dụ: Deluxe Mountain View'
+                placeholder='Ví dụ: Phòng Deluxe hướng núi'
                 className={inputClassName}
               />
               {errors.title && (
@@ -227,7 +227,7 @@ export function RoomFormModal({ room, onClose }: TRoomFormModalProps) {
               Loại giường
               <input
                 {...register('bed')}
-                placeholder='1 King Bed'
+                placeholder='Ví dụ: 1 giường King'
                 className={inputClassName}
               />
             </label>
@@ -236,7 +236,7 @@ export function RoomFormModal({ room, onClose }: TRoomFormModalProps) {
               View
               <input
                 {...register('views')}
-                placeholder='Mountain view'
+                placeholder='Ví dụ: Hướng núi và thung lũng'
                 className={inputClassName}
               />
             </label>
@@ -275,7 +275,7 @@ export function RoomFormModal({ room, onClose }: TRoomFormModalProps) {
               Phòng tắm
               <input
                 {...register('bathroom')}
-                placeholder='Private bathroom'
+                placeholder='Ví dụ: Phòng tắm riêng'
                 className={inputClassName}
               />
             </label>
@@ -284,7 +284,7 @@ export function RoomFormModal({ room, onClose }: TRoomFormModalProps) {
               Lò sưởi
               <input
                 {...register('fireplace')}
-                placeholder='Fireplace information'
+                placeholder='Ví dụ: 1 lò sưởi'
                 className={inputClassName}
               />
             </label>

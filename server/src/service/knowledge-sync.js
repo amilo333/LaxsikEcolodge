@@ -17,6 +17,9 @@ const EMBEDDING_BATCH_SIZE = 50;
 
 const compact = (values) => values.filter(Boolean).join(". ");
 
+const localizedValues = (document, locale) =>
+  document?.translations?.[locale] || document || {};
+
 const checksumDocument = (document) =>
   createHash("sha256")
     .update(
@@ -39,53 +42,74 @@ const mapStaticDocuments = () =>
     metadata: {},
   }));
 
-const mapRoom = (room) => ({
-  key: `room:${room._id}`,
-  title: room.title,
-  category: "room",
-  language: "multilingual",
-  sourceType: "room",
-  sourceId: room._id.toString(),
-  sourcePath: `/rooms/${room._id}`,
-  content: compact([
-    `Room name: ${room.title}`,
-    room.description,
-    room.capacity ? `Capacity: up to ${room.capacity} guests` : null,
-    room.area ? `Area: ${room.area} square metres` : null,
-    room.bed ? `Bed: ${room.bed}` : null,
-    room.views ? `View: ${room.views}` : null,
-    room.bathroom ? `Bathroom: ${room.bathroom}` : null,
-    room.fireplace ? `Fireplace: ${room.fireplace}` : null,
-  ]),
-  metadata: { roomId: room._id.toString() },
-});
+const mapRoom = (room) => {
+  const vi = localizedValues(room, "vi");
+  const en = localizedValues(room, "en");
+
+  return {
+    key: `room:${room._id}`,
+    title: vi.title || room.title,
+    category: "room",
+    language: "multilingual",
+    sourceType: "room",
+    sourceId: room._id.toString(),
+    sourcePath: `/rooms/${room._id}`,
+    content: compact([
+      `Tên phòng: ${vi.title || room.title}`,
+      vi.description,
+      vi.bed ? `Giường: ${vi.bed}` : null,
+      vi.views ? `Hướng nhìn: ${vi.views}` : null,
+      vi.bathroom ? `Phòng tắm: ${vi.bathroom}` : null,
+      vi.fireplace ? `Lò sưởi: ${vi.fireplace}` : null,
+      `Room name: ${en.title || room.title}`,
+      en.description,
+      room.capacity ? `Capacity: up to ${room.capacity} guests` : null,
+      room.area ? `Area: ${room.area} square metres` : null,
+      en.bed ? `Bed: ${en.bed}` : null,
+      en.views ? `View: ${en.views}` : null,
+      en.bathroom ? `Bathroom: ${en.bathroom}` : null,
+      en.fireplace ? `Fireplace: ${en.fireplace}` : null,
+    ]),
+    metadata: { roomId: room._id.toString() },
+  };
+};
 
 const mapDining = (dining) => ({
   key: `dining:${dining._id}`,
-  title: dining.title,
+  title: localizedValues(dining, "vi").title || dining.title,
   category: "dining",
   language: "multilingual",
   sourceType: "dining",
   sourceId: dining._id.toString(),
   sourcePath: "/dining",
-  content: compact([`Dining venue: ${dining.title}`, dining.description]),
+  content: compact([
+    `Khu ẩm thực: ${localizedValues(dining, "vi").title || dining.title}`,
+    localizedValues(dining, "vi").description,
+    `Dining venue: ${localizedValues(dining, "en").title || dining.title}`,
+    localizedValues(dining, "en").description,
+  ]),
   metadata: { diningId: dining._id.toString() },
 });
 
 const mapDiningService = (service) => ({
   key: `dining-service:${service._id}`,
-  title: service.title,
+  title: localizedValues(service, "vi").title || service.title,
   category: "dining",
   language: "multilingual",
   sourceType: "dining-service",
   sourceId: service._id.toString(),
   sourcePath: "/dining",
   content: compact([
-    `Dining service: ${service.title}`,
+    `Dịch vụ ẩm thực: ${localizedValues(service, "vi").title || service.title}`,
+    localizedValues(service, "vi").description,
     service.diningId?.title
-      ? `Available at ${service.diningId.title}`
+      ? `Có tại ${localizedValues(service.diningId, "vi").title || service.diningId.title}`
       : null,
-    service.description,
+    `Dining service: ${localizedValues(service, "en").title || service.title}`,
+    service.diningId?.title
+      ? `Available at ${localizedValues(service.diningId, "en").title || service.diningId.title}`
+      : null,
+    localizedValues(service, "en").description,
   ]),
   metadata: {
     diningId: service.diningId?._id?.toString() || null,
@@ -94,28 +118,40 @@ const mapDiningService = (service) => ({
 
 const mapSpa = (spa) => ({
   key: `spa:${spa._id}`,
-  title: spa.title,
+  title: localizedValues(spa, "vi").title || spa.title,
   category: "spa",
   language: "multilingual",
   sourceType: "spa",
   sourceId: spa._id.toString(),
   sourcePath: "/spa-massage",
-  content: compact([`Spa or wellness area: ${spa.title}`, spa.description]),
+  content: compact([
+    `Khu spa: ${localizedValues(spa, "vi").title || spa.title}`,
+    localizedValues(spa, "vi").description,
+    `Spa or wellness area: ${localizedValues(spa, "en").title || spa.title}`,
+    localizedValues(spa, "en").description,
+  ]),
   metadata: { spaId: spa._id.toString() },
 });
 
 const mapSpaService = (service) => ({
   key: `spa-service:${service._id}`,
-  title: service.title,
+  title: localizedValues(service, "vi").title || service.title,
   category: "spa",
   language: "multilingual",
   sourceType: "spa-service",
   sourceId: service._id.toString(),
   sourcePath: "/spa-massage",
   content: compact([
-    `Spa service: ${service.title}`,
-    service.spaId?.title ? `Available at ${service.spaId.title}` : null,
-    service.description,
+    `Dịch vụ spa: ${localizedValues(service, "vi").title || service.title}`,
+    localizedValues(service, "vi").description,
+    service.spaId?.title
+      ? `Có tại ${localizedValues(service.spaId, "vi").title || service.spaId.title}`
+      : null,
+    `Spa service: ${localizedValues(service, "en").title || service.title}`,
+    service.spaId?.title
+      ? `Available at ${localizedValues(service.spaId, "en").title || service.spaId.title}`
+      : null,
+    localizedValues(service, "en").description,
   ]),
   metadata: { spaId: service.spaId?._id?.toString() || null },
 });
@@ -126,11 +162,11 @@ const collectLaxsikKnowledge = async () => {
       Room.find({ status: "available" }).lean(),
       Dining.find({ status: "active" }).lean(),
       DiningService.find({ status: "active" })
-        .populate({ path: "diningId", select: "title" })
+        .populate({ path: "diningId", select: "title translations" })
         .lean(),
       Spa.find({ status: "active" }).lean(),
       SpaService.find({ status: "active" })
-        .populate({ path: "spaId", select: "title" })
+        .populate({ path: "spaId", select: "title translations" })
         .lean(),
     ]);
 

@@ -11,6 +11,8 @@ import {
 } from "../controllers/booking-controller.js";
 
 import { authenticate, authorizedAdmin } from "../middleware/authMiddleware.js";
+import { getAdminRoomOccupancy } from "../controllers/room-occupancy-controller.js";
+import { getAdminDashboardAnalytics } from "../controllers/dashboard-analytics-controller.js";
 
 const router = express.Router();
 
@@ -25,6 +27,20 @@ router.get(
   authenticate,
   authorizedAdmin,
   getAdminDashboardSummary,
+);
+
+router.get(
+  "/admin/analytics",
+  authenticate,
+  authorizedAdmin,
+  getAdminDashboardAnalytics,
+);
+
+router.get(
+  "/admin/occupancy",
+  authenticate,
+  authorizedAdmin,
+  getAdminRoomOccupancy,
 );
 
 router.put("/admin/:id", authenticate, authorizedAdmin, updateBookingAdmin);

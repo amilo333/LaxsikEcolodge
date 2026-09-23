@@ -5,6 +5,7 @@ import { VNPay, ignoreLogger } from "vnpay";
 
 import Booking from "../models/Booking.js";
 import Payment from "../models/Payment.js";
+import { getDepositAmount } from "../utils/deposit.js";
 
 // ======================================
 // Sort params theo yêu cầu VNPay
@@ -78,11 +79,26 @@ const applyVnpayResult = async ({
 
     await payment.save();
 
-    await Booking.findByIdAndUpdate(payment.bookingId, {
-      paymentStatus: "paid",
-      paymentMethod: "vnpay",
-      bookingStatus: "confirmed",
-    });
+    const booking = await Booking.findById(payment.bookingId);
+    if (booking) {
+      const isFullPayment = payment.amount >= Math.round(booking.totalAmount);
+      await Booking.findOneAndUpdate(
+        {
+          _id: booking._id,
+          paymentStatus: isFullPayment
+            ? { $in: ["unpaid", "pending", "failed", "deposit_paid"] }
+            : { $in: ["unpaid", "pending", "failed"] },
+        },
+        {
+          paymentStatus: isFullPayment ? "paid" : "deposit_paid",
+          paidAmount: isFullPayment ? booking.totalAmount : payment.amount,
+          paymentMethod: "vnpay",
+          bookingStatus: ["cancelled", "completed"].includes(booking.bookingStatus)
+            ? booking.bookingStatus
+            : "confirmed",
+        },
+      );
+    }
 
     return;
   }
@@ -94,7 +110,7 @@ const applyVnpayResult = async ({
   await Booking.findOneAndUpdate(
     {
       _id: payment.bookingId,
-      paymentStatus: { $ne: "paid" },
+      paymentStatus: { $in: ["unpaid", "pending", "failed"] },
     },
     {
       paymentStatus: "failed",
@@ -123,7 +139,6 @@ const createVnpayClient = () => {
 
 export const createVnpayPayment = async (req, res) => {
   try {
-    console.log(req.user._id);
     const userId = req.user._id;
 
     const { bookingId, bankCode } = req.body;
@@ -149,9 +164,9 @@ export const createVnpayPayment = async (req, res) => {
       });
     }
 
-    if (booking.paymentStatus === "paid") {
+    if (["deposit_paid", "paid"].includes(booking.paymentStatus)) {
       return res.status(400).json({
-        message: "Booking has already been paid",
+        message: "Booking deposit has already been paid",
       });
     }
 
@@ -184,9 +199,14 @@ export const createVnpayPayment = async (req, res) => {
 
     const orderId = `VNP${Date.now()}`;
 
-    // QUAN TRỌNG:
-    // lấy từ Booking DB
-    const amount = Math.round(booking.totalAmount);
+    // Chỉ thu tiền cọc tại thời điểm đặt phòng.
+    const amount = booking.depositAmount ?? getDepositAmount(booking.totalAmount);
+
+    if (amount <= 0) {
+      return res.status(400).json({
+        message: "This booking does not require an online deposit",
+      });
+    }
 
     const ipAddr = getIpAddress(req);
 
@@ -230,7 +250,7 @@ export const createVnpayPayment = async (req, res) => {
 
     vnpParams["vnp_TxnRef"] = orderId;
 
-    vnpParams["vnp_OrderInfo"] = `Thanh toan booking ${booking.bookingCode}`;
+    vnpParams["vnp_OrderInfo"] = `Dat coc booking ${booking.bookingCode}`;
 
     vnpParams["vnp_OrderType"] = "other";
 
@@ -284,6 +304,7 @@ export const createVnpayPayment = async (req, res) => {
 
     booking.paymentStatus = "pending";
     booking.paymentMethod = "vnpay";
+    booking.depositAmount = amount;
 
     await booking.save();
 

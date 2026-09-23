@@ -13,17 +13,13 @@ export const getTrustedVnpayUrl = (payUrl: string) => {
   return url.toString();
 };
 
-export const getPaymentErrorMessage = (error: unknown) => {
+export const getPaymentErrorMessage = (
+  error: unknown,
+  fallback = 'Unable to start the payment. Please try again.'
+) => {
   if (axios.isAxiosError<{ message?: string }>(error)) {
-    return (
-      error.response?.data?.message ??
-      'Unable to start the payment. Please try again.'
-    );
+    return error.response?.data?.message ?? fallback;
   }
 
-  if (error instanceof Error && error.message) {
-    return error.message;
-  }
-
-  return 'Unable to start the payment. Please try again.';
+  return fallback;
 };

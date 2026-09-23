@@ -7,6 +7,7 @@ import {
   getBookingDetailsApi,
   getMyBookingsApi,
 } from '../apis';
+import { useTranslations } from 'next-intl';
 
 export const useCreateBookingApi = () =>
   useMutation({ mutationFn: createBookingApi });
@@ -29,6 +30,7 @@ export const useMyBookingsApi = () =>
   });
 
 export const useCancelBookingApi = () => {
+  const t = useTranslations('Booking.api');
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -36,14 +38,14 @@ export const useCancelBookingApi = () => {
     onSuccess: (booking) => {
       queryClient.setQueryData(['booking', booking._id], booking);
       void queryClient.invalidateQueries({ queryKey: ['bookings', 'mine'] });
-      toast.success('Đã hủy đặt phòng thành công.');
+      toast.success(t('cancelSuccess'));
     },
     onError: (error: unknown) => {
       const message = axios.isAxiosError<{ message?: string }>(error)
         ? error.response?.data?.message
         : null;
 
-      toast.error(message ?? 'Không thể hủy đặt phòng. Vui lòng thử lại.');
+      toast.error(message ?? t('cancelError'));
     },
   });
 };

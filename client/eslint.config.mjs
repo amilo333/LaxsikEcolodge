@@ -1,6 +1,5 @@
 import nextVitals from 'eslint-config-next/core-web-vitals';
 import nextTs from 'eslint-config-next/typescript';
-import eslintPluginTailwindCSS from 'eslint-plugin-tailwindcss';
 import { defineConfig, globalIgnores } from 'eslint/config';
 
 const eslintConfig = defineConfig([
@@ -16,11 +15,7 @@ const eslintConfig = defineConfig([
           varsIgnorePattern: '^_',
         },
       ],
-      'tailwindcss/classnames-order': 'warn',
       'no-console': 'warn',
-    },
-    plugins: {
-      tailwindcss: eslintPluginTailwindCSS,
     },
   },
   // Override default ignores of eslint-config-next.

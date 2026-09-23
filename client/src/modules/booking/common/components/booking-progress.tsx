@@ -1,7 +1,11 @@
+'use client';
+
+import { useTranslations } from 'next-intl';
+
 const BOOKING_STEPS = [
-  { number: 1, label: 'Your plan' },
-  { number: 2, label: 'Confirm your plan' },
-  { number: 3, label: 'Finish booking' },
+  { number: 1, label: 'plan' },
+  { number: 2, label: 'confirm' },
+  { number: 3, label: 'finish' },
 ];
 
 type TBookingProgressProps = {
@@ -9,10 +13,11 @@ type TBookingProgressProps = {
 };
 
 export function BookingProgress({ activeStep }: TBookingProgressProps) {
+  const t = useTranslations('Booking.progress');
   return (
     <div className='border-b border-[#0D4949]/10 bg-white/95'>
       <ol
-        aria-label='Booking progress'
+        aria-label={t('label')}
         className='mx-auto flex h-[76px] max-w-[840px] items-center px-5'>
         {BOOKING_STEPS.map((step, index) => (
           <li
@@ -29,7 +34,7 @@ export function BookingProgress({ activeStep }: TBookingProgressProps) {
                 {step.number < activeStep ? '✓' : step.number}
               </span>
               <span className='hidden text-xs font-semibold whitespace-nowrap sm:inline'>
-                {step.label}
+                {t(step.label)}
               </span>
             </div>
 

@@ -1,13 +1,16 @@
 import { Footer, Header } from '@/components/layouts';
 import { ContactCta } from '@/components/layouts/contact-cta';
-import { getUpscaledCloudinaryImageUrl } from '@/utils';
+import { getUpscaledCloudinaryImageUrl, localizeRoomContent } from '@/utils';
 import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { DetailFacilities, ImageSlider, RoomCard } from '../common';
 import { SlideRoom } from '../common/components/slide-room';
 import { useRoomDetailApi } from '../common/hooks';
+import { useLocale, useTranslations } from 'next-intl';
 
 export function DetailRoomModule() {
+  const t = useTranslations('Rooms.detail');
+  const locale = useLocale();
   const params = useParams<{ id: string }>();
 
   const id = params.id;
@@ -15,16 +18,18 @@ export function DetailRoomModule() {
   const { data, isLoading, isError } = useRoomDetailApi(id);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <div>{t('loading')}</div>;
   }
 
   if (isError) {
-    return <div>Failed to load room</div>;
+    return <div>{t('loadError')}</div>;
   }
 
   if (!data) {
-    return <div>Room not found</div>;
+    return <div>{t('notFound')}</div>;
   }
+
+  const localizedRoom = localizeRoomContent(data, locale);
 
   const heroImage = getUpscaledCloudinaryImageUrl(
     data.images.find(Boolean) ?? data.thumbnail
@@ -38,7 +43,7 @@ export function DetailRoomModule() {
           height={800}
           width={1920}
           src={heroImage}
-          alt={data.title}
+          alt={localizedRoom.title}
           preload
           sizes='100vw'
           quality={90}
@@ -46,13 +51,13 @@ export function DetailRoomModule() {
         />
 
         <div className='absolute top-162.5 left-1/2 w-4/5 -translate-x-1/2'>
-          <RoomCard room={data} />
+          <RoomCard room={localizedRoom} />
         </div>
       </div>
       <div className='mt-110'>
-        <ImageSlider images={data.images} title='Room’s Gallery' />
+        <ImageSlider images={data.images} title={t('gallery')} />
       </div>
-      <DetailFacilities room={data} />
+      <DetailFacilities room={localizedRoom} />
       <ContactCta />
       <SlideRoom currentRoomId={data._id} />
       <Footer />

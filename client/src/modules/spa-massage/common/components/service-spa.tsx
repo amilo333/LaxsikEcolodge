@@ -1,4 +1,7 @@
+'use client';
+
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 type TServiceItem = {
   id: string;
@@ -14,10 +17,12 @@ type ServiceSpaProps = {
 };
 
 export function ServiceSpa({
-  title = 'SPA SERVICES',
+  title,
   services = [],
   className = '',
 }: ServiceSpaProps) {
+  const t = useTranslations('Spa.services');
+  const displayTitle = title ?? t('title');
   return (
     <section
       className={`relative w-full overflow-hidden select-none ${className}`}>
@@ -33,9 +38,9 @@ export function ServiceSpa({
 
       <div className='relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
         {/* Title */}
-        {title && (
+        {displayTitle && (
           <h2 className='font-lora mb-10 text-center text-[28px] font-semibold text-[#0D4949] uppercase md:mb-12 md:text-[32px]'>
-            {title}
+            {displayTitle}
           </h2>
         )}
 
@@ -76,7 +81,7 @@ export function ServiceSpa({
           })}
           {services.length === 0 && (
             <p className='font-montserrat py-8 text-center text-sm text-[#68726F] md:col-span-3'>
-              Chưa có dịch vụ Spa đang hoạt động.
+              {t('empty')}
             </p>
           )}
         </div>

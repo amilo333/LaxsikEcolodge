@@ -4,16 +4,10 @@ import { Button } from '@/components/core';
 import axios from 'axios';
 import { useValidateVoucherApi } from '../hooks';
 import { useBookingStore } from '../stores';
-
-const getVoucherErrorMessage = (error: unknown) => {
-  if (axios.isAxiosError<{ message?: string }>(error)) {
-    return error.response?.data?.message ?? 'Unable to apply this voucher.';
-  }
-
-  return 'Unable to apply this voucher.';
-};
+import { useTranslations } from 'next-intl';
 
 export function VoucherSelector() {
+  const t = useTranslations('Booking.voucher');
   const voucherCode = useBookingStore((state) => state.voucherCode);
   const appliedVoucher = useBookingStore((state) => state.appliedVoucher);
   const voucherError = useBookingStore((state) => state.voucherError);
@@ -27,13 +21,18 @@ export function VoucherSelector() {
     const normalizedCode = voucherCode.trim().toUpperCase();
 
     if (!normalizedCode) {
-      setVoucherError('Please enter a voucher code.');
+      setVoucherError(t('required'));
       return;
     }
 
     validateVoucher.mutate(normalizedCode, {
       onSuccess: applyVoucher,
-      onError: (error) => setVoucherError(getVoucherErrorMessage(error)),
+      onError: (error) => {
+        const message = axios.isAxiosError<{ message?: string }>(error)
+          ? error.response?.data?.message
+          : null;
+        setVoucherError(message ?? t('applyError'));
+      },
     });
   };
 
@@ -41,14 +40,14 @@ export function VoucherSelector() {
     <div className='rounded-[16px] border border-[#DCE4E1] bg-[#F8FAF9] p-4 sm:p-5'>
       <div>
         <p className='text-[11px] font-bold text-[#0D4949]/60 uppercase'>
-          Special offer
+          {t('eyebrow')}
         </p>
-        <h2 className='mt-0.5 text-sm font-bold'>Add a voucher</h2>
+        <h2 className='mt-0.5 text-sm font-bold'>{t('title')}</h2>
       </div>
 
       <div className='mt-4 flex gap-2'>
         <label htmlFor='voucher-code' className='sr-only'>
-          Voucher code
+          {t('code')}
         </label>
         <input
           id='voucher-code'
@@ -61,7 +60,7 @@ export function VoucherSelector() {
               handleApplyVoucher();
             }
           }}
-          placeholder='Enter voucher code'
+          placeholder={t('placeholder')}
           autoComplete='off'
           className='h-11 min-w-0 flex-1 rounded-full border border-[#C9D4D0] bg-white px-4 text-sm font-semibold transition outline-none placeholder:font-normal focus:border-[#0D4949] disabled:bg-[#EEF3F1]'
         />
@@ -70,14 +69,14 @@ export function VoucherSelector() {
           <Button
             onClick={removeVoucher}
             className='h-11! w-auto! rounded-full! border border-[#0D4949]! bg-white! px-5! text-xs! text-[#0D4949]!'>
-            Remove
+            {t('remove')}
           </Button>
         ) : (
           <Button
             isDisabled={validateVoucher.isPending}
             onClick={handleApplyVoucher}
             className='h-11! w-auto! min-w-[88px]! rounded-full! px-5! text-xs!'>
-            {validateVoucher.isPending ? 'Applying…' : 'Apply'}
+            {validateVoucher.isPending ? t('applying') : t('apply')}
           </Button>
         )}
       </div>
@@ -95,7 +94,7 @@ export function VoucherSelector() {
           <span className='flex h-4 w-4 items-center justify-center rounded-full bg-[#236B51] text-[10px] text-white'>
             ✓
           </span>
-          Voucher {appliedVoucher.code} applied
+          {t('applied', { code: appliedVoucher.code })}
         </p>
       )}
     </div>

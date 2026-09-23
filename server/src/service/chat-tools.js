@@ -205,7 +205,23 @@ const getRoomDetails = async ({ roomIdOrTitle }) => {
   const value = roomIdOrTitle.trim();
   const query = mongoose.Types.ObjectId.isValid(value)
     ? { _id: value }
-    : { title: { $regex: `^${escapeRegExp(value)}$`, $options: "i" } };
+    : {
+        $or: [
+          { title: { $regex: `^${escapeRegExp(value)}$`, $options: "i" } },
+          {
+            "translations.vi.title": {
+              $regex: `^${escapeRegExp(value)}$`,
+              $options: "i",
+            },
+          },
+          {
+            "translations.en.title": {
+              $regex: `^${escapeRegExp(value)}$`,
+              $options: "i",
+            },
+          },
+        ],
+      };
   const room = await Room.findOne({ ...query, status: "available" });
 
   return room

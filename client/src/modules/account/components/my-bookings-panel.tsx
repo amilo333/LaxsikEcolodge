@@ -7,29 +7,20 @@ import {
   useMyBookingsApi,
 } from '@/modules/booking/common/hooks';
 import { TBooking } from '@/modules/booking/common/types';
-import { formatCurrency, formatStayDate } from '@/modules/booking/common/utils';
+import {
+  formatCurrency,
+  formatStayDate,
+  getBookingPaymentAmounts,
+} from '@/modules/booking/common/utils';
+import { localizeRoomContent } from '@/utils';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { CancelBookingDialog } from './cancel-booking-dialog';
+import { useLocale, useTranslations } from 'next-intl';
 
-const BOOKING_STATUS_LABELS = {
-  pending: 'Chờ xác nhận',
-  confirmed: 'Đã xác nhận',
-  cancelled: 'Đã hủy',
-  completed: 'Đã hoàn thành',
-};
-
-const PAYMENT_STATUS_LABELS = {
-  unpaid: 'Chưa thanh toán',
-  pending: 'Đang xử lý',
-  paid: 'Đã thanh toán',
-  failed: 'Thanh toán lỗi',
-  refunded: 'Đã hoàn tiền',
-};
-
-const formatBookingDate = (date: string) =>
-  new Intl.DateTimeFormat('vi-VN', {
+const formatBookingDate = (date: string, locale: string) =>
+  new Intl.DateTimeFormat(locale, {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
@@ -38,6 +29,8 @@ const formatBookingDate = (date: string) =>
   }).format(new Date(date));
 
 export function MyBookingsPanel() {
+  const t = useTranslations('Account.bookings');
+  const locale = useLocale();
   const bookingsQuery = useMyBookingsApi();
   const cancelBooking = useCancelBookingApi();
   const [currentTime, setCurrentTime] = useState(() => Date.now());
@@ -66,15 +59,15 @@ export function MyBookingsPanel() {
     return (
       <div className='rounded-[16px] border border-[#E7B8B8] bg-white p-7 text-center'>
         <h2 className='text-lg font-extrabold text-[#8F2F2F]'>
-          Không thể tải danh sách booking
+          {t('loadError')}
         </h2>
         <p className='mt-2 text-sm text-[#6E7774]'>
-          Vui lòng kiểm tra lại kết nối và thử lại.
+          {t('loadErrorDescription')}
         </p>
         <Button
           onClick={() => void bookingsQuery.refetch()}
           className='mx-auto mt-5 h-11! w-auto! rounded-full! px-6! text-sm!'>
-          Thử lại
+          {t('tryAgain')}
         </Button>
       </div>
     );
@@ -89,15 +82,13 @@ export function MyBookingsPanel() {
           ⌂
         </span>
         <h2 className='mt-5 text-xl font-extrabold text-[#193D3B]'>
-          Bạn chưa đặt phòng nào
+          {t('emptyTitle')}
         </h2>
-        <p className='mt-2 text-sm text-[#6E7B77]'>
-          Các booking được tạo từ tài khoản này sẽ xuất hiện tại đây.
-        </p>
+        <p className='mt-2 text-sm text-[#6E7B77]'>{t('emptyDescription')}</p>
         <Link
           href='/rooms'
           className='mt-6 inline-flex h-11 items-center rounded-full bg-[#0D4949] px-7 text-sm font-bold text-white'>
-          Xem phòng
+          {t('viewRooms')}
         </Link>
       </div>
     );
@@ -114,6 +105,8 @@ export function MyBookingsPanel() {
           0,
           booking.subtotal - booking.discountAmount
         );
+        const { depositAmount, paidAmount, remainingAmount } =
+          getBookingPaymentAmounts(booking);
         const voucherCode =
           booking.voucherId && typeof booking.voucherId !== 'string'
             ? booking.voucherId.code
@@ -137,21 +130,23 @@ export function MyBookingsPanel() {
             <div className='flex flex-col gap-3 border-b border-[#E4ECE9] bg-[#F6F9F8] px-5 py-4 sm:flex-row sm:items-center sm:justify-between'>
               <div>
                 <p className='text-[10px] font-bold text-[#75827E] uppercase'>
-                  Mã booking
+                  {t('bookingCode')}
                 </p>
                 <p className='mt-1 text-sm font-extrabold text-[#193D3B]'>
                   {booking.bookingCode}
                 </p>
                 <p className='mt-1 text-[10px] text-[#7A8581]'>
-                  Đặt lúc {formatBookingDate(booking.createdAt)}
+                  {t('bookedAt', {
+                    date: formatBookingDate(booking.createdAt, locale),
+                  })}
                 </p>
               </div>
               <div className='flex flex-wrap gap-2'>
                 <span className='rounded-full bg-[#E7F1EE] px-3 py-1.5 text-[10px] font-bold text-[#0D665A]'>
-                  {BOOKING_STATUS_LABELS[booking.bookingStatus]}
+                  {t(`status.booking.${booking.bookingStatus}`)}
                 </span>
                 <span className='rounded-full bg-[#FFF4DC] px-3 py-1.5 text-[10px] font-bold text-[#97610B]'>
-                  {PAYMENT_STATUS_LABELS[booking.paymentStatus]}
+                  {t(`status.payment.${booking.paymentStatus}`)}
                 </span>
               </div>
             </div>
@@ -161,18 +156,18 @@ export function MyBookingsPanel() {
                 <div className='grid gap-3 sm:grid-cols-2'>
                   <div className='rounded-[14px] bg-[#F4F7F6] px-4 py-3'>
                     <p className='text-[9px] font-bold text-[#75827E] uppercase'>
-                      Nhận phòng
+                      {t('checkIn')}
                     </p>
                     <p className='mt-1 text-xs font-bold text-[#193D3B]'>
-                      {formatStayDate(booking.checkInDate)}
+                      {formatStayDate(booking.checkInDate, locale)}
                     </p>
                   </div>
                   <div className='rounded-[14px] bg-[#F4F7F6] px-4 py-3'>
                     <p className='text-[9px] font-bold text-[#75827E] uppercase'>
-                      Trả phòng
+                      {t('checkOut')}
                     </p>
                     <p className='mt-1 text-xs font-bold text-[#193D3B]'>
-                      {formatStayDate(booking.checkOutDate)}
+                      {formatStayDate(booking.checkOutDate, locale)}
                     </p>
                   </div>
                 </div>
@@ -180,21 +175,27 @@ export function MyBookingsPanel() {
                 <div className='mt-5 flex items-center justify-between gap-3'>
                   <div>
                     <p className='text-xs font-extrabold text-[#193D3B]'>
-                      Các phòng đã đặt
+                      {t('bookedRooms')}
                     </p>
                     <p className='mt-0.5 text-[10px] text-[#71807B]'>
-                      {roomCount} phòng · {booking.totalNights} đêm
+                      {t('staySummary', {
+                        rooms: roomCount,
+                        nights: booking.totalNights,
+                      })}
                     </p>
                   </div>
                   <span className='rounded-full bg-[#EAF3F0] px-2.5 py-1 text-[9px] font-bold text-[#0D665A]'>
-                    {booking.bookingItems.length} loại phòng
+                    {t('roomTypes', { count: booking.bookingItems.length })}
                   </span>
                 </div>
 
                 <div className='mt-3 divide-y divide-[#E3EAE7] overflow-hidden rounded-[16px] border border-[#DCE6E2]'>
                   {booking.bookingItems.map((item, index) => {
-                    const room =
+                    const rawRoom =
                       typeof item.roomId === 'string' ? null : item.roomId;
+                    const room = rawRoom
+                      ? localizeRoomContent(rawRoom, locale)
+                      : null;
                     const lineTotal =
                       item.pricePerNight * item.quantity * booking.totalNights;
                     const roomHref = room ? `/rooms/${room._id}` : null;
@@ -206,7 +207,7 @@ export function MyBookingsPanel() {
                         {room?.thumbnail && roomHref ? (
                           <Link
                             href={roomHref}
-                            aria-label={`Xem ${room.title}`}
+                            aria-label={t('viewNamed', { name: room.title })}
                             className='relative block h-[82px] overflow-hidden rounded-[12px] bg-[#E9EFED]'>
                             <Image
                               src={room.thumbnail}
@@ -237,7 +238,7 @@ export function MyBookingsPanel() {
                             </Link>
                           ) : (
                             <p className='text-xs font-extrabold text-[#193D3B]'>
-                              Phòng đã đặt
+                              {t('bookedRoom')}
                             </p>
                           )}
 
@@ -255,12 +256,12 @@ export function MyBookingsPanel() {
                               )}
                               {room.capacity > 0 && (
                                 <span className='rounded-full bg-[#F1F5F3] px-2 py-1 text-[9px] text-[#62706C]'>
-                                  {room.capacity} khách
+                                  {t('guestCount', { count: room.capacity })}
                                 </span>
                               )}
                               {room.views && (
                                 <span className='rounded-full bg-[#F1F5F3] px-2 py-1 text-[9px] text-[#62706C]'>
-                                  View {room.views}
+                                  {t('view')} {room.views}
                                 </span>
                               )}
                             </div>
@@ -272,10 +273,15 @@ export function MyBookingsPanel() {
                             {formatCurrency(lineTotal)}
                           </p>
                           <p className='mt-1 text-[9px] leading-4 text-[#6E7A77]'>
-                            {item.quantity} phòng × {booking.totalNights} đêm
+                            {t('lineQuantity', {
+                              rooms: item.quantity,
+                              nights: booking.totalNights,
+                            })}
                           </p>
                           <p className='text-[9px] leading-4 text-[#6E7A77]'>
-                            {formatCurrency(item.pricePerNight)} / phòng / đêm
+                            {t('nightlyRate', {
+                              price: formatCurrency(item.pricePerNight),
+                            })}
                           </p>
                         </div>
                       </div>
@@ -287,7 +293,7 @@ export function MyBookingsPanel() {
               <aside className='rounded-[16px] border border-[#DCE6E2] bg-[#FAFBFA] p-4 lg:self-start'>
                 <div className='border-b border-[#DCE6E2] pb-3'>
                   <p className='text-[9px] font-bold text-[#75827E] uppercase'>
-                    Thanh toán
+                    {t('payment')}
                   </p>
                   <div className='mt-1 flex items-center justify-between gap-3'>
                     <p className='text-xs font-extrabold text-[#193D3B]'>
@@ -295,17 +301,17 @@ export function MyBookingsPanel() {
                         ? 'VNPay'
                         : booking.paymentMethod === 'momo'
                           ? 'MoMo'
-                          : 'Chuyển khoản'}
+                          : t('bankTransfer')}
                     </p>
                     <span className='text-[9px] font-bold text-[#97610B]'>
-                      {PAYMENT_STATUS_LABELS[booking.paymentStatus]}
+                      {t(`status.payment.${booking.paymentStatus}`)}
                     </span>
                   </div>
                 </div>
 
                 <dl className='mt-4 space-y-2.5 text-[10px]'>
                   <div className='flex justify-between gap-3 text-[#5E6965]'>
-                    <dt>Tạm tính tiền phòng</dt>
+                    <dt>{t('subtotal')}</dt>
                     <dd>{formatCurrency(booking.subtotal)}</dd>
                   </div>
                   {booking.discountAmount > 0 && (
@@ -315,42 +321,71 @@ export function MyBookingsPanel() {
                         <dd>− {formatCurrency(booking.discountAmount)}</dd>
                       </div>
                       <div className='flex justify-between gap-3 text-[#71807B]'>
-                        <dt>Sau giảm giá</dt>
+                        <dt>{t('afterDiscount')}</dt>
                         <dd>{formatCurrency(amountAfterDiscount)}</dd>
                       </div>
                     </>
                   )}
                   <div className='flex justify-between gap-3 text-[#5E6965]'>
-                    <dt>Phí dịch vụ (5%)</dt>
+                    <dt>{t('serviceCharge')}</dt>
                     <dd>{formatCurrency(booking.serviceChargeAmount)}</dd>
                   </div>
                   <div className='flex justify-between gap-3 text-[#5E6965]'>
-                    <dt>Thuế (10%)</dt>
+                    <dt>{t('tax')}</dt>
                     <dd>{formatCurrency(booking.taxAmount)}</dd>
                   </div>
                 </dl>
 
                 <div className='mt-4 border-t border-[#D5E0DC] pt-4'>
                   <p className='text-[9px] font-bold text-[#75827E] uppercase'>
-                    Tổng thanh toán
+                    {t('total')}
                   </p>
                   <p className='mt-1 text-lg font-extrabold text-[#0D4949]'>
                     {formatCurrency(booking.totalAmount)}
                   </p>
+                  {booking.totalAmount > 0 && (
+                    <dl className='mt-3 space-y-2 text-[10px]'>
+                      {(booking.depositAmount !== undefined ||
+                        booking.paymentStatus !== 'paid') && (
+                        <div className='flex justify-between gap-3 text-[#5E6965]'>
+                          <dt>{t('deposit')}</dt>
+                          <dd>{formatCurrency(depositAmount)}</dd>
+                        </div>
+                      )}
+                      <div className='flex justify-between gap-3 font-bold text-[#0D4949]'>
+                        <dt>{t('paid')}</dt>
+                        <dd>{formatCurrency(paidAmount)}</dd>
+                      </div>
+                      <div className='flex justify-between gap-3 text-[#5E6965]'>
+                        <dt>
+                          {booking.paymentStatus === 'deposit_paid' &&
+                          booking.bookingStatus !== 'cancelled'
+                            ? t('remainingAtResort')
+                            : t('remaining')}
+                        </dt>
+                        <dd>{formatCurrency(remainingAmount)}</dd>
+                      </div>
+                    </dl>
+                  )}
                 </div>
 
                 {hasCancellableStatus && (
                   <div className='mt-4 border-t border-[#D5E0DC] pt-4'>
                     <p className='text-[9px] leading-4 text-[#6E7A77]'>
                       {canCancel
-                        ? `Có thể hủy đến ${formatBookingDate(cancellationDeadline.toISOString())} (trước giờ nhận phòng 48 giờ).`
-                        : 'Đã hết thời hạn hủy trước giờ nhận phòng 48 giờ.'}
+                        ? t('cancelUntil', {
+                            date: formatBookingDate(
+                              cancellationDeadline.toISOString(),
+                              locale
+                            ),
+                          })
+                        : t('cancelExpired')}
                     </p>
                     <Button
                       onClick={() => setBookingToCancel(booking)}
                       isDisabled={!canCancel || cancelBooking.isPending}
                       className='mt-3 h-9! w-full! rounded-full! border border-[#A64242]! bg-white! px-4! text-xs! font-bold! text-[#A64242]! disabled:opacity-45'>
-                      Hủy đặt phòng
+                      {t('cancelBooking')}
                     </Button>
                   </div>
                 )}

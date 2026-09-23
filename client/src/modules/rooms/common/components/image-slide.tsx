@@ -3,6 +3,7 @@
 import useEmblaCarousel from 'embla-carousel-react';
 import Image from 'next/image';
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 type ImageSliderProps = {
   images: string[];
@@ -10,6 +11,7 @@ type ImageSliderProps = {
 };
 
 export function ImageSlider({ images, title }: ImageSliderProps) {
+  const t = useTranslations('Rooms.detail');
   const initialIndex = Math.floor(images.length / 2);
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
@@ -66,7 +68,7 @@ export function ImageSlider({ images, title }: ImageSliderProps) {
                   }`}>
                   <Image
                     src={image}
-                    alt={`Room gallery ${index + 1}`}
+                    alt={t('galleryItem', { index: index + 1 })}
                     fill
                     sizes='(max-width: 768px) 90vw, (max-width: 1280px) 70vw, 700px'
                     quality={90}

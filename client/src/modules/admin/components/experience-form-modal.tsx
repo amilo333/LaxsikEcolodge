@@ -46,8 +46,9 @@ export function ExperienceFormModal({
   } = useForm<TExperienceForm>({
     resolver: zodResolver(experienceSchema),
     defaultValues: {
-      title: item?.title ?? '',
-      description: item?.description ?? '',
+      title: item?.translations?.vi?.title ?? item?.title ?? '',
+      description:
+        item?.translations?.vi?.description ?? item?.description ?? '',
       status: item?.status ?? 'active',
     },
   });
@@ -103,7 +104,8 @@ export function ExperienceFormModal({
               {item ? `Chỉnh sửa ${label}` : `Thêm ${label}`}
             </h2>
             <p className='mt-1 text-xs text-[#75827E]'>
-              Dữ liệu và hình ảnh sẽ được lưu qua API hiện có.
+              Nhập nội dung bằng tiếng Việt. Hệ thống sẽ tự tạo bản tiếng Anh
+              khi lưu.
             </p>
           </div>
           <button
@@ -150,8 +152,8 @@ export function ExperienceFormModal({
               <label className='text-xs font-bold text-[#344B47]'>
                 Trạng thái
                 <select {...register('status')} className={inputClassName}>
-                  <option value='active'>Active</option>
-                  <option value='inactive'>Inactive</option>
+                  <option value='active'>Đang hiển thị</option>
+                  <option value='inactive'>Đang ẩn</option>
                 </select>
               </label>
 

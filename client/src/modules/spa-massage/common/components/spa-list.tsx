@@ -1,5 +1,8 @@
+'use client';
+
 import Image from 'next/image';
 import React from 'react';
+import { useTranslations } from 'next-intl';
 type TSpaItem = {
   id: string;
   title: string;
@@ -14,6 +17,7 @@ type SpaListProps = {
 };
 
 export function SpaList({ spa = [], className = '', children }: SpaListProps) {
+  const t = useTranslations('Spa');
   return (
     <section className={`w-full py-12 select-none md:py-20 ${className}`}>
       <div className='mx-auto flex w-[90%] max-w-7xl flex-col gap-16 px-4 sm:px-6 md:gap-24 lg:px-8'>
@@ -44,7 +48,7 @@ export function SpaList({ spa = [], className = '', children }: SpaListProps) {
                 <div className='relative h-[260px] w-full overflow-hidden sm:h-[320px] lg:h-[360px] lg:w-[42%]'>
                   <Image
                     src={item.thumbnail}
-                    alt={item.title || 'Spa service'}
+                    alt={item.title || t('serviceImageAlt')}
                     fill
                     className='object-cover'
                     sizes='(max-width: 1024px) 90vw, 42vw'

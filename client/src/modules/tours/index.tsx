@@ -1,40 +1,26 @@
 'use client';
 
 import { Footer, Header } from '@/components/layouts';
+import { localizeTourContent } from '@/utils';
 import Image from 'next/image';
 import { useTourListApi } from './hooks';
+import { useLocale, useTranslations } from 'next-intl';
 
 const TRAVEL_NOTES = [
-  {
-    number: '01',
-    title: 'Season-led routes',
-    description:
-      'Paths and views change with the rice season, rain and village activity, so every journey feels slightly different.',
-  },
-  {
-    number: '02',
-    title: 'Local perspective',
-    description:
-      'Experiences are shaped around people, traditions and everyday life rather than a checklist of attractions.',
-  },
-  {
-    number: '03',
-    title: 'A comfortable pace',
-    description:
-      'There is time to stop, talk, take photographs and enjoy the landscape without rushing from place to place.',
-  },
+  { number: '01', key: 'season' },
+  { number: '02', key: 'local' },
+  { number: '03', key: 'pace' },
 ] as const;
 
-const PRACTICAL_NOTES = [
-  'Wear shoes with reliable grip for terrace and village paths.',
-  'Bring a light rain layer; mountain weather can change quickly.',
-  'Ask before photographing people, homes or ceremonies.',
-  'Routes may be adjusted to suit weather and trail conditions.',
-] as const;
+const PRACTICAL_NOTES = ['shoes', 'rain', 'photos', 'routes'] as const;
 
 export function ToursModule() {
+  const t = useTranslations('Tours');
+  const locale = useLocale();
   const toursQuery = useTourListApi();
-  const tours = toursQuery.data?.data ?? [];
+  const tours = (toursQuery.data?.data ?? []).map((tour) =>
+    localizeTourContent(tour, locale)
+  );
 
   return (
     <div className="min-h-screen bg-[url('/images/bg-screen.jpg')] bg-[length:720px_720px] text-[#163E3B]">
@@ -42,7 +28,7 @@ export function ToursModule() {
         <section className='relative min-h-[640px] overflow-hidden sm:min-h-[700px] lg:min-h-[780px]'>
           <Image
             src='/images/slider1.png'
-            alt='Muong Hoa Valley rice terraces surrounded by mountains'
+            alt={t('hero.imageAlt')}
             fill
             priority
             sizes='100vw'
@@ -56,14 +42,13 @@ export function ToursModule() {
 
           <div className='relative z-10 mx-auto flex min-h-[640px] max-w-6xl flex-col items-center justify-end px-5 pb-32 text-center text-white sm:min-h-[700px] sm:pb-36 lg:min-h-[780px] lg:pb-44'>
             <p className='text-xs font-bold tracking-[0.28em] text-white/80 uppercase sm:text-sm'>
-              Journeys from Laxsik
+              {t('hero.eyebrow')}
             </p>
             <h1 className='font-lora mt-5 max-w-4xl text-4xl leading-[1.08] font-semibold text-balance sm:text-6xl lg:text-7xl'>
-              Discover Sa Pa, one story at a time
+              {t('hero.title')}
             </h1>
             <p className='mt-6 max-w-2xl text-sm leading-7 text-white/85 sm:text-base sm:leading-8'>
-              Walk beyond the familiar views and spend time with the landscapes,
-              traditions and people that give Muong Hoa Valley its rhythm.
+              {t('hero.description')}
             </p>
           </div>
 
@@ -80,15 +65,13 @@ export function ToursModule() {
         <section className='px-5 py-20 sm:px-8 sm:py-24 lg:py-32'>
           <div className='mx-auto max-w-6xl text-center'>
             <p className='text-xs font-bold tracking-[0.2em] text-[#70837E] uppercase'>
-              Ways to explore
+              {t('list.eyebrow')}
             </p>
             <h2 className='font-lora mt-4 text-3xl font-semibold text-[#0D5653] sm:text-5xl'>
-              Journeys shaped by the valley
+              {t('list.title')}
             </h2>
             <p className='mx-auto mt-6 max-w-2xl text-sm leading-7 text-[#60746F] sm:text-base sm:leading-8'>
-              From a gentle village stroll to a full-day highland challenge,
-              these routes reveal Sa Pa through forest paths, waterfalls, rice
-              terraces and local communities.
+              {t('list.description')}
             </p>
           </div>
 
@@ -112,13 +95,13 @@ export function ToursModule() {
             {toursQuery.isError && (
               <div className='rounded-[24px] border border-[#E7D8D8] bg-white px-6 py-12 text-center'>
                 <p className='text-sm font-semibold text-[#8A4040]'>
-                  We could not load the journeys right now.
+                  {t('list.loadError')}
                 </p>
                 <button
                   type='button'
                   onClick={() => void toursQuery.refetch()}
                   className='mt-5 rounded-full bg-[#0D4949] px-6 py-3 text-xs font-bold text-white'>
-                  Try again
+                  {t('list.tryAgain')}
                 </button>
               </div>
             )}
@@ -127,8 +110,7 @@ export function ToursModule() {
               !toursQuery.isError &&
               tours.length === 0 && (
                 <div className='rounded-[24px] border border-[#DDE6E1] bg-white px-6 py-12 text-center text-sm leading-7 text-[#60746F]'>
-                  New seasonal journeys are being prepared. Please ask our local
-                  team for the best routes during your stay.
+                  {t('list.empty')}
                 </div>
               )}
 
@@ -171,7 +153,7 @@ export function ToursModule() {
                   <dl className='mt-8 grid grid-cols-2 gap-3'>
                     <div className='rounded-2xl bg-[#EEF3F0] px-4 py-4'>
                       <dt className='text-[10px] font-bold tracking-[0.18em] text-[#70837E] uppercase'>
-                        Duration
+                        {t('list.duration')}
                       </dt>
                       <dd className='mt-2 text-sm font-semibold text-[#164B47]'>
                         {tour.duration}
@@ -179,7 +161,7 @@ export function ToursModule() {
                     </div>
                     <div className='rounded-2xl bg-[#EEF3F0] px-4 py-4'>
                       <dt className='text-[10px] font-bold tracking-[0.18em] text-[#70837E] uppercase'>
-                        Rhythm
+                        {t('list.rhythm')}
                       </dt>
                       <dd className='mt-2 text-sm font-semibold text-[#164B47]'>
                         {tour.rhythm}
@@ -210,15 +192,13 @@ export function ToursModule() {
           <div className='mx-auto grid max-w-6xl gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:items-start lg:gap-20'>
             <div className='lg:sticky lg:top-10'>
               <p className='text-xs font-bold tracking-[0.2em] text-[#70837E] uppercase'>
-                Travel slowly
+                {t('notes.eyebrow')}
               </p>
               <h2 className='font-lora mt-4 text-3xl font-semibold text-[#0D5653] sm:text-5xl'>
-                A closer way to meet Sa Pa
+                {t('notes.title')}
               </h2>
               <p className='mt-6 text-sm leading-7 text-[#60746F] sm:text-base sm:leading-8'>
-                The most memorable moments are often unscheduled: a conversation
-                beside a field, tea shared in a family home or mist lifting from
-                the terraces.
+                {t('notes.description')}
               </p>
             </div>
 
@@ -232,10 +212,10 @@ export function ToursModule() {
                   </span>
                   <div>
                     <h3 className='font-lora text-2xl font-semibold text-[#163E3B]'>
-                      {note.title}
+                      {t(`notes.items.${note.key}.title`)}
                     </h3>
                     <p className='mt-3 text-sm leading-7 text-[#60746F]'>
-                      {note.description}
+                      {t(`notes.items.${note.key}.description`)}
                     </p>
                   </div>
                 </article>
@@ -249,10 +229,10 @@ export function ToursModule() {
             <div className='grid lg:grid-cols-[1.05fr_0.95fr]'>
               <div className='px-7 py-12 sm:px-12 sm:py-16 lg:px-16'>
                 <p className='text-xs font-bold tracking-[0.2em] text-white/60 uppercase'>
-                  Before you set out
+                  {t('practical.eyebrow')}
                 </p>
                 <h2 className='font-lora mt-4 text-3xl font-semibold sm:text-4xl'>
-                  A few useful notes
+                  {t('practical.title')}
                 </h2>
                 <ul className='mt-8 space-y-5'>
                   {PRACTICAL_NOTES.map((note) => (
@@ -263,7 +243,7 @@ export function ToursModule() {
                         aria-hidden='true'
                         className='mt-3 h-px w-6 shrink-0 bg-[#D7B47A]'
                       />
-                      {note}
+                      {t(`practical.items.${note}`)}
                     </li>
                   ))}
                 </ul>
@@ -271,7 +251,7 @@ export function ToursModule() {
               <div className='relative min-h-[340px] lg:min-h-full'>
                 <Image
                   src='/images/slider2.png'
-                  alt='Rice terraces and villages across Muong Hoa Valley'
+                  alt={t('practical.imageAlt')}
                   fill
                   sizes='(max-width: 1024px) 100vw, 45vw'
                   className='object-cover'
@@ -281,8 +261,7 @@ export function ToursModule() {
           </div>
 
           <p className='mx-auto mt-10 max-w-2xl text-center text-sm leading-7 text-[#6B7D78]'>
-            Routes are introductions rather than fixed itineraries. Our local
-            team can share the most suitable seasonal options during your stay.
+            {t('practical.footer')}
           </p>
         </section>
       </main>

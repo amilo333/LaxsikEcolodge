@@ -1,5 +1,6 @@
 import Tour from "../models/Tour.js";
 import { uploadOnCloudinary } from "../service/cloudinary.js";
+import { createBilingualContent } from "../service/content-translation.js";
 import { ResponseUtil } from "../utils/response.util.js";
 
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -82,6 +83,18 @@ export const getAllTours = async (req, res) => {
         { eyebrow: expression },
         { duration: expression },
         { rhythm: expression },
+        { "translations.vi.title": expression },
+        { "translations.en.title": expression },
+        { "translations.vi.eyebrow": expression },
+        { "translations.en.eyebrow": expression },
+        { "translations.vi.duration": expression },
+        { "translations.en.duration": expression },
+        { "translations.vi.rhythm": expression },
+        { "translations.en.rhythm": expression },
+        { "translations.vi.description": expression },
+        { "translations.en.description": expression },
+        { "translations.vi.highlights": expression },
+        { "translations.en.highlights": expression },
       ];
     }
 
@@ -154,6 +167,15 @@ export const createTour = async (req, res) => {
 
     const highlights = parseHighlights(req.body.highlights) ?? [];
     const sortOrder = parseSortOrder(req.body.sortOrder) ?? 0;
+    const tourContent = {
+      title,
+      eyebrow,
+      description,
+      duration,
+      rhythm,
+      highlights,
+    };
+    const translations = await createBilingualContent(tourContent);
     const uploadedThumbnail = await uploadOnCloudinary(req.file.path, "tours");
 
     const tour = await Tour.create({
@@ -164,6 +186,7 @@ export const createTour = async (req, res) => {
       duration,
       rhythm,
       highlights,
+      translations,
       sortOrder,
       status,
       createdBy: req.user._id,
@@ -190,24 +213,41 @@ export const updateTour = async (req, res) => {
       });
     }
 
-    const fields = [
+    const contentFields = [
       "title",
       "eyebrow",
       "description",
       "duration",
       "rhythm",
-      "status",
     ];
-
-    fields.forEach((field) => {
-      if (typeof req.body[field] !== "undefined") {
-        tour[field] = req.body[field];
-      }
-    });
-
     const highlights = parseHighlights(req.body.highlights);
     const sortOrder = parseSortOrder(req.body.sortOrder);
-    if (highlights) tour.highlights = highlights;
+
+    const hasContentUpdate =
+      contentFields.some(
+        (field) => typeof req.body[field] !== "undefined",
+      ) || typeof highlights !== "undefined";
+
+    if (hasContentUpdate) {
+      const vietnameseContent = Object.fromEntries(
+        contentFields.map((field) => [
+          field,
+          typeof req.body[field] !== "undefined"
+            ? req.body[field]
+            : (tour.translations?.vi?.[field] ?? tour[field]),
+        ]),
+      );
+      vietnameseContent.highlights =
+        highlights ?? tour.translations?.vi?.highlights ?? tour.highlights ?? [];
+
+      tour.translations = await createBilingualContent(vietnameseContent);
+      contentFields.forEach((field) => {
+        tour[field] = vietnameseContent[field];
+      });
+      tour.highlights = vietnameseContent.highlights;
+    }
+
+    if (typeof req.body.status !== "undefined") tour.status = req.body.status;
     if (typeof sortOrder !== "undefined") tour.sortOrder = sortOrder;
 
     if (req.file) {

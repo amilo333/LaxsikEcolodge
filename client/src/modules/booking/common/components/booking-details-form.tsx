@@ -8,10 +8,10 @@ import {
 } from '@/modules/payment/common';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useCreateBookingApi } from '../hooks';
-import { bookingDetailsSchema } from '../schemas';
+import { createBookingDetailsSchema } from '../schemas';
 import { useBookingStore } from '../stores';
 import {
   TAvailableRoom,
@@ -19,6 +19,7 @@ import {
   TCreateBookingPayload,
 } from '../types';
 import { PaymentMethodSelector } from './payment-method-selector';
+import { useTranslations } from 'next-intl';
 
 type TBookingDetailsFormProps = {
   profile: TUser;
@@ -29,12 +30,12 @@ type TBookingDetailsFormProps = {
   onBookingCreated: (bookingId: string) => void;
 };
 
-const getBookingErrorMessage = (error: unknown) => {
+const getBookingErrorMessage = (error: unknown, fallback: string) => {
   if (axios.isAxiosError<{ message?: string }>(error)) {
-    return error.response?.data?.message ?? 'Unable to create your booking.';
+    return error.response?.data?.message ?? fallback;
   }
 
-  return 'Unable to create your booking.';
+  return fallback;
 };
 
 export function BookingDetailsForm({
@@ -45,6 +46,12 @@ export function BookingDetailsForm({
   onBack,
   onBookingCreated,
 }: TBookingDetailsFormProps) {
+  const t = useTranslations('Booking.detailsForm');
+  const validationT = useTranslations('Booking.validation');
+  const localizedSchema = useMemo(
+    () => createBookingDetailsSchema(validationT),
+    [validationT]
+  );
   const quantities = useBookingStore((state) => state.quantities);
   const appliedVoucher = useBookingStore((state) => state.appliedVoucher);
   const savedCustomerInfo = useBookingStore((state) => state.customerInfo);
@@ -65,7 +72,7 @@ export function BookingDetailsForm({
     formState: { errors },
     handleSubmit,
   } = useForm<TBookingDetailsForm>({
-    resolver: zodResolver(bookingDetailsSchema),
+    resolver: zodResolver(localizedSchema),
     defaultValues: {
       fullNameContact: savedCustomerInfo?.fullNameContact ?? profile.full_name,
       emailContact: savedCustomerInfo?.emailContact ?? profile.email,
@@ -83,7 +90,7 @@ export function BookingDetailsForm({
       try {
         await vnpayPayment.startPayment(paymentRetryBookingId);
       } catch (error) {
-        setPaymentError(getPaymentErrorMessage(error));
+        setPaymentError(getPaymentErrorMessage(error, t('paymentStartError')));
       }
 
       return;
@@ -121,12 +128,17 @@ export function BookingDetailsForm({
 
     setCreatedBookingId(booking._id);
 
+    if (booking.totalAmount === 0) {
+      onBookingCreated(booking._id);
+      return;
+    }
+
     setPaymentRetryBookingId(booking._id);
 
     try {
       await vnpayPayment.startPayment(booking._id);
     } catch (error) {
-      setPaymentError(getPaymentErrorMessage(error));
+      setPaymentError(getPaymentErrorMessage(error, t('paymentStartError')));
     }
   };
 
@@ -136,14 +148,13 @@ export function BookingDetailsForm({
     <div>
       <div>
         <p className='text-[11px] font-bold text-[#0D4949]/60 uppercase'>
-          Step 2 of 3
+          {t('step')}
         </p>
         <h1 className='mt-1 text-xl font-bold uppercase sm:text-2xl'>
-          Enter your details
+          {t('title')}
         </h1>
         <p className='mt-2 text-xs leading-5 text-[#68726E]'>
-          Your account information is loaded from your profile. You can update
-          the contact details for this booking below.
+          {t('description')}
         </p>
       </div>
 
@@ -151,11 +162,11 @@ export function BookingDetailsForm({
         <Field
           control={control}
           name='fullNameContact'
-          label='Full name'
+          label={t('fullName')}
           required>
           <Textfield
-            label='Full name'
-            placeholder='Guest full name'
+            label={t('fullName')}
+            placeholder={t('fullNamePlaceholder')}
             autoComplete='name'
             inputClassName='h-[50px]! rounded-[16px]! bg-[#F7F9F8]! shadow-none! ring-1 ring-[#DDE6E3] focus-within:ring-2 focus-within:ring-[#0D4949]/45 [&_input]:px-4!'
             error={errors.fullNameContact?.message}
@@ -165,10 +176,10 @@ export function BookingDetailsForm({
         <Field
           control={control}
           name='emailContact'
-          label='Email address'
+          label={t('email')}
           required>
           <Textfield
-            label='Email address'
+            label={t('email')}
             type='email'
             placeholder='you@example.com'
             autoComplete='email'
@@ -181,12 +192,12 @@ export function BookingDetailsForm({
           <Field
             control={control}
             name='phoneContact'
-            label='Telephone'
+            label={t('phone')}
             required>
             <Textfield
-              label='Telephone'
+              label={t('phone')}
               type='tel'
-              placeholder='Your phone number'
+              placeholder={t('phonePlaceholder')}
               autoComplete='tel'
               inputClassName='h-[50px]! rounded-[16px]! bg-[#F7F9F8]! shadow-none! ring-1 ring-[#DDE6E3] focus-within:ring-2 focus-within:ring-[#0D4949]/45 [&_input]:px-4!'
               error={errors.phoneContact?.message}
@@ -195,10 +206,10 @@ export function BookingDetailsForm({
         </div>
 
         <div className='sm:col-span-2'>
-          <Field control={control} name='note' label='Special requests'>
+          <Field control={control} name='note' label={t('requests')}>
             <Textarea
-              label='Special requests'
-              placeholder='Tell us about any requests for your stay'
+              label={t('requests')}
+              placeholder={t('requestsPlaceholder')}
               inputClassName='h-32! rounded-[16px]! border-0! bg-[#F7F9F8]! shadow-none! ring-1 ring-[#DDE6E3] focus-within:ring-2 focus-within:ring-[#0D4949]/45 [&_textarea]:px-4! [&_textarea]:py-3!'
               error={errors.note?.message}
             />
@@ -225,10 +236,7 @@ export function BookingDetailsForm({
           {...register('acceptTerms')}
           className='mt-0.5 h-4 w-4 shrink-0 accent-[#0D4949]'
         />
-        <span>
-          I have read and accept the Terms &amp; Conditions and consent to the
-          processing of my booking information.
-        </span>
+        <span>{t('terms')}</span>
       </label>
       {errors.acceptTerms && (
         <p className='mt-2 text-xs text-[#B33939]' role='alert'>
@@ -240,7 +248,7 @@ export function BookingDetailsForm({
         <p
           className='mt-4 rounded-[16px] bg-[#FFF0F0] px-4 py-3 text-xs font-medium text-[#B33939]'
           role='alert'>
-          {getBookingErrorMessage(createBooking.error)}
+          {getBookingErrorMessage(createBooking.error, t('createError'))}
         </p>
       )}
 
@@ -248,9 +256,9 @@ export function BookingDetailsForm({
         <div
           className='mt-4 rounded-[16px] border border-[#E7B8B8] bg-[#FFF0F0] px-4 py-3 text-xs text-[#8F2F2F]'
           role='alert'>
-          <p className='font-bold'>Your booking was created.</p>
+          <p className='font-bold'>{t('bookingCreated')}</p>
           <p className='mt-1'>{paymentError}</p>
-          <p className='mt-1'>Retrying will not create another booking.</p>
+          <p className='mt-1'>{t('retryNote')}</p>
         </div>
       )}
 
@@ -263,7 +271,7 @@ export function BookingDetailsForm({
           }
           isDisabled={isSubmitting}
           className='h-12! w-auto! min-w-[130px]! rounded-full! border border-[#0D4949]! bg-white! px-7! text-sm! text-[#0D4949]!'>
-          {paymentRetryBookingId ? 'View booking' : 'Back'}
+          {paymentRetryBookingId ? t('viewBooking') : t('back')}
         </Button>
         <Button
           type='submit'
@@ -271,12 +279,12 @@ export function BookingDetailsForm({
           onClick={handleSubmit(onSubmit)}
           className='h-12! w-auto! min-w-[190px]! rounded-full! px-8! text-sm! uppercase'>
           {createBooking.isPending
-            ? 'Creating booking…'
+            ? t('creating')
             : vnpayPayment.isPending
-              ? 'Opening VNPAY…'
+              ? t('openingVnpay')
               : paymentRetryBookingId
-                ? 'Retry payment'
-                : 'Confirm & pay with VNPay'}
+                ? t('retryPayment')
+                : t('confirmDeposit')}
         </Button>
       </div>
     </div>

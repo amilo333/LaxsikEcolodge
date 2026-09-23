@@ -3,6 +3,7 @@
 import { TBooking } from '@/modules/booking/common/types';
 import { formatCurrency, formatStayDate } from '@/modules/booking/common/utils';
 import { useEffect, useRef } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 
 type TCancelBookingDialogProps = {
   booking: TBooking | null;
@@ -17,6 +18,8 @@ export function CancelBookingDialog({
   onClose,
   onConfirm,
 }: TCancelBookingDialogProps) {
+  const t = useTranslations('Account.cancelDialog');
+  const locale = useLocale();
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -65,7 +68,7 @@ export function CancelBookingDialog({
             type='button'
             onClick={onClose}
             disabled={isPending}
-            aria-label='Đóng hộp thoại'
+            aria-label={t('close')}
             className='absolute top-4 right-4 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-[#DFCFC8] bg-white/80 text-xl text-[#6B514A] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-50'>
             ×
           </button>
@@ -84,13 +87,12 @@ export function CancelBookingDialog({
           <h2
             id='cancel-booking-title'
             className='font-lora relative mt-4 text-2xl font-semibold text-[#A15A48] uppercase'>
-            Xác nhận hủy đặt phòng ?
+            {t('title')}
           </h2>
           <p
             id='cancel-booking-description'
             className='relative mx-auto mt-2 max-w-[380px] text-xs leading-5 text-[#66736F]'>
-            Booking sẽ chuyển sang trạng thái đã hủy và phòng sẽ được mở lại cho
-            khách khác.
+            {t('description')}
           </p>
         </div>
 
@@ -99,7 +101,7 @@ export function CancelBookingDialog({
             <div className='flex items-center justify-between gap-4 border-b border-[#E1E9E6] pb-3'>
               <div>
                 <p className='text-[9px] font-bold tracking-[0.12em] text-[#78847F] uppercase'>
-                  Mã booking
+                  {t('bookingCode')}
                 </p>
                 <p className='mt-1 text-sm font-extrabold text-[#193D3B]'>
                   {booking.bookingCode}
@@ -112,15 +114,18 @@ export function CancelBookingDialog({
 
             <div className='mt-3 grid grid-cols-2 gap-3 text-[10px]'>
               <div>
-                <p className='text-[#7A8581]'>Nhận phòng</p>
+                <p className='text-[#7A8581]'>{t('checkIn')}</p>
                 <p className='mt-1 font-bold text-[#294B48]'>
-                  {formatStayDate(booking.checkInDate)}
+                  {formatStayDate(booking.checkInDate, locale)}
                 </p>
               </div>
               <div>
-                <p className='text-[#7A8581]'>Thời gian lưu trú</p>
+                <p className='text-[#7A8581]'>{t('stay')}</p>
                 <p className='mt-1 font-bold text-[#294B48]'>
-                  {roomCount} phòng · {booking.totalNights} đêm
+                  {t('staySummary', {
+                    rooms: roomCount,
+                    nights: booking.totalNights,
+                  })}
                 </p>
               </div>
             </div>
@@ -139,10 +144,7 @@ export function CancelBookingDialog({
                 strokeLinejoin='round'
               />
             </svg>
-            <p>
-              Chính sách chỉ cho phép hủy tối thiểu 48 giờ trước giờ nhận phòng.
-              Thao tác này không thể hoàn tác.
-            </p>
+            <p>{t('policy')}</p>
           </div>
 
           <div className='mt-6 grid gap-3 sm:grid-cols-2'>
@@ -151,7 +153,7 @@ export function CancelBookingDialog({
               onClick={onClose}
               disabled={isPending}
               className='h-12 rounded-full border border-[#B9CBC5] bg-white px-5 text-xs font-bold text-[#315A55] transition hover:border-[#0D4949] hover:bg-[#F4F8F7] disabled:cursor-not-allowed disabled:opacity-50'>
-              Giữ đặt phòng
+              {t('keep')}
             </button>
             <button
               type='button'
@@ -161,7 +163,7 @@ export function CancelBookingDialog({
               {isPending && (
                 <span className='h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white' />
               )}
-              {isPending ? 'Đang hủy booking…' : 'Xác nhận hủy'}
+              {isPending ? t('cancelling') : t('confirm')}
             </button>
           </div>
         </div>

@@ -1,6 +1,758 @@
 {
-  "Message": {},
+  "Common": {
+    "language": {
+      "label": "Chọn ngôn ngữ",
+      "en": "Tiếng Anh",
+      "vi": "Tiếng Việt"
+    }
+  },
+  "Navigation": {
+    "overview": "TỔNG QUAN",
+    "rooms": "PHÒNG",
+    "dining": "ẨM THỰC",
+    "tours": "TOUR",
+    "spa": "SPA & MASSAGE",
+    "contact": "LIÊN HỆ",
+    "bookNow": "Đặt phòng"
+  },
+  "AccountMenu": {
+    "signIn": "Đăng nhập",
+    "register": "Đăng ký",
+    "loading": "Đang tải tài khoản",
+    "adminDashboard": "Trang quản trị",
+    "bookings": "Phòng đã đặt",
+    "profile": "Thông tin cá nhân",
+    "signingOut": "Đang đăng xuất…",
+    "signOut": "Đăng xuất"
+  },
+  "BookingBar": {
+    "checkIn": "Ngày nhận phòng",
+    "checkOut": "Ngày trả phòng",
+    "findNow": "Tìm phòng",
+    "hide": "ẨN",
+    "collapse": "Thu gọn tìm kiếm đặt phòng",
+    "errors": {
+      "requiredDates": "Vui lòng chọn ngày nhận và trả phòng.",
+      "pastCheckIn": "Ngày nhận phòng không thể ở trong quá khứ.",
+      "invalidCheckOut": "Ngày trả phòng phải sau ngày nhận phòng."
+    }
+  },
+  "GuestSelect": {
+    "label": "Khách",
+    "summary": "{people} khách · {rooms} phòng",
+    "room": "Phòng",
+    "person": "Khách",
+    "done": "XONG",
+    "open": "Mở bộ chọn số khách"
+  },
+  "Footer": {
+    "address": "Lao Chải, Sa Pa, Lào Cai, Việt Nam",
+    "hotline": "Đường dây nóng",
+    "menus": {
+      "careers": "Gia nhập đội ngũ",
+      "partner": "Trở thành đối tác",
+      "privacy": "Quyền riêng tư & Chính sách",
+      "terms": "Điều khoản & Điều kiện"
+    },
+    "copyright": "© Bản quyền Laxsik Ecolodge 2024"
+  },
+  "ContactCta": {
+    "title": "Chúng tôi sẵn sàng hỗ trợ mọi câu hỏi và thông tin bạn cần.",
+    "call": "GỌI",
+    "contact": "LIÊN HỆ"
+  },
+  "AuthLayout": {
+    "imageAlt": "Cảnh núi tại Laxsik Ecolodge",
+    "eyebrow": "Khu nghỉ dưỡng yên bình giữa thiên nhiên",
+    "title": "Trở về với thiên nhiên. Nghỉ ngơi trong tiện nghi.",
+    "description": "Đăng nhập để tiếp tục đặt phòng và quản lý trọn vẹn kỳ nghỉ tại Sa Pa của bạn.",
+    "highlights": {
+      "mountainViews": "Tầm nhìn núi",
+      "localExperiences": "Trải nghiệm bản địa",
+      "peacefulStays": "Kỳ nghỉ yên bình"
+    }
+  },
+  "Auth": {
+    "validation": {
+      "invalidEmail": "Vui lòng nhập địa chỉ email hợp lệ.",
+      "shortPassword": "Mật khẩu phải có ít nhất 6 ký tự.",
+      "requiredName": "Vui lòng nhập họ và tên.",
+      "shortPhone": "Số điện thoại phải có ít nhất 8 ký tự.",
+      "passwordMismatch": "Mật khẩu xác nhận không khớp."
+    },
+    "login": {
+      "backHome": "Quay về trang chủ Laxsik Ecolodge",
+      "welcomeBack": "Chào mừng trở lại",
+      "eyebrow": "Dành cho thành viên",
+      "description": "Đăng nhập để quản lý kỳ nghỉ và tiếp tục đặt phòng tại Laxsik Ecolodge.",
+      "form": {
+        "email": "Email",
+        "emailPlaceholder": "ban@example.com",
+        "password": "Mật khẩu",
+        "passwordPlaceholder": "Nhập mật khẩu",
+        "forgotPassword": "Quên mật khẩu?",
+        "signingIn": "Đang đăng nhập…",
+        "signIn": "Đăng nhập",
+        "continueWith": "Hoặc tiếp tục với",
+        "newToLaxsik": "Lần đầu đến Laxsik?",
+        "noAccount": "Bạn chưa có tài khoản?",
+        "createAccount": "Tạo tài khoản"
+      }
+    },
+    "register": {
+      "backHome": "Quay về trang chủ Laxsik Ecolodge",
+      "join": "Gia nhập Laxsik",
+      "eyebrow": "Tạo tài khoản",
+      "title": "Bắt đầu hành trình",
+      "description": "Lưu thông tin để trải nghiệm đặt phòng nhanh chóng và thuận tiện hơn.",
+      "form": {
+        "fullName": "Họ và tên",
+        "fullNamePlaceholder": "Nhập họ và tên",
+        "email": "Email",
+        "emailPlaceholder": "ban@example.com",
+        "phone": "Số điện thoại",
+        "phonePlaceholder": "Nhập số điện thoại",
+        "password": "Mật khẩu",
+        "passwordPlaceholder": "Ít nhất 6 ký tự",
+        "confirmPassword": "Xác nhận mật khẩu",
+        "confirmPasswordPlaceholder": "Nhập lại mật khẩu",
+        "creating": "Đang tạo tài khoản…",
+        "createAccount": "Tạo tài khoản",
+        "hasAccount": "Bạn đã có tài khoản?",
+        "signIn": "Đăng nhập"
+      }
+    },
+    "google": {
+      "notConfigured": "Đăng nhập Google chưa được cấu hình.",
+      "passwordRequired": "Vui lòng nhập mật khẩu hiện tại.",
+      "linkTitle": "Liên kết tài khoản hiện có",
+      "linkDescription": "Email Google này đã có tài khoản Laxsik. Hãy nhập mật khẩu hiện tại một lần để liên kết đăng nhập Google an toàn.",
+      "currentPassword": "Mật khẩu hiện tại",
+      "currentPasswordPlaceholder": "Nhập mật khẩu hiện tại",
+      "linking": "Đang liên kết…",
+      "linkAndSignIn": "Liên kết Google và đăng nhập",
+      "useAnother": "Dùng tài khoản Google khác",
+      "forgotPassword": "Quên mật khẩu?"
+    },
+    "forgotPassword": {
+      "invalidEmail": "Vui lòng nhập địa chỉ email hợp lệ.",
+      "eyebrow": "Khôi phục tài khoản",
+      "checkInbox": "Kiểm tra hộp thư",
+      "title": "Quên mật khẩu?",
+      "sentDescription": "Nếu có tài khoản với email <strong>{email}</strong>, chúng tôi đã gửi liên kết có hiệu lực trong 15 phút. Vui lòng kiểm tra cả thư rác.",
+      "tryAnother": "Thử email khác",
+      "backToSignIn": "Quay lại đăng nhập",
+      "description": "Nhập email tài khoản, chúng tôi sẽ gửi liên kết an toàn để bạn tạo mật khẩu mới.",
+      "email": "Email",
+      "sending": "Đang gửi…",
+      "sendLink": "Gửi liên kết đặt lại"
+    },
+    "resetPassword": {
+      "shortPassword": "Mật khẩu phải có ít nhất 8 ký tự.",
+      "passwordMismatch": "Mật khẩu xác nhận không khớp.",
+      "eyebrow": "Khôi phục tài khoản",
+      "updated": "Đã cập nhật mật khẩu",
+      "title": "Chọn mật khẩu mới",
+      "invalidLink": "Liên kết đặt lại mật khẩu không đầy đủ. Vui lòng yêu cầu email mới.",
+      "requestLink": "Yêu cầu liên kết mới",
+      "successDescription": "Mật khẩu đã được thay đổi thành công. Bạn có thể đăng nhập bằng mật khẩu mới.",
+      "continueSignIn": "Tiếp tục đăng nhập",
+      "description": "Dùng ít nhất 8 ký tự. Để an toàn hơn, hãy chọn mật khẩu bạn không dùng ở nơi khác.",
+      "newPassword": "Mật khẩu mới",
+      "passwordPlaceholder": "Ít nhất 8 ký tự",
+      "confirmPassword": "Xác nhận mật khẩu mới",
+      "confirmPlaceholder": "Nhập lại mật khẩu mới",
+      "updating": "Đang cập nhật…",
+      "updatePassword": "Cập nhật mật khẩu"
+    },
+    "api": {
+      "genericError": "Đã xảy ra lỗi.",
+      "googleSignInFailed": "Đăng nhập Google thất bại.",
+      "googleLinked": "Đã liên kết đăng nhập Google với tài khoản của bạn.",
+      "googleLinkFailed": "Không thể liên kết đăng nhập Google.",
+      "resetEmailFailed": "Không thể gửi email đặt lại mật khẩu.",
+      "resetFailed": "Không thể đặt lại mật khẩu.",
+      "profileUpdated": "Cập nhật hồ sơ thành công.",
+      "profileUpdateFailed": "Không thể cập nhật hồ sơ của bạn."
+    }
+  },
   "Home": {
-    "title": "Xin chào!"
+    "hero": {
+      "imageAlt": "Laxsik Ecolodge giữa ruộng bậc thang tại Lao Chải, Sa Pa",
+      "location": "Lao Chải, Sa Pa, Lào Cai, Việt Nam"
+    },
+    "introduction": {
+      "title": "Ngay bên thềm thiên nhiên Sa Pa",
+      "description": "Một chốn nghỉ yên bình giữa thung lũng Lao Chải, bao quanh bởi ruộng bậc thang, khí trời vùng cao và văn hóa sống động của Sa Pa. Mỗi kỳ nghỉ đưa du khách đến gần hơn với cảnh sắc và nhịp sống của cộng đồng bản địa."
+    },
+    "rooms": {
+      "eyebrow": "Nghỉ dưỡng gần thiên nhiên",
+      "title": "Phòng & Suite",
+      "description": "Khám phá các phòng hiện có, hình ảnh và giá mỗi đêm.",
+      "loading": "Đang tải phòng…"
+    },
+    "retreat": {
+      "eyebrow": "Hơn cả một kỳ nghỉ",
+      "items": {
+        "wellness": {
+          "title": "Chăm sóc sức khỏe Laxsik",
+          "description": "Không gian chăm sóc sức khỏe yên tĩnh giữa ruộng bậc thang, dành cho vận động, nghỉ ngơi và những phút giây thư thái trong khí trời vùng cao.",
+          "linkLabel": "Khám phá chăm sóc sức khỏe"
+        },
+        "restaurant": {
+          "title": "Nhà hàng Mường Hoa",
+          "description": "Không gian ẩm thực ấm cúng nhìn ra thung lũng, nơi mỗi bữa ăn kết hợp nguyên liệu địa phương với hương vị Tây Bắc.",
+          "linkLabel": "Khám phá ẩm thực"
+        }
+      }
+    },
+    "experiences": {
+      "eyebrow": "Văn hóa, cảnh sắc và sức khỏe",
+      "title": "Khám phá Sa Pa",
+      "items": {
+        "cuisine": {
+          "title": "Ẩm thực H'Mông cùng đầu bếp",
+          "description": "Cùng đội ngũ bản địa nấu ăn và khám phá nguyên liệu, kỹ thuật cùng những câu chuyện đằng sau ẩm thực H'Mông.",
+          "linkLabel": "Khám phá ẩm thực"
+        },
+        "trekking": {
+          "title": "Tour trekking",
+          "description": "Đi bộ qua thung lũng Mường Hoa, ruộng bậc thang và các bản làng vùng cao giữa cảnh sắc Sa Pa rộng mở.",
+          "linkLabel": "Khám phá Sa Pa"
+        },
+        "spa": {
+          "title": "Po Mu Spa",
+          "description": "Thư giãn với các liệu trình phục hồi lấy cảm hứng từ thảo dược người Dao Đỏ và nhịp sống bình yên của núi rừng.",
+          "linkLabel": "Khám phá spa"
+        },
+        "wedding": {
+          "title": "Đám cưới trên mây",
+          "description": "Kỷ niệm ngày trọng đại giữa toàn cảnh núi rừng, trong không gian thân mật với hoa, thủ công địa phương và vẻ đẹp Sa Pa.",
+          "linkLabel": "Lên kế hoạch ngày vui"
+        }
+      }
+    },
+    "gallery": {
+      "imageAlt": "Ruộng bậc thang tại Sa Pa",
+      "eyebrow": "Câu chuyện từ thung lũng",
+      "description": "Những lát cắt về cảnh sắc, văn hóa địa phương và khoảnh khắc bình yên tại Laxsik Ecolodge.",
+      "itemAlt": "Thư viện ảnh Laxsik Ecolodge {index}"
+    }
+  },
+  "Rooms": {
+    "list": {
+      "yourStay": "Kỳ nghỉ của bạn",
+      "availableRooms": "Phòng còn trống",
+      "dates": "Ngày lưu trú",
+      "guestCount": "{count} khách",
+      "roomCount": "{count} phòng",
+      "clearSearch": "Xóa tìm kiếm",
+      "pricePerNight": "Giá mỗi đêm",
+      "priceRanges": {
+        "all": "Tất cả mức giá",
+        "under2m": "Dưới 2 triệu",
+        "2to3m": "2 – 3 triệu",
+        "3to5m": "3 – 5 triệu",
+        "over5m": "Từ 5 triệu"
+      },
+      "roomsFound": "Tìm thấy {count} phòng",
+      "searching": "Đang tìm phòng…",
+      "noRoomsPrice": "Không có phòng trong khoảng giá này",
+      "noRooms": "Không có phòng trống",
+      "tryPrice": "Hãy chọn khoảng giá khác hoặc xóa bộ lọc.",
+      "tryDates": "Hãy thử ngày khác hoặc giảm số khách.",
+      "loadError": "Không thể tải danh sách phòng. Vui lòng thử lại."
+    },
+    "detail": {
+      "loading": "Đang tải phòng…",
+      "loadError": "Không thể tải phòng.",
+      "notFound": "Không tìm thấy phòng.",
+      "gallery": "Thư viện ảnh phòng",
+      "galleryItem": "Ảnh phòng {index}"
+    },
+    "card": {
+      "averagePrice": "Giá trung bình mỗi đêm",
+      "bookNow": "ĐẶT PHÒNG"
+    },
+    "item": {
+      "viewNamed": "Xem {name}",
+      "guestCount": "{count} khách",
+      "view": "Hướng nhìn",
+      "averagePrice": "Giá trung bình mỗi đêm",
+      "viewRoom": "Xem phòng"
+    },
+    "slider": {
+      "otherRooms": "CÁC PHÒNG KHÁC",
+      "loading": "Đang tải phòng…",
+      "loadError": "Không thể tải phòng.",
+      "explore": "Khám phá ngay"
+    },
+    "facilities": {
+      "eyebrow": "Mọi tiện nghi bạn cần",
+      "title": "TIỆN NGHI",
+      "items": {
+        "wifi": "WIFI MIỄN PHÍ",
+        "roomService": "DỊCH VỤ PHÒNG",
+        "parking": "BÃI ĐỖ XE",
+        "restaurant": "NHÀ HÀNG",
+        "pool": "BỂ BƠI",
+        "spa": "SPA",
+        "laundry": "GIẶT LÀ"
+      }
+    },
+    "detailFacilities": {
+      "title": "TIỆN NGHI",
+      "beds": "GIƯỜNG",
+      "occupancy": "SỨC CHỨA",
+      "adults": "{count} người lớn",
+      "size": "DIỆN TÍCH",
+      "floorPlan": "Mặt bằng {area} m²",
+      "bathroom": "PHÒNG TẮM",
+      "fireplace": "LÒ SƯỞI",
+      "views": "HƯỚNG NHÌN"
+    },
+    "policies": {
+      "title": "Chính sách",
+      "items": {
+        "1": {
+          "title": "GIỜ NHẬN/TRẢ PHÒNG",
+          "description": "Giờ nhận phòng: 15:00. Giờ trả phòng: 12:00."
+        },
+        "2": {
+          "title": "ĐẾN SỚM VÀ RỜI ĐI MUỘN",
+          "description": "Để chắc chắn được nhận phòng sớm, bạn nên đặt thêm đêm trước đó. Để chắc chắn trả phòng muộn, hãy đặt thêm một đêm. Nếu không, chúng tôi sẵn sàng giữ hành lý và hỗ trợ bạn sử dụng khu vực thể dục để làm mới bản thân."
+        },
+        "3": {
+          "title": "THẺ TÍN DỤNG",
+          "description": "American Express, Visa, Master Card và JCB."
+        },
+        "4": {
+          "title": "HỦY ĐẶT PHÒNG",
+          "description": "Đặt phòng có thể được hủy chậm nhất 48 giờ trước giờ nhận phòng dự kiến. Sau thời hạn này, yêu cầu hủy không còn khả dụng."
+        }
+      }
+    }
+  },
+  "Dining": {
+    "banner": {
+      "imageAlt": "Nhà hàng Mường Hoa nhìn ra thung lũng",
+      "title": "NHÀ HÀNG MƯỜNG HOA",
+      "description": "Nhà hàng Mường Hoa mang đến trải nghiệm ẩm thực tinh tế từ hương vị đậm đà và nguyên liệu tươi ngon của Tây Bắc. Giữa cảnh sắc thung lũng Mường Hoa, nhà hàng kết hợp ẩm thực Việt truyền thống với nét hiện đại."
+    },
+    "gallery": {
+      "title": "THƯ VIỆN ẢNH MƯỜNG HOA",
+      "imageAlt": "Ảnh Mường Hoa {index}"
+    },
+    "services": {
+      "title": "DỊCH VỤ",
+      "empty": "Hiện chưa có dịch vụ ẩm thực đang hoạt động."
+    }
+  },
+  "Spa": {
+    "banner": {
+      "imageAlt": "Laxsik Spa giữa thiên nhiên",
+      "title": "LAXSIK SPA",
+      "description": "Một chốn bình yên giữa thiên nhiên, nơi liệu pháp chăm sóc sức khỏe truyền thống hòa cùng trải nghiệm thư giãn hiện đại. Mỗi liệu trình massage và phục hồi được thiết kế để giải tỏa căng thẳng, làm mới cơ thể và tìm lại sự an yên."
+    },
+    "services": {
+      "title": "DỊCH VỤ SPA",
+      "empty": "Hiện chưa có dịch vụ spa đang hoạt động."
+    },
+    "serviceImageAlt": "Dịch vụ spa"
+  },
+  "Contact": {
+    "heroEyebrow": "Lao Chải · Sa Pa · Việt Nam",
+    "heroTitle": "Liên hệ Laxsik Ecolodge",
+    "heroDescription": "Chúng tôi sẵn sàng hỗ trợ về kỳ nghỉ, hành trình đến Lao Chải và mọi câu hỏi trước khi bạn tới.",
+    "heroAlt": "Laxsik Ecolodge lung linh giữa núi rừng về đêm",
+    "sectionEyebrow": "Tìm đường đến thung lũng",
+    "sectionTitle": "Chúng tôi mong được lắng nghe bạn",
+    "sectionDescription": "Laxsik Ecolodge nằm giữa ruộng bậc thang Lao Chải. Hãy dùng bản đồ để chỉ đường hoặc liên hệ trực tiếp với chúng tôi qua điện thoại và email.",
+    "mapTitle": "Vị trí Laxsik Ecolodge trên Google Maps",
+    "directions": "Mở chỉ đường",
+    "addressLabel": "Địa chỉ",
+    "address": "Lao Chải, Sa Pa, Lào Cai, Việt Nam",
+    "hotlineLabel": "Đường dây nóng",
+    "emailLabel": "Email",
+    "responseNote": "Để được phản hồi nhanh nhất, vui lòng gọi đường dây nóng. Chúng tôi tiếp nhận yêu cầu qua email bất kỳ lúc nào."
+  },
+  "Tours": {
+    "hero": {
+      "imageAlt": "Ruộng bậc thang thung lũng Mường Hoa giữa núi rừng",
+      "eyebrow": "Hành trình từ Laxsik",
+      "title": "Khám phá Sa Pa qua từng câu chuyện",
+      "description": "Bước khỏi những góc nhìn quen thuộc để cảm nhận cảnh sắc, truyền thống và con người tạo nên nhịp sống thung lũng Mường Hoa."
+    },
+    "list": {
+      "eyebrow": "Những cách khám phá",
+      "title": "Hành trình được tạo nên bởi thung lũng",
+      "description": "Từ cuộc dạo bộ nhẹ nhàng qua bản đến thử thách vùng cao cả ngày, các cung đường mở ra Sa Pa qua lối rừng, thác nước, ruộng bậc thang và cộng đồng địa phương.",
+      "loadError": "Hiện không thể tải các hành trình.",
+      "tryAgain": "Thử lại",
+      "empty": "Các hành trình theo mùa đang được chuẩn bị. Hãy hỏi đội ngũ bản địa về cung đường phù hợp nhất trong kỳ nghỉ.",
+      "duration": "Thời lượng",
+      "rhythm": "Nhịp độ"
+    },
+    "notes": {
+      "eyebrow": "Du lịch chậm",
+      "title": "Cách gần gũi hơn để gặp gỡ Sa Pa",
+      "description": "Những khoảnh khắc đáng nhớ nhất thường không có trong lịch trình: một cuộc trò chuyện bên ruộng, chén trà trong ngôi nhà bản địa hay màn sương dần tan trên ruộng bậc thang.",
+      "items": {
+        "season": {
+          "title": "Cung đường theo mùa",
+          "description": "Lối đi và cảnh sắc thay đổi theo mùa lúa, mưa và nhịp sống trong bản, vì vậy mỗi hành trình đều mang nét riêng."
+        },
+        "local": {
+          "title": "Góc nhìn bản địa",
+          "description": "Trải nghiệm xoay quanh con người, truyền thống và đời sống thường ngày thay vì một danh sách điểm tham quan."
+        },
+        "pace": {
+          "title": "Nhịp độ thoải mái",
+          "description": "Bạn có thời gian dừng chân, trò chuyện, chụp ảnh và tận hưởng cảnh sắc mà không phải vội vã."
+        }
+      }
+    },
+    "practical": {
+      "eyebrow": "Trước khi khởi hành",
+      "title": "Một vài lưu ý hữu ích",
+      "items": {
+        "shoes": "Mang giày có độ bám tốt khi đi trên ruộng bậc thang và đường bản.",
+        "rain": "Mang áo mưa mỏng vì thời tiết vùng cao có thể thay đổi nhanh.",
+        "photos": "Hãy xin phép trước khi chụp người, nhà ở hoặc nghi lễ.",
+        "routes": "Cung đường có thể được điều chỉnh theo thời tiết và điều kiện đường đi."
+      },
+      "imageAlt": "Ruộng bậc thang và bản làng trong thung lũng Mường Hoa",
+      "footer": "Các cung đường là gợi ý mở thay vì lịch trình cố định. Đội ngũ bản địa sẽ giới thiệu lựa chọn theo mùa phù hợp nhất trong kỳ nghỉ của bạn."
+    }
+  },
+  "Account": {
+    "eyebrow": "Khu vực thành viên",
+    "title": "Tài khoản của tôi",
+    "loadError": "Không thể tải thông tin tài khoản",
+    "tryAgain": "Thử lại",
+    "navigation": {
+      "bookings": "Phòng đã đặt",
+      "profile": "Thông tin cá nhân"
+    },
+    "cancelDialog": {
+      "close": "Đóng hộp thoại",
+      "title": "Hủy đặt phòng này?",
+      "description": "Đặt phòng sẽ chuyển sang trạng thái đã hủy và các phòng sẽ được mở lại cho khách khác.",
+      "bookingCode": "Mã đặt phòng",
+      "checkIn": "Nhận phòng",
+      "stay": "Thời gian lưu trú",
+      "staySummary": "{rooms} phòng · {nights} đêm",
+      "policy": "Chỉ có thể hủy tối thiểu 48 giờ trước giờ nhận phòng. Thao tác này không thể hoàn tác.",
+      "keep": "Giữ đặt phòng",
+      "cancelling": "Đang hủy đặt phòng…",
+      "confirm": "Xác nhận hủy"
+    },
+    "profile": {
+      "title": "Thông tin cá nhân",
+      "description": "Thông tin này sẽ được dùng làm dữ liệu liên hệ mặc định khi đặt phòng.",
+      "fullName": "Họ và tên",
+      "fullNamePlaceholder": "Nhập họ và tên",
+      "email": "Email",
+      "phone": "Số điện thoại",
+      "phonePlaceholder": "Nhập số điện thoại",
+      "saving": "Đang lưu…",
+      "save": "Lưu thay đổi",
+      "validation": {
+        "name": "Vui lòng nhập họ và tên.",
+        "email": "Vui lòng nhập đúng địa chỉ email.",
+        "phone": "Vui lòng nhập đúng số điện thoại."
+      }
+    },
+    "bookings": {
+      "loadError": "Không thể tải danh sách đặt phòng",
+      "loadErrorDescription": "Vui lòng kiểm tra kết nối và thử lại.",
+      "tryAgain": "Thử lại",
+      "emptyTitle": "Bạn chưa đặt phòng nào",
+      "emptyDescription": "Các đặt phòng được tạo từ tài khoản này sẽ xuất hiện tại đây.",
+      "viewRooms": "Xem phòng",
+      "bookingCode": "Mã đặt phòng",
+      "bookedAt": "Đặt lúc {date}",
+      "status": {
+        "booking": {
+          "pending": "Chờ xác nhận",
+          "confirmed": "Đã xác nhận",
+          "cancelled": "Đã hủy",
+          "completed": "Đã hoàn thành"
+        },
+        "payment": {
+          "unpaid": "Chưa thanh toán",
+          "pending": "Đang xử lý",
+          "deposit_paid": "Đã đặt cọc 50%",
+          "paid": "Đã thanh toán",
+          "failed": "Thanh toán lỗi",
+          "refunded": "Đã hoàn tiền"
+        }
+      },
+      "checkIn": "Nhận phòng",
+      "checkOut": "Trả phòng",
+      "bookedRooms": "Các phòng đã đặt",
+      "staySummary": "{rooms} phòng · {nights} đêm",
+      "roomTypes": "{count} loại phòng",
+      "viewNamed": "Xem {name}",
+      "bookedRoom": "Phòng đã đặt",
+      "guestCount": "{count} khách",
+      "view": "Hướng nhìn",
+      "lineQuantity": "{rooms} phòng × {nights} đêm",
+      "nightlyRate": "{price} / phòng / đêm",
+      "payment": "Thanh toán",
+      "bankTransfer": "Chuyển khoản",
+      "subtotal": "Tạm tính tiền phòng",
+      "afterDiscount": "Sau giảm giá",
+      "serviceCharge": "Phí dịch vụ (5%)",
+      "tax": "Thuế (10%)",
+      "total": "Tổng thanh toán",
+      "deposit": "Đặt cọc trước (50%)",
+      "paid": "Đã thanh toán",
+      "remainingAtResort": "Còn lại khi đến resort",
+      "remaining": "Còn phải thanh toán",
+      "cancelUntil": "Có thể hủy đến {date} (trước giờ nhận phòng 48 giờ).",
+      "cancelExpired": "Đã hết thời hạn hủy trước giờ nhận phòng 48 giờ.",
+      "cancelBooking": "Hủy đặt phòng"
+    }
+  },
+  "Booking": {
+    "progress": {
+      "label": "Tiến trình đặt phòng",
+      "plan": "Chọn phòng",
+      "confirm": "Xác nhận thông tin",
+      "finish": "Hoàn tất đặt phòng"
+    },
+    "authState": {
+      "error": "Không thể xác minh tài khoản.",
+      "tryAgain": "Thử lại",
+      "checking": "Đang kiểm tra tài khoản…"
+    },
+    "selection": {
+      "step": "Bước 1/3",
+      "title": "Chọn phòng",
+      "nightCount": "{count} đêm",
+      "feeNote": "Phí dịch vụ 5% và thuế 10% được tính trên tiền phòng sau khi áp dụng voucher hợp lệ.",
+      "roomType": "Loại phòng",
+      "guests": "Khách",
+      "price": "Giá",
+      "selectRooms": "Chọn số phòng",
+      "loadError": "Không thể tải phòng đã chọn.",
+      "tryAgain": "Thử lại",
+      "unavailable": "Phòng đã chọn không còn trống trong khoảng ngày này.",
+      "chooseFirst": "Vui lòng chọn một phòng trước khi đặt.",
+      "returnToRooms": "Quay lại danh sách phòng và chọn phương án khác."
+    },
+    "roomRow": {
+      "upToGuests": "Tối đa {count} khách",
+      "guests": "Khách",
+      "priceNote": "mỗi đêm + phí dịch vụ 5% + thuế 10%",
+      "selectRooms": "Chọn số phòng",
+      "removeOne": "Giảm một phòng {name}",
+      "addOne": "Thêm một phòng {name}"
+    },
+    "stepTwo": {
+      "loading": "Đang tải lựa chọn phòng từ hệ thống…",
+      "unavailableTitle": "Lựa chọn phòng không còn khả dụng",
+      "unavailableDescription": "Tải lại tình trạng phòng hoặc quay về bước 1 để cập nhật lựa chọn.",
+      "back": "Quay lại",
+      "tryAgain": "Thử lại"
+    },
+    "summary": {
+      "selectRoomError": "Vui lòng chọn ít nhất một phòng để tiếp tục.",
+      "goodToKnow": "Thông tin cần biết",
+      "notice": "Phòng được giữ sau khi đặt phòng được xác nhận. Thuế và phí dịch vụ được tính sau khi áp dụng voucher hợp lệ. Thanh toán trước 50% và trả phần còn lại tại resort. Bạn có thể hủy trước giờ nhận phòng tối đa 48 giờ.",
+      "subtotal": "Tạm tính tiền phòng",
+      "serviceCharge": "Phí dịch vụ (5%)",
+      "tax": "Thuế (10%)",
+      "total": "Tổng kỳ nghỉ",
+      "deposit": "Đặt cọc ngay (50%)",
+      "balance": "Còn lại tại resort",
+      "payNow": "Thanh toán ngay",
+      "staySummary": "cho {rooms} phòng · {nights} đêm",
+      "continue": "Tiếp tục"
+    },
+    "detailPanel": {
+      "title": "Chi tiết đặt phòng",
+      "checkIn": "Nhận phòng",
+      "checkOut": "Trả phòng",
+      "lengthOfStay": "Thời gian lưu trú",
+      "nightCount": "{count} đêm",
+      "guests": "Khách",
+      "rooms": "Phòng",
+      "roomDetails": "Chi tiết phòng",
+      "lineQuantity": "{rooms} phòng × {nights} đêm",
+      "nightlyRate": "{price} / phòng / đêm",
+      "priceSummary": "Tổng hợp chi phí",
+      "subtotal": "Tạm tính tiền phòng",
+      "afterDiscount": "Sau giảm giá",
+      "serviceCharge": "Phí dịch vụ (5%)",
+      "tax": "Thuế (10%)",
+      "total": "Tổng kỳ nghỉ",
+      "deposit": "Đặt cọc ngay (50%)",
+      "balance": "Còn lại tại resort",
+      "feeNote": "Phí dịch vụ và thuế được tính sau khi trừ voucher."
+    },
+    "paymentMethod": {
+      "title": "Phương thức thanh toán",
+      "description": "Thanh toán an toàn 50% tiền cọc qua VNPay. Phần còn lại thanh toán khi đến resort.",
+      "secure": "Thanh toán an toàn",
+      "payWithVnpay": "Đặt cọc qua VNPay",
+      "methodDescription": "Quét mã QR VNPay hoặc thanh toán bằng tài khoản ngân hàng hay thẻ được hỗ trợ.",
+      "selected": "Đã chọn",
+      "redirectNote": "Bạn sẽ được chuyển đến VNPay để hoàn tất giao dịch sau khi xác nhận."
+    },
+    "voucher": {
+      "required": "Vui lòng nhập mã voucher.",
+      "applyError": "Không thể áp dụng voucher này.",
+      "eyebrow": "Ưu đãi đặc biệt",
+      "title": "Thêm voucher",
+      "code": "Mã voucher",
+      "placeholder": "Nhập mã voucher",
+      "remove": "Gỡ bỏ",
+      "applying": "Đang áp dụng…",
+      "apply": "Áp dụng",
+      "applied": "Đã áp dụng voucher {code}"
+    },
+    "validation": {
+      "guestName": "Vui lòng nhập tên khách.",
+      "email": "Vui lòng nhập địa chỉ email hợp lệ.",
+      "phone": "Vui lòng nhập số điện thoại hợp lệ.",
+      "note": "Ghi chú quá dài.",
+      "terms": "Vui lòng chấp nhận điều khoản và điều kiện."
+    },
+    "detailsForm": {
+      "step": "Bước 2/3",
+      "title": "Nhập thông tin",
+      "description": "Thông tin tài khoản được lấy từ hồ sơ. Bạn có thể cập nhật thông tin liên hệ cho đặt phòng này bên dưới.",
+      "fullName": "Họ và tên",
+      "fullNamePlaceholder": "Họ tên khách",
+      "email": "Địa chỉ email",
+      "phone": "Số điện thoại",
+      "phonePlaceholder": "Nhập số điện thoại",
+      "requests": "Yêu cầu đặc biệt",
+      "requestsPlaceholder": "Cho chúng tôi biết yêu cầu của bạn trong kỳ nghỉ",
+      "terms": "Tôi đã đọc và chấp nhận Điều khoản & Điều kiện, đồng thời đồng ý xử lý thông tin đặt phòng.",
+      "createError": "Không thể tạo đặt phòng.",
+      "bookingCreated": "Đặt phòng đã được tạo.",
+      "retryNote": "Thử lại sẽ không tạo thêm đặt phòng mới.",
+      "viewBooking": "Xem đặt phòng",
+      "back": "Quay lại",
+      "creating": "Đang tạo đặt phòng…",
+      "openingVnpay": "Đang mở VNPAY…",
+      "retryPayment": "Thử thanh toán lại",
+      "confirmDeposit": "Xác nhận & đặt cọc 50%",
+      "paymentStartError": "Không thể bắt đầu thanh toán. Vui lòng thử lại."
+    },
+    "stepThree": {
+      "notFound": "Không tìm thấy đặt phòng",
+      "notFoundDescription": "Hoàn tất bước 2 trước khi mở trang xác nhận.",
+      "loading": "Đang tải đặt phòng đã xác nhận từ hệ thống…",
+      "loadError": "Không thể tải đặt phòng",
+      "loadErrorDescription": "Đặt phòng có thể đã được tạo. Hãy thử tải lại trang xác nhận.",
+      "tryAgain": "Thử lại",
+      "bankTransfer": "Chuyển khoản",
+      "step": "Bước 3/3",
+      "titles": {
+        "cancelled": "Đặt phòng đã bị hủy",
+        "failed": "Thanh toán chưa hoàn tất",
+        "confirmed": "Đặt phòng đã được xác nhận",
+        "confirming": "Đang xác nhận thanh toán",
+        "created": "Đặt phòng đã được tạo"
+      },
+      "reference": "Mã tham chiếu:",
+      "stay": "Kỳ nghỉ",
+      "nightCount": "{count} đêm",
+      "payment": "Thanh toán",
+      "status": "Trạng thái:",
+      "paymentStatus": {
+        "deposit": "Đã đặt cọc",
+        "paid": "Đã thanh toán đủ",
+        "pending": "Đang xử lý",
+        "failed": "Thất bại",
+        "unpaid": "Chưa thanh toán",
+        "refunded": "Đã hoàn tiền",
+        "deposit_paid": "Đã đặt cọc"
+      },
+      "invoice": "Chi tiết hóa đơn",
+      "total": "Tổng kỳ nghỉ",
+      "guest": "Khách",
+      "contact": "Liên hệ",
+      "issuedOn": "Ngày tạo",
+      "room": "Phòng",
+      "quantity": "SL",
+      "nights": "Đêm",
+      "rate": "Đơn giá",
+      "amount": "Thành tiền",
+      "reservedRoom": "Phòng đã đặt",
+      "lineQuantity": "{rooms} phòng × {nights} đêm",
+      "nightlyRate": "{price} / phòng / đêm",
+      "lineTotal": "Thành tiền",
+      "subtotal": "Tạm tính tiền phòng",
+      "afterDiscount": "Sau giảm giá",
+      "serviceCharge": "Phí dịch vụ (5%)",
+      "tax": "Thuế (10%)",
+      "staySummary": "{rooms} phòng · {nights} đêm",
+      "deposit": "Đặt cọc trực tuyến (50%)",
+      "paidSoFar": "Đã thanh toán",
+      "balanceAtResort": "Còn lại tại resort",
+      "remaining": "Còn phải thanh toán",
+      "messages": {
+        "cancelled": "Đặt phòng đã bị hủy. Vui lòng liên hệ resort về khoản thanh toán hoặc hoàn tiền.",
+        "pending": "Hệ thống đang kiểm tra kết quả thanh toán. Trang sẽ tự cập nhật; vui lòng không tạo thêm đặt phòng.",
+        "deposit": "Đã thanh toán tiền cọc. Vui lòng trả {amount} khi đến resort.",
+        "paid": "Kỳ nghỉ đã được thanh toán đầy đủ.",
+        "unpaid": "Thanh toán tiền cọc để xác nhận đặt phòng. Phần còn lại trả khi đến resort."
+      },
+      "checkingStatus": "Đang kiểm tra trạng thái thanh toán mới nhất…",
+      "verifyingVnpay": "Đang xác minh giao dịch trực tiếp với VNPAY…",
+      "openingVnpay": "Đang mở VNPAY…",
+      "retryPayment": "Thử thanh toán lại",
+      "viewRooms": "Xem phòng",
+      "paymentStartError": "Không thể bắt đầu thanh toán. Vui lòng thử lại."
+    },
+    "api": {
+      "cancelSuccess": "Đã hủy đặt phòng thành công.",
+      "cancelError": "Không thể hủy đặt phòng. Vui lòng thử lại."
+    }
+  },
+  "Payment": {
+    "result": {
+      "notFound": "Không tìm thấy phiên thanh toán",
+      "description": "Hãy mở cổng thanh toán từ trang đặt phòng trong trình duyệt này để hệ thống ghép kết quả an toàn với đặt phòng của bạn.",
+      "viewRooms": "Xem phòng"
+    }
+  },
+  "Chatbot": {
+    "welcome": "Xin chào! Tôi là trợ lý của Laxsik Ecolodge. Tôi có thể giúp bạn tìm phòng, xem giá và chuẩn bị kỳ nghỉ tại Sa Pa.",
+    "quick": {
+      "findForTwo": "Tìm phòng cho 2 khách",
+      "prices": "Giá phòng hiện tại thế nào?",
+      "bestView": "Tư vấn phòng có hướng nhìn đẹp"
+    },
+    "sendError": "Không thể gửi tin nhắn.",
+    "label": "Trợ lý Laxsik",
+    "subtitle": "Trợ lý phòng và kỳ nghỉ",
+    "clear": "Xóa hội thoại",
+    "close": "Đóng chatbot",
+    "open": "Mở chatbot",
+    "matchingRooms": "Phòng phù hợp",
+    "inputLabel": "Nhập tin nhắn",
+    "placeholder": "Nhập câu hỏi của bạn…",
+    "send": "Gửi tin nhắn",
+    "footer": {
+      "default": "Hỏi đáp về Laxsik Ecolodge",
+      "live": "Thông tin phòng được kiểm tra trực tiếp từ hệ thống",
+      "basic": "Chế độ cơ bản · Chưa cấu hình OpenAI API"
+    },
+    "roomCard": {
+      "viewNamed": "Xem phòng {name}",
+      "capacity": "Tối đa {count} khách/phòng",
+      "view": "Hướng nhìn: {view}",
+      "perNight": "{price} / đêm",
+      "contactPrice": "Liên hệ để xem giá",
+      "available": "Còn {count} phòng",
+      "notChecked": "Chưa kiểm tra phòng trống theo ngày",
+      "viewRoom": "Xem phòng"
+    }
   }
 }

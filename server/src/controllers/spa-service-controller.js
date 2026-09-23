@@ -2,6 +2,7 @@ import SpaService from "../models/SpaService.js";
 import Spa from "../models/Spa.js";
 
 import { uploadOnCloudinary } from "../service/cloudinary.js";
+import { createBilingualContent } from "../service/content-translation.js";
 import { ResponseUtil } from "../utils/response.util.js";
 
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -33,9 +34,14 @@ export const getAllSpaServices = async (req, res) => {
 
     if (req.query.search?.trim()) {
       const search = escapeRegExp(req.query.search.trim());
+      const expression = { $regex: search, $options: "i" };
       filter.$or = [
-        { title: { $regex: search, $options: "i" } },
-        { description: { $regex: search, $options: "i" } },
+        { title: expression },
+        { description: expression },
+        { "translations.vi.title": expression },
+        { "translations.en.title": expression },
+        { "translations.vi.description": expression },
+        { "translations.en.description": expression },
       ];
     }
 
@@ -126,6 +132,8 @@ export const createSpaService = async (req, res) => {
       return ResponseUtil.badRequest(res, "Icon file is required");
     }
 
+    const translations = await createBilingualContent({ title, description });
+
     // Upload icon lên Cloudinary
     const uploadedIcon = await uploadOnCloudinary(
       req.file.path,
@@ -141,6 +149,7 @@ export const createSpaService = async (req, res) => {
       spaId,
       title,
       description,
+      translations,
       icon: uploadedIcon.url,
       status: status || "active",
     });
@@ -180,14 +189,17 @@ export const updateSpaService = async (req, res) => {
       service.spaId = spaId;
     }
 
-    // Update title
-    if (title !== undefined) {
-      service.title = title;
-    }
-
-    // Update description
-    if (description !== undefined) {
-      service.description = description;
+    if (title !== undefined || description !== undefined) {
+      const vietnameseContent = {
+        title: title ?? service.translations?.vi?.title ?? service.title,
+        description:
+          description ??
+          service.translations?.vi?.description ??
+          service.description,
+      };
+      service.translations = await createBilingualContent(vietnameseContent);
+      service.title = vietnameseContent.title;
+      service.description = vietnameseContent.description;
     }
 
     // Update status

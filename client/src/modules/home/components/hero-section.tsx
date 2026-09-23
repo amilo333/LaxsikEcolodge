@@ -1,12 +1,16 @@
+'use client';
+
 import { Header } from '@/components/layouts';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 export function HeroSection() {
+  const t = useTranslations('Home.hero');
   return (
     <section className='relative min-h-[680px] overflow-hidden sm:min-h-[760px] lg:min-h-[860px]'>
       <Image
         src='/images/banner/banner-home.png'
-        alt='Laxsik Ecolodge among the rice terraces of Lao Chai, Sa Pa'
+        alt={t('imageAlt')}
         fill
         priority
         sizes='100vw'
@@ -29,7 +33,7 @@ export function HeroSection() {
           className='object-cover object-center'
         />
         <p className='mt-8 text-xs font-semibold uppercase drop-shadow-md sm:text-sm lg:text-base'>
-          Lao Chai, Sa Pa, Lao Cai, Vietnam
+          {t('location')}
         </p>
       </div>
     </section>

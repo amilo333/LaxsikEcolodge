@@ -6,11 +6,19 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { REGISTER_FORM_DEFAULT_VALUES } from '../constant';
-import { registerSchema } from '../schema';
+import { createRegisterSchema } from '../schema';
 import { TRegisterForm } from '../types';
 import { useRegisterApi } from '../../common/hooks';
+import { useTranslations } from 'next-intl';
+import { useMemo } from 'react';
 
 export function RegisterForm() {
+  const t = useTranslations('Auth.register.form');
+  const validationT = useTranslations('Auth.validation');
+  const localizedSchema = useMemo(
+    () => createRegisterSchema(validationT),
+    [validationT]
+  );
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectParam = searchParams.get('redirect');
@@ -25,7 +33,7 @@ export function RegisterForm() {
     formState: { errors },
     handleSubmit,
   } = useForm<TRegisterForm>({
-    resolver: zodResolver(registerSchema),
+    resolver: zodResolver(localizedSchema),
     defaultValues: REGISTER_FORM_DEFAULT_VALUES,
   });
 
@@ -43,10 +51,10 @@ export function RegisterForm() {
     <div className='flex flex-col gap-5'>
       <div className='grid gap-4 sm:grid-cols-2'>
         <div>
-          <Field control={control} name='full_name' label='Full Name'>
+          <Field control={control} name='full_name' label={t('fullName')}>
             <Textfield
-              label='Full Name'
-              placeholder='Your full name'
+              label={t('fullName')}
+              placeholder={t('fullNamePlaceholder')}
               autoComplete='name'
               inputClassName='h-[50px]! rounded-[16px]! bg-[#F7F9F8]! shadow-none! ring-1 ring-[#DDE6E3] transition focus-within:ring-2 focus-within:ring-[#0D4949]/45 [&_input]:px-4!'
               error={errors.full_name?.message}
@@ -55,10 +63,10 @@ export function RegisterForm() {
         </div>
 
         <div>
-          <Field control={control} name='email' label='Email'>
+          <Field control={control} name='email' label={t('email')}>
             <Textfield
-              label='Email'
-              placeholder='you@example.com'
+              label={t('email')}
+              placeholder={t('emailPlaceholder')}
               autoComplete='email'
               inputClassName='h-[50px]! rounded-[16px]! bg-[#F7F9F8]! shadow-none! ring-1 ring-[#DDE6E3] transition focus-within:ring-2 focus-within:ring-[#0D4949]/45 [&_input]:px-4!'
               error={errors.email?.message}
@@ -67,10 +75,10 @@ export function RegisterForm() {
         </div>
 
         <div className='sm:col-span-2'>
-          <Field control={control} name='phone' label='Phone'>
+          <Field control={control} name='phone' label={t('phone')}>
             <Textfield
-              label='Phone'
-              placeholder='Your phone number'
+              label={t('phone')}
+              placeholder={t('phonePlaceholder')}
               autoComplete='tel'
               inputClassName='h-[50px]! rounded-[16px]! bg-[#F7F9F8]! shadow-none! ring-1 ring-[#DDE6E3] transition focus-within:ring-2 focus-within:ring-[#0D4949]/45 [&_input]:px-4!'
               error={errors.phone?.message}
@@ -79,11 +87,11 @@ export function RegisterForm() {
         </div>
 
         <div>
-          <Field control={control} name='password' label='Password'>
+          <Field control={control} name='password' label={t('password')}>
             <Textfield
-              label='Password'
+              label={t('password')}
               type='password'
-              placeholder='At least 6 characters'
+              placeholder={t('passwordPlaceholder')}
               autoComplete='new-password'
               inputClassName='h-[50px]! rounded-[16px]! bg-[#F7F9F8]! shadow-none! ring-1 ring-[#DDE6E3] transition focus-within:ring-2 focus-within:ring-[#0D4949]/45 [&_input]:px-4!'
               error={errors.password?.message}
@@ -95,11 +103,11 @@ export function RegisterForm() {
           <Field
             control={control}
             name='confirmPassword'
-            label='Confirm Password'>
+            label={t('confirmPassword')}>
             <Textfield
-              label='Confirm Password'
+              label={t('confirmPassword')}
               type='password'
-              placeholder='Repeat password'
+              placeholder={t('confirmPasswordPlaceholder')}
               autoComplete='new-password'
               inputClassName='h-[50px]! rounded-[16px]! bg-[#F7F9F8]! shadow-none! ring-1 ring-[#DDE6E3] transition focus-within:ring-2 focus-within:ring-[#0D4949]/45 [&_input]:px-4!'
               error={errors.confirmPassword?.message}
@@ -113,15 +121,15 @@ export function RegisterForm() {
         isDisabled={isPending}
         className='h-[52px]! w-full! rounded-full! bg-[#0D4949]! text-base! font-bold! text-white! shadow-[0_12px_28px_rgba(13,73,73,0.24)] transition hover:bg-[#0A3B3B]!'
         onClick={handleSubmit(onSubmit)}>
-        {isPending ? 'Creating account…' : 'Create account'}
+        {isPending ? t('creating') : t('createAccount')}
       </Button>
 
       <div className='text-center text-sm text-[#687570]'>
-        Have an account?{' '}
+        {t('hasAccount')}{' '}
         <Link
           href={loginHref}
           className='font-bold text-[#0D4949] underline-offset-4 hover:underline'>
-          Sign in
+          {t('signIn')}
         </Link>
       </div>
     </div>

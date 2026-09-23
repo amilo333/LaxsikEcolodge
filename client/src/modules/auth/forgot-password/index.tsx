@@ -7,14 +7,17 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { useTranslations } from 'next-intl';
+import { useMemo } from 'react';
 
-const forgotPasswordSchema = z.object({
-  email: z.email('Please enter a valid email address.'),
-});
-
-type TForgotPasswordForm = z.infer<typeof forgotPasswordSchema>;
+type TForgotPasswordForm = { email: string };
 
 export default function ForgotPasswordModule() {
+  const t = useTranslations('Auth.forgotPassword');
+  const forgotPasswordSchema = useMemo(
+    () => z.object({ email: z.email(t('invalidEmail')) }),
+    [t]
+  );
   const [submittedEmail, setSubmittedEmail] = useState<string | null>(null);
   const { mutate, isPending } = useForgotPasswordApi();
   const {
@@ -35,43 +38,43 @@ export default function ForgotPasswordModule() {
   return (
     <div className='w-full max-w-[520px] rounded-[32px] border border-white/60 bg-white/94 p-6 shadow-[0_28px_90px_rgba(3,35,34,0.35)] backdrop-blur-xl sm:p-9 lg:p-10'>
       <p className='text-[11px] font-bold text-[#0D4949]/60 uppercase'>
-        Account recovery
+        {t('eyebrow')}
       </p>
       <h2 className='mt-2 text-3xl font-bold text-[#153F3D] sm:text-[38px]'>
-        {submittedEmail ? 'Check your inbox' : 'Forgot your password?'}
+        {submittedEmail ? t('checkInbox') : t('title')}
       </h2>
 
       {submittedEmail ? (
         <div className='mt-5'>
           <p className='text-sm leading-6 text-[#61706C]'>
-            If an account exists for <strong>{submittedEmail}</strong>, we sent
-            a link that is valid for 15 minutes. Please also check your spam
-            folder.
+            {t.rich('sentDescription', {
+              email: submittedEmail,
+              strong: (chunks) => <strong>{chunks}</strong>,
+            })}
           </p>
           <div className='mt-7 flex flex-col gap-3'>
             <Button
               type='button'
               onClick={() => setSubmittedEmail(null)}
               className='h-[52px]! w-full! rounded-full! text-base!'>
-              Try another email
+              {t('tryAnother')}
             </Button>
             <Link
               href='/auth/login'
               className='text-center text-sm font-bold text-[#0D4949] underline-offset-4 hover:underline'>
-              Back to sign in
+              {t('backToSignIn')}
             </Link>
           </div>
         </div>
       ) : (
         <>
           <p className='mt-3 mb-7 text-sm leading-6 text-[#61706C]'>
-            Enter your account email and we&apos;ll send you a secure link to
-            choose a new password.
+            {t('description')}
           </p>
           <div className='flex flex-col gap-6'>
-            <Field control={control} name='email' label='Email'>
+            <Field control={control} name='email' label={t('email')}>
               <Textfield
-                label='Email'
+                label={t('email')}
                 type='email'
                 placeholder='you@example.com'
                 autoComplete='email'
@@ -84,12 +87,12 @@ export default function ForgotPasswordModule() {
               isDisabled={isPending}
               onClick={handleSubmit(onSubmit)}
               className='h-[52px]! w-full! rounded-full! text-base!'>
-              {isPending ? 'Sending…' : 'Send reset link'}
+              {isPending ? t('sending') : t('sendLink')}
             </Button>
             <Link
               href='/auth/login'
               className='text-center text-sm font-bold text-[#0D4949] underline-offset-4 hover:underline'>
-              Back to sign in
+              {t('backToSignIn')}
             </Link>
           </div>
         </>

@@ -1,8 +1,13 @@
 import { getRequestConfig } from 'next-intl/server';
+import { cookies } from 'next/headers';
+import { DEFAULT_LOCALE, isAppLocale, LOCALE_COOKIE } from './i18n';
 
 export default getRequestConfig(async () => {
-  // Static for now, we'll change this later
-  const locale = 'vi';
+  const cookieStore = await cookies();
+  const requestedLocale = cookieStore.get(LOCALE_COOKIE)?.value;
+  const locale = isAppLocale(requestedLocale)
+    ? requestedLocale
+    : DEFAULT_LOCALE;
 
   return {
     locale,

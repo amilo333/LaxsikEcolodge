@@ -1,8 +1,11 @@
+'use client';
+
 import { Button } from '@/components/core';
 import { TUser } from '@/modules/auth/common';
 import { TAvailableRoom } from '../types';
 import { BookingDetailPanel } from './booking-detail-panel';
 import { BookingDetailsForm } from './booking-details-form';
+import { useTranslations } from 'next-intl';
 
 type TBookingStepTwoProps = {
   profile: TUser;
@@ -31,11 +34,12 @@ export function BookingStepTwo({
   onBack,
   onBookingCreated,
 }: TBookingStepTwoProps) {
+  const t = useTranslations('Booking.stepTwo');
   if (isLoading) {
     return (
       <section className='mx-auto w-[calc(100%-32px)] max-w-[1120px] py-12'>
         <div className='rounded-[16px] bg-white p-8 text-center font-semibold text-[#0D4949] shadow-lg'>
-          Loading your room selection from the server…
+          {t('loading')}
         </div>
       </section>
     );
@@ -46,22 +50,22 @@ export function BookingStepTwo({
       <section className='mx-auto w-[calc(100%-32px)] max-w-[760px] py-12'>
         <div className='flex flex-col items-center rounded-[16px] bg-white p-8 text-center shadow-lg'>
           <h1 className='text-xl font-bold text-[#0D4949]'>
-            Your room selection is unavailable
+            {t('unavailableTitle')}
           </h1>
           <p className='mt-2 text-sm text-[#68726E]'>
-            Reload availability or return to step 1 to update your selection.
+            {t('unavailableDescription')}
           </p>
           <div className='mt-5 flex gap-3'>
             <Button
               onClick={onBack}
               className='h-11! w-auto! rounded-full! border border-[#0D4949]! bg-white! px-6! text-sm! text-[#0D4949]!'>
-              Back
+              {t('back')}
             </Button>
             {isError && (
               <Button
                 onClick={onRetry}
                 className='h-11! w-auto! rounded-full! px-6! text-sm!'>
-                Try again
+                {t('tryAgain')}
               </Button>
             )}
           </div>

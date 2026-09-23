@@ -1,5 +1,758 @@
 {
+  "Common": {
+    "language": {
+      "label": "Choose language",
+      "en": "English",
+      "vi": "Vietnamese"
+    }
+  },
+  "Navigation": {
+    "overview": "OVERVIEW",
+    "rooms": "ROOMS",
+    "dining": "DINING",
+    "tours": "TOURS",
+    "spa": "SPA & MASSAGE",
+    "contact": "CONTACT",
+    "bookNow": "Book Now"
+  },
+  "AccountMenu": {
+    "signIn": "Sign in",
+    "register": "Register",
+    "loading": "Loading account",
+    "adminDashboard": "Admin dashboard",
+    "bookings": "My bookings",
+    "profile": "Personal information",
+    "signingOut": "Signing out…",
+    "signOut": "Sign out"
+  },
+  "BookingBar": {
+    "checkIn": "Check-in date",
+    "checkOut": "Check-out date",
+    "findNow": "Find now",
+    "hide": "HIDE",
+    "collapse": "Collapse booking search",
+    "errors": {
+      "requiredDates": "Please select both check-in and check-out dates.",
+      "pastCheckIn": "Check-in date cannot be in the past.",
+      "invalidCheckOut": "Check-out must be after check-in."
+    }
+  },
+  "GuestSelect": {
+    "label": "Guests",
+    "summary": "{people, plural, one {# person} other {# people}} · {rooms, plural, one {# room} other {# rooms}}",
+    "room": "Rooms",
+    "person": "Guests",
+    "done": "DONE",
+    "open": "Open guest selector"
+  },
+  "Footer": {
+    "address": "Lao Chai, Sa Pa, Lao Cai, Vietnam",
+    "hotline": "Hotline",
+    "menus": {
+      "careers": "Join Our Team",
+      "partner": "Become A Partner",
+      "privacy": "Privacy & Policies",
+      "terms": "Terms & Conditions"
+    },
+    "copyright": "© Copyright Laxsik Ecolodge 2024"
+  },
+  "ContactCta": {
+    "title": "We can help you with any questions or information.",
+    "call": "CALL",
+    "contact": "CONTACT"
+  },
+  "AuthLayout": {
+    "imageAlt": "Laxsik Ecolodge mountain landscape",
+    "eyebrow": "A peaceful nature retreat",
+    "title": "Return to nature. Rest in comfort.",
+    "description": "Sign in to continue your booking and keep every detail of your Sa Pa stay in one place.",
+    "highlights": {
+      "mountainViews": "Mountain views",
+      "localExperiences": "Local experiences",
+      "peacefulStays": "Peaceful stays"
+    }
+  },
+  "Auth": {
+    "validation": {
+      "invalidEmail": "Please enter a valid email address.",
+      "shortPassword": "Password must be at least 6 characters.",
+      "requiredName": "Please enter your full name.",
+      "shortPhone": "Phone number must be at least 8 characters.",
+      "passwordMismatch": "Passwords do not match."
+    },
+    "login": {
+      "backHome": "Back to Laxsik Ecolodge home",
+      "welcomeBack": "Welcome back",
+      "eyebrow": "Member access",
+      "description": "Sign in to manage your stay and continue your booking at Laxsik Ecolodge.",
+      "form": {
+        "email": "Email",
+        "emailPlaceholder": "you@example.com",
+        "password": "Password",
+        "passwordPlaceholder": "Enter your password",
+        "forgotPassword": "Forgot password?",
+        "signingIn": "Signing in…",
+        "signIn": "Sign in",
+        "continueWith": "Or continue with",
+        "newToLaxsik": "New to Laxsik?",
+        "noAccount": "Don't have an account?",
+        "createAccount": "Create account"
+      }
+    },
+    "register": {
+      "backHome": "Back to Laxsik Ecolodge home",
+      "join": "Join Laxsik",
+      "eyebrow": "Create your account",
+      "title": "Begin your journey",
+      "description": "Save your details and enjoy a smoother booking experience.",
+      "form": {
+        "fullName": "Full name",
+        "fullNamePlaceholder": "Your full name",
+        "email": "Email",
+        "emailPlaceholder": "you@example.com",
+        "phone": "Phone",
+        "phonePlaceholder": "Your phone number",
+        "password": "Password",
+        "passwordPlaceholder": "At least 6 characters",
+        "confirmPassword": "Confirm password",
+        "confirmPasswordPlaceholder": "Repeat password",
+        "creating": "Creating account…",
+        "createAccount": "Create account",
+        "hasAccount": "Already have an account?",
+        "signIn": "Sign in"
+      }
+    },
+    "google": {
+      "notConfigured": "Google sign-in is not configured yet.",
+      "passwordRequired": "Please enter your current password.",
+      "linkTitle": "Link your existing account",
+      "linkDescription": "This Google email already has a Laxsik account. Enter your current password once to securely link Google sign-in.",
+      "currentPassword": "Current password",
+      "currentPasswordPlaceholder": "Enter your current password",
+      "linking": "Linking…",
+      "linkAndSignIn": "Link Google and sign in",
+      "useAnother": "Use another Google account",
+      "forgotPassword": "Forgot password?"
+    },
+    "forgotPassword": {
+      "invalidEmail": "Please enter a valid email address.",
+      "eyebrow": "Account recovery",
+      "checkInbox": "Check your inbox",
+      "title": "Forgot your password?",
+      "sentDescription": "If an account exists for <strong>{email}</strong>, we sent a link that is valid for 15 minutes. Please also check your spam folder.",
+      "tryAnother": "Try another email",
+      "backToSignIn": "Back to sign in",
+      "description": "Enter your account email and we'll send you a secure link to choose a new password.",
+      "email": "Email",
+      "sending": "Sending…",
+      "sendLink": "Send reset link"
+    },
+    "resetPassword": {
+      "shortPassword": "Password must be at least 8 characters.",
+      "passwordMismatch": "Passwords do not match.",
+      "eyebrow": "Account recovery",
+      "updated": "Password updated",
+      "title": "Choose a new password",
+      "invalidLink": "This reset link is incomplete. Please request a new password reset email.",
+      "requestLink": "Request a new link",
+      "successDescription": "Your password has been changed successfully. You can now sign in with your new password.",
+      "continueSignIn": "Continue to sign in",
+      "description": "Use at least 8 characters. For better security, choose a password you do not use elsewhere.",
+      "newPassword": "New password",
+      "passwordPlaceholder": "At least 8 characters",
+      "confirmPassword": "Confirm new password",
+      "confirmPlaceholder": "Repeat your new password",
+      "updating": "Updating…",
+      "updatePassword": "Update password"
+    },
+    "api": {
+      "genericError": "Something went wrong.",
+      "googleSignInFailed": "Google sign-in failed.",
+      "googleLinked": "Google sign-in has been linked to your account.",
+      "googleLinkFailed": "Unable to link Google sign-in.",
+      "resetEmailFailed": "Unable to send the password reset email.",
+      "resetFailed": "Unable to reset password.",
+      "profileUpdated": "Profile updated successfully.",
+      "profileUpdateFailed": "Unable to update your profile."
+    }
+  },
   "Home": {
-    "title": "Hello world!"
+    "hero": {
+      "imageAlt": "Laxsik Ecolodge among the rice terraces of Lao Chai, Sa Pa",
+      "location": "Lao Chai, Sa Pa, Lao Cai, Vietnam"
+    },
+    "introduction": {
+      "title": "At the doorstep of Sa Pa nature",
+      "description": "A peaceful retreat in Lao Chai Valley, surrounded by terraced fields, mountain air and the living culture of Sa Pa. Every stay brings guests closer to the landscape and the rhythm of the local community."
+    },
+    "rooms": {
+      "eyebrow": "Stay close to nature",
+      "title": "Rooms & Suites",
+      "description": "Explore our current rooms, images and nightly rates.",
+      "loading": "Loading rooms…"
+    },
+    "retreat": {
+      "eyebrow": "More than a stay",
+      "items": {
+        "wellness": {
+          "title": "Laxsik Wellness",
+          "description": "A quiet wellness space surrounded by rice terraces, created for movement, rest and unhurried moments in the mountain air.",
+          "linkLabel": "Discover wellness"
+        },
+        "restaurant": {
+          "title": "Muong Hoa Restaurant",
+          "description": "A warm dining room overlooking the valley, where each meal brings together local ingredients and the flavours of the Northwest.",
+          "linkLabel": "Explore dining"
+        }
+      }
+    },
+    "experiences": {
+      "eyebrow": "Culture, landscape and wellbeing",
+      "title": "Exploring Sa Pa",
+      "items": {
+        "cuisine": {
+          "title": "H'Mong cuisine with chef",
+          "description": "Cook alongside our local team and discover the ingredients, techniques and stories behind H'Mong cuisine.",
+          "linkLabel": "Explore dining"
+        },
+        "trekking": {
+          "title": "Trekking tour",
+          "description": "Walk through Muong Hoa Valley, terraced fields and mountain villages with the landscape of Sa Pa unfolding around you.",
+          "linkLabel": "Explore Sa Pa"
+        },
+        "spa": {
+          "title": "Po Mu Spa",
+          "description": "Slow down with restorative treatments inspired by Red Dao herbal traditions and the calm rhythm of the mountains.",
+          "linkLabel": "Explore spa"
+        },
+        "wedding": {
+          "title": "Wedding on the clouds",
+          "description": "Celebrate against a mountain panorama with an intimate setting shaped by flowers, local craft and the beauty of Sa Pa.",
+          "linkLabel": "Plan your day"
+        }
+      }
+    },
+    "gallery": {
+      "imageAlt": "Terraced rice fields in Sa Pa",
+      "eyebrow": "Stories from the valley",
+      "description": "A glimpse of the landscape, local culture and quiet moments around Laxsik Ecolodge.",
+      "itemAlt": "Laxsik Ecolodge gallery {index}"
+    }
+  },
+  "Rooms": {
+    "list": {
+      "yourStay": "Your stay",
+      "availableRooms": "Available rooms",
+      "dates": "Dates",
+      "guestCount": "{count, plural, one {# guest} other {# guests}}",
+      "roomCount": "{count, plural, one {# room} other {# rooms}}",
+      "clearSearch": "Clear search",
+      "pricePerNight": "Price per night",
+      "priceRanges": {
+        "all": "All prices",
+        "under2m": "Under 2M",
+        "2to3m": "2M – 3M",
+        "3to5m": "3M – 5M",
+        "over5m": "5M+"
+      },
+      "roomsFound": "{count, plural, one {# room found} other {# rooms found}}",
+      "searching": "Searching rooms…",
+      "noRoomsPrice": "No rooms in this price range",
+      "noRooms": "No rooms available",
+      "tryPrice": "Try another price range or clear the filter.",
+      "tryDates": "Try different dates or fewer guests.",
+      "loadError": "Unable to load rooms. Please try again."
+    },
+    "detail": {
+      "loading": "Loading room…",
+      "loadError": "Failed to load room.",
+      "notFound": "Room not found.",
+      "gallery": "Room Gallery",
+      "galleryItem": "Room gallery image {index}"
+    },
+    "card": {
+      "averagePrice": "Average price per night",
+      "bookNow": "BOOK NOW"
+    },
+    "item": {
+      "viewNamed": "View {name}",
+      "guestCount": "{count, plural, one {# guest} other {# guests}}",
+      "view": "View",
+      "averagePrice": "Average price per night",
+      "viewRoom": "View Room"
+    },
+    "slider": {
+      "otherRooms": "OTHER ROOMS",
+      "loading": "Loading rooms…",
+      "loadError": "Failed to load rooms.",
+      "explore": "Explore Now"
+    },
+    "facilities": {
+      "eyebrow": "Everything you need",
+      "title": "FACILITIES",
+      "items": {
+        "wifi": "FREE WIFI",
+        "roomService": "ROOM SERVICE",
+        "parking": "CAR PARK",
+        "restaurant": "RESTAURANT",
+        "pool": "POOL",
+        "spa": "SPA",
+        "laundry": "LAUNDRY"
+      }
+    },
+    "detailFacilities": {
+      "title": "FACILITIES",
+      "beds": "BEDS",
+      "occupancy": "OCCUPANCY",
+      "adults": "{count, plural, one {# adult} other {# adults}}",
+      "size": "SIZE",
+      "floorPlan": "{area} m² floor plan",
+      "bathroom": "BATHROOM",
+      "fireplace": "FIREPLACE",
+      "views": "VIEWS"
+    },
+    "policies": {
+      "title": "Policies",
+      "items": {
+        "1": {
+          "title": "CHECK-IN/OUT TIMES",
+          "description": "Check-in time: 3:00 PM. Check-out time: 12:00 PM."
+        },
+        "2": {
+          "title": "EARLY ARRIVALS AND LATE DEPARTURES",
+          "description": "For guaranteed early access, we recommend booking the previous night. For a guaranteed late departure, reserve an additional night. Otherwise, we will gladly store your bags and make our fitness facilities available for you to freshen up."
+        },
+        "3": {
+          "title": "CREDIT CARDS",
+          "description": "American Express, Visa, Master Card and JCB."
+        },
+        "4": {
+          "title": "CANCEL BOOKING",
+          "description": "Reservations can be cancelled no later than 48 hours before the scheduled check-in time. Cancellation is unavailable after this deadline."
+        }
+      }
+    }
+  },
+  "Dining": {
+    "banner": {
+      "imageAlt": "Muong Hoa Restaurant overlooking the valley",
+      "title": "MUONG HOA RESTAURANT",
+      "description": "Muong Hoa Restaurant offers a refined dining experience inspired by the rich flavors and fresh ingredients of Northwest Vietnam. Set against the scenery of Muong Hoa Valley, the restaurant combines traditional Vietnamese cuisine with a modern touch."
+    },
+    "gallery": {
+      "title": "MUONG HOA GALLERY",
+      "imageAlt": "Muong Hoa gallery image {index}"
+    },
+    "services": {
+      "title": "SERVICES",
+      "empty": "No dining services are currently available."
+    }
+  },
+  "Spa": {
+    "banner": {
+      "imageAlt": "Laxsik Spa surrounded by nature",
+      "title": "LAXSIK SPA",
+      "description": "A peaceful sanctuary surrounded by nature, where traditional wellness treatments and modern relaxation come together. Every massage and restorative therapy is designed to release tension, refresh your body and restore calm."
+    },
+    "services": {
+      "title": "SPA SERVICES",
+      "empty": "No spa services are currently available."
+    },
+    "serviceImageAlt": "Spa service"
+  },
+  "Contact": {
+    "heroEyebrow": "Lao Chai · Sa Pa · Vietnam",
+    "heroTitle": "Contact Laxsik Ecolodge",
+    "heroDescription": "We are here to help with your stay, the journey to Lao Chai and any questions before you arrive.",
+    "heroAlt": "Laxsik Ecolodge illuminated in the mountains at night",
+    "sectionEyebrow": "Find your way to the valley",
+    "sectionTitle": "We look forward to hearing from you",
+    "sectionDescription": "Laxsik Ecolodge is set among the rice terraces of Lao Chai. Use the map for directions or reach our team directly by phone and email.",
+    "mapTitle": "Location of Laxsik Ecolodge on Google Maps",
+    "directions": "Open directions",
+    "addressLabel": "Address",
+    "address": "Lao Chai, Sa Pa, Lao Cai, Vietnam",
+    "hotlineLabel": "Hotline",
+    "emailLabel": "Email",
+    "responseNote": "For the quickest response, please call our hotline. Email enquiries are welcomed at any time."
+  },
+  "Tours": {
+    "hero": {
+      "imageAlt": "Muong Hoa Valley rice terraces surrounded by mountains",
+      "eyebrow": "Journeys from Laxsik",
+      "title": "Discover Sa Pa, one story at a time",
+      "description": "Walk beyond the familiar views and spend time with the landscapes, traditions and people that give Muong Hoa Valley its rhythm."
+    },
+    "list": {
+      "eyebrow": "Ways to explore",
+      "title": "Journeys shaped by the valley",
+      "description": "From a gentle village stroll to a full-day highland challenge, these routes reveal Sa Pa through forest paths, waterfalls, rice terraces and local communities.",
+      "loadError": "We could not load the journeys right now.",
+      "tryAgain": "Try again",
+      "empty": "New seasonal journeys are being prepared. Please ask our local team for the best routes during your stay.",
+      "duration": "Duration",
+      "rhythm": "Rhythm"
+    },
+    "notes": {
+      "eyebrow": "Travel slowly",
+      "title": "A closer way to meet Sa Pa",
+      "description": "The most memorable moments are often unscheduled: a conversation beside a field, tea shared in a family home or mist lifting from the terraces.",
+      "items": {
+        "season": {
+          "title": "Season-led routes",
+          "description": "Paths and views change with the rice season, rain and village activity, so every journey feels slightly different."
+        },
+        "local": {
+          "title": "Local perspective",
+          "description": "Experiences are shaped around people, traditions and everyday life rather than a checklist of attractions."
+        },
+        "pace": {
+          "title": "A comfortable pace",
+          "description": "There is time to stop, talk, take photographs and enjoy the landscape without rushing from place to place."
+        }
+      }
+    },
+    "practical": {
+      "eyebrow": "Before you set out",
+      "title": "A few useful notes",
+      "items": {
+        "shoes": "Wear shoes with reliable grip for terrace and village paths.",
+        "rain": "Bring a light rain layer; mountain weather can change quickly.",
+        "photos": "Ask before photographing people, homes or ceremonies.",
+        "routes": "Routes may be adjusted to suit weather and trail conditions."
+      },
+      "imageAlt": "Rice terraces and villages across Muong Hoa Valley",
+      "footer": "Routes are introductions rather than fixed itineraries. Our local team can share the most suitable seasonal options during your stay."
+    }
+  },
+  "Account": {
+    "eyebrow": "Member area",
+    "title": "My account",
+    "loadError": "Unable to load account information",
+    "tryAgain": "Try again",
+    "navigation": {
+      "bookings": "My bookings",
+      "profile": "Personal information"
+    },
+    "cancelDialog": {
+      "close": "Close dialog",
+      "title": "Cancel this booking?",
+      "description": "The booking will be marked as cancelled and its rooms will become available to other guests.",
+      "bookingCode": "Booking code",
+      "checkIn": "Check-in",
+      "stay": "Stay",
+      "staySummary": "{rooms, plural, one {# room} other {# rooms}} · {nights, plural, one {# night} other {# nights}}",
+      "policy": "Cancellation is only available at least 48 hours before check-in. This action cannot be undone.",
+      "keep": "Keep booking",
+      "cancelling": "Cancelling booking…",
+      "confirm": "Confirm cancellation"
+    },
+    "profile": {
+      "title": "Personal information",
+      "description": "We use these details as your default contact information when you book.",
+      "fullName": "Full name",
+      "fullNamePlaceholder": "Enter your full name",
+      "email": "Email",
+      "phone": "Phone number",
+      "phonePlaceholder": "Enter your phone number",
+      "saving": "Saving…",
+      "save": "Save changes",
+      "validation": {
+        "name": "Please enter your full name.",
+        "email": "Please enter a valid email address.",
+        "phone": "Please enter a valid phone number."
+      }
+    },
+    "bookings": {
+      "loadError": "Unable to load your bookings",
+      "loadErrorDescription": "Please check your connection and try again.",
+      "tryAgain": "Try again",
+      "emptyTitle": "You have no bookings yet",
+      "emptyDescription": "Bookings made with this account will appear here.",
+      "viewRooms": "View rooms",
+      "bookingCode": "Booking code",
+      "bookedAt": "Booked on {date}",
+      "status": {
+        "booking": {
+          "pending": "Pending confirmation",
+          "confirmed": "Confirmed",
+          "cancelled": "Cancelled",
+          "completed": "Completed"
+        },
+        "payment": {
+          "unpaid": "Unpaid",
+          "pending": "Processing",
+          "deposit_paid": "50% deposit paid",
+          "paid": "Paid",
+          "failed": "Payment failed",
+          "refunded": "Refunded"
+        }
+      },
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "bookedRooms": "Booked rooms",
+      "staySummary": "{rooms, plural, one {# room} other {# rooms}} · {nights, plural, one {# night} other {# nights}}",
+      "roomTypes": "{count, plural, one {# room type} other {# room types}}",
+      "viewNamed": "View {name}",
+      "bookedRoom": "Booked room",
+      "guestCount": "{count, plural, one {# guest} other {# guests}}",
+      "view": "View",
+      "lineQuantity": "{rooms, plural, one {# room} other {# rooms}} × {nights, plural, one {# night} other {# nights}}",
+      "nightlyRate": "{price} / room / night",
+      "payment": "Payment",
+      "bankTransfer": "Bank transfer",
+      "subtotal": "Room subtotal",
+      "afterDiscount": "After discount",
+      "serviceCharge": "Service charge (5%)",
+      "tax": "Tax (10%)",
+      "total": "Total payment",
+      "deposit": "Deposit due (50%)",
+      "paid": "Paid",
+      "remainingAtResort": "Due at the resort",
+      "remaining": "Remaining balance",
+      "cancelUntil": "You can cancel until {date} (48 hours before check-in).",
+      "cancelExpired": "The 48-hour cancellation window has expired.",
+      "cancelBooking": "Cancel booking"
+    }
+  },
+  "Booking": {
+    "progress": {
+      "label": "Booking progress",
+      "plan": "Your plan",
+      "confirm": "Confirm your plan",
+      "finish": "Finish booking"
+    },
+    "authState": {
+      "error": "Unable to verify your account.",
+      "tryAgain": "Try again",
+      "checking": "Checking your account…"
+    },
+    "selection": {
+      "step": "Step 1 of 3",
+      "title": "Choose your room",
+      "nightCount": "{count, plural, one {# night} other {# nights}}",
+      "feeNote": "A 5% service charge and 10% tax are calculated from the room total after any eligible voucher discount.",
+      "roomType": "Room type",
+      "guests": "Guests",
+      "price": "Price",
+      "selectRooms": "Select rooms",
+      "loadError": "We couldn't load the selected room.",
+      "tryAgain": "Try again",
+      "unavailable": "The selected room is not available for these dates.",
+      "chooseFirst": "Please choose a room before opening booking.",
+      "returnToRooms": "Return to the room list and choose another option."
+    },
+    "roomRow": {
+      "upToGuests": "Up to {count, plural, one {# guest} other {# guests}}",
+      "guests": "Guests",
+      "priceNote": "per night + 5% service charge + 10% tax",
+      "selectRooms": "Select rooms",
+      "removeOne": "Remove one {name}",
+      "addOne": "Add one {name}"
+    },
+    "stepTwo": {
+      "loading": "Loading your room selection from the server…",
+      "unavailableTitle": "Your room selection is unavailable",
+      "unavailableDescription": "Reload availability or return to step 1 to update your selection.",
+      "back": "Back",
+      "tryAgain": "Try again"
+    },
+    "summary": {
+      "selectRoomError": "Please select at least one room to continue.",
+      "goodToKnow": "Good to know",
+      "notice": "Room availability is held after your booking is confirmed. Taxes and service fees are calculated after any eligible voucher discount. Pay a 50% deposit now and the balance at the resort. You can cancel up to 48 hours before check-in.",
+      "subtotal": "Room subtotal",
+      "serviceCharge": "Service charge (5%)",
+      "tax": "Tax (10%)",
+      "total": "Total stay",
+      "deposit": "Deposit due now (50%)",
+      "balance": "Balance due at resort",
+      "payNow": "Pay now",
+      "staySummary": "for {rooms, plural, one {# room} other {# rooms}} · {nights, plural, one {# night} other {# nights}}",
+      "continue": "Continue"
+    },
+    "detailPanel": {
+      "title": "Your booking details",
+      "checkIn": "Check-in",
+      "checkOut": "Check-out",
+      "lengthOfStay": "Length of stay",
+      "nightCount": "{count, plural, one {# night} other {# nights}}",
+      "guests": "Guests",
+      "rooms": "Rooms",
+      "roomDetails": "Room details",
+      "lineQuantity": "{rooms, plural, one {# room} other {# rooms}} × {nights, plural, one {# night} other {# nights}}",
+      "nightlyRate": "{price} / room / night",
+      "priceSummary": "Price summary",
+      "subtotal": "Room subtotal",
+      "afterDiscount": "After discount",
+      "serviceCharge": "Service charge (5%)",
+      "tax": "Tax (10%)",
+      "total": "Total stay",
+      "deposit": "Deposit due now (50%)",
+      "balance": "Balance due at resort",
+      "feeNote": "The service charge and tax are calculated after the voucher discount."
+    },
+    "paymentMethod": {
+      "title": "Payment method",
+      "description": "Pay your 50% deposit securely through VNPay. The balance is due when you arrive at the resort.",
+      "secure": "Secure payment",
+      "payWithVnpay": "Pay deposit with VNPay",
+      "methodDescription": "Scan a VNPay QR code or pay with a supported bank account or card.",
+      "selected": "Selected",
+      "redirectNote": "You will be redirected to VNPay to complete the transaction after confirming."
+    },
+    "voucher": {
+      "required": "Please enter a voucher code.",
+      "applyError": "Unable to apply this voucher.",
+      "eyebrow": "Special offer",
+      "title": "Add a voucher",
+      "code": "Voucher code",
+      "placeholder": "Enter voucher code",
+      "remove": "Remove",
+      "applying": "Applying…",
+      "apply": "Apply",
+      "applied": "Voucher {code} applied"
+    },
+    "validation": {
+      "guestName": "Please enter the guest name.",
+      "email": "Please enter a valid email address.",
+      "phone": "Please enter a valid phone number.",
+      "note": "The note is too long.",
+      "terms": "Please accept the terms and conditions."
+    },
+    "detailsForm": {
+      "step": "Step 2 of 3",
+      "title": "Enter your details",
+      "description": "Your account information is loaded from your profile. You can update the contact details for this booking below.",
+      "fullName": "Full name",
+      "fullNamePlaceholder": "Guest full name",
+      "email": "Email address",
+      "phone": "Telephone",
+      "phonePlaceholder": "Your phone number",
+      "requests": "Special requests",
+      "requestsPlaceholder": "Tell us about any requests for your stay",
+      "terms": "I have read and accept the Terms & Conditions and consent to the processing of my booking information.",
+      "createError": "Unable to create your booking.",
+      "bookingCreated": "Your booking was created.",
+      "retryNote": "Retrying will not create another booking.",
+      "viewBooking": "View booking",
+      "back": "Back",
+      "creating": "Creating booking…",
+      "openingVnpay": "Opening VNPAY…",
+      "retryPayment": "Retry payment",
+      "confirmDeposit": "Confirm & pay 50% deposit",
+      "paymentStartError": "Unable to start the payment. Please try again."
+    },
+    "stepThree": {
+      "notFound": "Booking not found",
+      "notFoundDescription": "Complete step 2 before opening the confirmation page.",
+      "loading": "Loading your confirmed booking from the server…",
+      "loadError": "Unable to load your booking",
+      "loadErrorDescription": "Your booking may have been created. Try loading the confirmation again.",
+      "tryAgain": "Try again",
+      "bankTransfer": "Bank transfer",
+      "step": "Step 3 of 3",
+      "titles": {
+        "cancelled": "Your booking was cancelled",
+        "failed": "Payment was not completed",
+        "confirmed": "Your booking is confirmed",
+        "confirming": "Confirming your payment",
+        "created": "Your booking is created"
+      },
+      "reference": "Booking reference:",
+      "stay": "Stay",
+      "nightCount": "{count, plural, one {# night} other {# nights}}",
+      "payment": "Payment",
+      "status": "Status:",
+      "paymentStatus": {
+        "deposit": "Deposit paid",
+        "paid": "Paid in full",
+        "pending": "Processing",
+        "failed": "Failed",
+        "unpaid": "Unpaid",
+        "refunded": "Refunded",
+        "deposit_paid": "Deposit paid"
+      },
+      "invoice": "Invoice details",
+      "total": "Total stay",
+      "guest": "Guest",
+      "contact": "Contact",
+      "issuedOn": "Issued on",
+      "room": "Room",
+      "quantity": "Qty",
+      "nights": "Nights",
+      "rate": "Rate",
+      "amount": "Amount",
+      "reservedRoom": "Reserved room",
+      "lineQuantity": "{rooms, plural, one {# room} other {# rooms}} × {nights, plural, one {# night} other {# nights}}",
+      "nightlyRate": "{price} / room / night",
+      "lineTotal": "Line total",
+      "subtotal": "Room subtotal",
+      "afterDiscount": "After discount",
+      "serviceCharge": "Service charge (5%)",
+      "tax": "Tax (10%)",
+      "staySummary": "{rooms, plural, one {# room} other {# rooms}} · {nights, plural, one {# night} other {# nights}}",
+      "deposit": "Deposit due online (50%)",
+      "paidSoFar": "Paid so far",
+      "balanceAtResort": "Balance due at resort",
+      "remaining": "Remaining to pay",
+      "messages": {
+        "cancelled": "This booking has been cancelled. Contact the resort about any payment or refund.",
+        "pending": "We are checking the payment result with the server. This page refreshes automatically; please do not create another booking.",
+        "deposit": "Your deposit is paid. Please pay {amount} when you arrive at the resort.",
+        "paid": "Your stay has been paid in full.",
+        "unpaid": "Pay your deposit to confirm this booking. The balance is due when you arrive at the resort."
+      },
+      "checkingStatus": "Checking the latest payment status…",
+      "verifyingVnpay": "Verifying the transaction directly with VNPAY…",
+      "openingVnpay": "Opening VNPAY…",
+      "retryPayment": "Retry payment",
+      "viewRooms": "View rooms",
+      "paymentStartError": "Unable to start the payment. Please try again."
+    },
+    "api": {
+      "cancelSuccess": "Booking cancelled successfully.",
+      "cancelError": "Unable to cancel this booking. Please try again."
+    }
+  },
+  "Payment": {
+    "result": {
+      "notFound": "Payment session not found",
+      "description": "Open the payment gateway from your booking page in this browser so we can securely match the result with your booking.",
+      "viewRooms": "View rooms"
+    }
+  },
+  "Chatbot": {
+    "welcome": "Hello! I'm the Laxsik Ecolodge assistant. I can help you find rooms, check prices and plan your stay in Sa Pa.",
+    "quick": {
+      "findForTwo": "Find a room for 2 guests",
+      "prices": "What are the current room prices?",
+      "bestView": "Recommend a room with a beautiful view"
+    },
+    "sendError": "Unable to send your message.",
+    "label": "Laxsik Assistant",
+    "subtitle": "Rooms and stays assistant",
+    "clear": "Clear conversation",
+    "close": "Close chatbot",
+    "open": "Open chatbot",
+    "matchingRooms": "Matching rooms",
+    "inputLabel": "Enter a message",
+    "placeholder": "Ask us a question…",
+    "send": "Send message",
+    "footer": {
+      "default": "Ask about Laxsik Ecolodge",
+      "live": "Room information is checked directly from our system",
+      "basic": "Basic mode · OpenAI API is not configured"
+    },
+    "roomCard": {
+      "viewNamed": "View room {name}",
+      "capacity": "Up to {count} guests per room",
+      "view": "View: {view}",
+      "perNight": "{price} / night",
+      "contactPrice": "Contact us for the price",
+      "available": "{count} rooms available",
+      "notChecked": "Availability has not been checked for dates",
+      "viewRoom": "View room"
+    }
   }
 }

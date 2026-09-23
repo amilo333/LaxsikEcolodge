@@ -1,4 +1,7 @@
+'use client';
+
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 type TServiceItem = {
   id: string;
@@ -14,10 +17,12 @@ type ServiceDiningProps = {
 };
 
 export function ServiceDining({
-  title = 'SERVICES',
+  title,
   services = [],
   className = '',
 }: ServiceDiningProps) {
+  const t = useTranslations('Dining.services');
+  const displayTitle = title ?? t('title');
   return (
     <section
       className={`relative w-full overflow-hidden select-none ${className}`}>
@@ -32,9 +37,9 @@ export function ServiceDining({
 
       <div className='relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
         {/* Section Title */}
-        {title && (
+        {displayTitle && (
           <h2 className='font-lora mb-10 text-center text-[32px] font-semibold text-[#0D4949] uppercase md:mb-16'>
-            {title}
+            {displayTitle}
           </h2>
         )}
 
@@ -76,7 +81,7 @@ export function ServiceDining({
           })}
           {services.length === 0 && (
             <p className='font-montserrat py-8 text-center text-sm text-[#68726F] md:col-span-3'>
-              Chưa có dịch vụ Dining đang hoạt động.
+              {t('empty')}
             </p>
           )}
         </div>

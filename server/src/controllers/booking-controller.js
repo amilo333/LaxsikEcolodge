@@ -2,6 +2,7 @@ import Booking from "../models/Booking.js";
 import Room from "../models/Room.js";
 import User from "../models/User.js";
 import Voucher from "../models/Voucher.js";
+import { getDepositAmount } from "../utils/deposit.js";
 
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const CANCELLATION_WINDOW_MS = 48 * 60 * 60 * 1000;
@@ -267,7 +268,9 @@ export const createBooking = async (req, res) => {
     // 10. Tính tổng tiền
     // ======================================
 
-    const totalAmount = amountAfterDiscount + serviceChargeAmount + taxAmount;
+    const totalAmount = Math.round(
+      amountAfterDiscount + serviceChargeAmount + taxAmount,
+    );
 
     // ======================================
     // 11. Tạo Booking
@@ -298,9 +301,13 @@ export const createBooking = async (req, res) => {
 
       totalAmount,
 
-      bookingStatus: "pending",
+      depositAmount: getDepositAmount(totalAmount),
 
-      paymentStatus: "unpaid",
+      paidAmount: 0,
+
+      bookingStatus: totalAmount === 0 ? "confirmed" : "pending",
+
+      paymentStatus: totalAmount === 0 ? "paid" : "unpaid",
 
       paymentMethod: paymentMethod || null,
 
@@ -566,6 +573,13 @@ export const getAllBookingsAdmin = async (req, res) => {
 
 export const getAdminDashboardSummary = async (_req, res) => {
   try {
+    // Dữ liệu cũ chưa có paidAmount: booking đã trả đủ vẫn được tính doanh thu.
+    const collectedAmount = {
+      $ifNull: [
+        "$paidAmount",
+        { $cond: [{ $eq: ["$paymentStatus", "paid"] }, "$totalAmount", 0] },
+      ],
+    };
     const now = new Date();
     const vietnamOffsetMs = 7 * 60 * 60 * 1000;
     const vietnamNow = new Date(now.getTime() + vietnamOffsetMs);
@@ -624,8 +638,7 @@ export const getAdminDashboardSummary = async (_req, res) => {
       Booking.countDocuments(),
       Booking.countDocuments({ bookingStatus: "pending" }),
       Booking.aggregate([
-        { $match: { paymentStatus: "paid" } },
-        { $group: { _id: null, total: { $sum: "$totalAmount" } } },
+        { $group: { _id: null, total: { $sum: collectedAmount } } },
       ]),
       Booking.find()
         .populate("userId", "full_name email phone role status")
@@ -650,9 +663,7 @@ export const getAdminDashboardSummary = async (_req, res) => {
               },
             },
             paidRevenue: {
-              $sum: {
-                $cond: [{ $eq: ["$paymentStatus", "paid"] }, "$totalAmount", 0],
-              },
+              $sum: collectedAmount,
             },
           },
         },
@@ -687,12 +698,16 @@ export const getAdminDashboardSummary = async (_req, res) => {
             },
             bookings: { $sum: 1 },
             paidBookings: {
-              $sum: { $cond: [{ $eq: ["$paymentStatus", "paid"] }, 1, 0] },
+              $sum: {
+                $cond: [
+                  { $in: ["$paymentStatus", ["deposit_paid", "paid"]] },
+                  1,
+                  0,
+                ],
+              },
             },
             paidRevenue: {
-              $sum: {
-                $cond: [{ $eq: ["$paymentStatus", "paid"] }, "$totalAmount", 0],
-              },
+              $sum: collectedAmount,
             },
           },
         },
@@ -717,7 +732,7 @@ export const getAdminDashboardSummary = async (_req, res) => {
       }),
       Booking.countDocuments({
         bookingStatus: { $ne: "cancelled" },
-        paymentStatus: { $in: ["unpaid", "pending"] },
+        paymentStatus: { $in: ["unpaid", "pending", "failed"] },
       }),
     ]);
 
@@ -911,7 +926,14 @@ export const updateBookingAdmin = async (req, res) => {
     }
 
     const bookingStatuses = ["pending", "confirmed", "cancelled", "completed"];
-    const paymentStatuses = ["unpaid", "pending", "paid", "failed", "refunded"];
+    const paymentStatuses = [
+      "unpaid",
+      "pending",
+      "deposit_paid",
+      "paid",
+      "failed",
+      "refunded",
+    ];
 
     if (
       req.body.bookingStatus &&
@@ -934,8 +956,17 @@ export const updateBookingAdmin = async (req, res) => {
     if (req.body.paymentStatus) {
       booking.paymentStatus = req.body.paymentStatus;
 
+      if (req.body.paymentStatus === "paid") {
+        booking.paidAmount = booking.totalAmount;
+      } else if (req.body.paymentStatus === "deposit_paid") {
+        booking.depositAmount ??= getDepositAmount(booking.totalAmount);
+        booking.paidAmount = booking.depositAmount;
+      } else {
+        booking.paidAmount = 0;
+      }
+
       if (
-        req.body.paymentStatus === "paid" &&
+        ["deposit_paid", "paid"].includes(req.body.paymentStatus) &&
         booking.bookingStatus === "pending"
       ) {
         booking.bookingStatus = "confirmed";

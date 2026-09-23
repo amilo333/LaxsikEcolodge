@@ -15,8 +15,10 @@ import {
   updateProfileApi,
   useAuthStore,
 } from '..';
+import { useTranslations } from 'next-intl';
 
 export const useRegisterApi = () => {
+  const t = useTranslations('Auth.api');
   const setUser = useAuthStore((state) => state.setUser);
   const queryClient = useQueryClient();
 
@@ -32,7 +34,7 @@ export const useRegisterApi = () => {
       if (axios.isAxiosError(error)) {
         toast.error(error.response?.data?.message);
       } else {
-        toast.error('Something went wrong');
+        toast.error(t('genericError'));
       }
     },
   });
@@ -48,6 +50,7 @@ export const useProfileApi = () => {
 };
 
 export const useLoginApi = () => {
+  const t = useTranslations('Auth.api');
   const setUser = useAuthStore((state) => state.setUser);
   const queryClient = useQueryClient();
   return useMutation({
@@ -62,13 +65,14 @@ export const useLoginApi = () => {
       if (axios.isAxiosError(error)) {
         toast.error(error.response?.data?.message);
       } else {
-        toast.error('Something went wrong');
+        toast.error(t('genericError'));
       }
     },
   });
 };
 
 export const useGoogleLoginApi = () => {
+  const t = useTranslations('Auth.api');
   const setUser = useAuthStore((state) => state.setUser);
   const queryClient = useQueryClient();
 
@@ -87,15 +91,16 @@ export const useGoogleLoginApi = () => {
       }
 
       if (axios.isAxiosError<{ message?: string }>(error)) {
-        toast.error(error.response?.data?.message ?? 'Google sign-in failed.');
+        toast.error(error.response?.data?.message ?? t('googleSignInFailed'));
       } else {
-        toast.error('Google sign-in failed.');
+        toast.error(t('googleSignInFailed'));
       }
     },
   });
 };
 
 export const useGoogleAccountLinkApi = () => {
+  const t = useTranslations('Auth.api');
   const setUser = useAuthStore((state) => state.setUser);
   const queryClient = useQueryClient();
 
@@ -104,48 +109,47 @@ export const useGoogleAccountLinkApi = () => {
     onSuccess: (response) => {
       setUser(response.data.data);
       queryClient.setQueryData(['profile'], response.data.data);
-      toast.success('Google sign-in has been linked to your account.');
+      toast.success(t('googleLinked'));
     },
     onError: (error) => {
       if (axios.isAxiosError<{ message?: string }>(error)) {
-        toast.error(
-          error.response?.data?.message ?? 'Unable to link Google sign-in.'
-        );
+        toast.error(error.response?.data?.message ?? t('googleLinkFailed'));
       } else {
-        toast.error('Unable to link Google sign-in.');
+        toast.error(t('googleLinkFailed'));
       }
     },
   });
 };
 
-export const useForgotPasswordApi = () =>
-  useMutation({
+export const useForgotPasswordApi = () => {
+  const t = useTranslations('Auth.api');
+
+  return useMutation({
     mutationFn: forgotPasswordApi,
     onError: (error) => {
       if (axios.isAxiosError(error)) {
-        toast.error(
-          error.response?.data?.message ??
-            'Unable to send the password reset email.'
-        );
+        toast.error(error.response?.data?.message ?? t('resetEmailFailed'));
       } else {
-        toast.error('Unable to send the password reset email.');
+        toast.error(t('resetEmailFailed'));
       }
     },
   });
+};
 
-export const useResetPasswordApi = () =>
-  useMutation({
+export const useResetPasswordApi = () => {
+  const t = useTranslations('Auth.api');
+
+  return useMutation({
     mutationFn: resetPasswordApi,
     onError: (error) => {
       if (axios.isAxiosError(error)) {
-        toast.error(
-          error.response?.data?.message ?? 'Unable to reset password.'
-        );
+        toast.error(error.response?.data?.message ?? t('resetFailed'));
       } else {
-        toast.error('Unable to reset password.');
+        toast.error(t('resetFailed'));
       }
     },
   });
+};
 
 export const useLogoutApi = () => {
   const { reset } = useAuthStore((state) => state);
@@ -162,6 +166,7 @@ export const useLogoutApi = () => {
 };
 
 export const useUpdateProfileApi = () => {
+  const t = useTranslations('Auth.api');
   const setUser = useAuthStore((state) => state.setUser);
   const queryClient = useQueryClient();
 
@@ -170,15 +175,13 @@ export const useUpdateProfileApi = () => {
     onSuccess: (user) => {
       setUser(user);
       queryClient.setQueryData(['profile'], user);
-      toast.success('Profile updated successfully.');
+      toast.success(t('profileUpdated'));
     },
     onError: (error) => {
       if (axios.isAxiosError<{ message?: string }>(error)) {
-        toast.error(
-          error.response?.data?.message ?? 'Unable to update your profile.'
-        );
+        toast.error(error.response?.data?.message ?? t('profileUpdateFailed'));
       } else {
-        toast.error('Unable to update your profile.');
+        toast.error(t('profileUpdateFailed'));
       }
     },
   });

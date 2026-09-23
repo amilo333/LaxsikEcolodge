@@ -1,6 +1,7 @@
 'use client';
 
 import { formatCurrency } from '@/utils';
+import { getBookingPaymentAmounts } from '@/modules/booking/common/utils';
 import { useEffect, useRef, useState } from 'react';
 import type { TAdminBooking, TUpdateAdminBookingPayload } from '../common';
 import { AdminSelect, type TAdminSelectOption } from './admin-select';
@@ -56,9 +57,15 @@ const PAYMENT_STATUS_OPTIONS: Array<TAdminSelectOption<TPaymentStatus>> = [
     dotClass: 'bg-amber-400 text-amber-400',
   },
   {
+    value: 'deposit_paid',
+    label: 'Đã đặt cọc 50%',
+    description: 'Đã thu cọc, còn thu phần còn lại tại resort',
+    dotClass: 'bg-teal-500 text-teal-500',
+  },
+  {
     value: 'paid',
     label: 'Đã thanh toán',
-    description: 'Giao dịch thành công',
+    description: 'Đã thu đủ tiền, gồm khoản còn lại tại resort',
     dotClass: 'bg-emerald-500 text-emerald-500',
   },
   {
@@ -137,6 +144,8 @@ export function BookingDetailDialog({
   const bookingStatusLabel =
     BOOKING_STATUS_OPTIONS.find((item) => item.value === booking.bookingStatus)
       ?.label ?? booking.bookingStatus;
+  const { depositAmount, paidAmount, remainingAmount } =
+    getBookingPaymentAmounts(booking);
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -344,6 +353,29 @@ export function BookingDetailDialog({
                     {formatCurrency(booking.totalAmount)}
                   </dd>
                 </div>
+                {booking.totalAmount > 0 && (
+                  <>
+                    {(booking.depositAmount !== undefined ||
+                      booking.paymentStatus !== 'paid') && (
+                      <div className='flex justify-between gap-3'>
+                        <dt>Tiền cọc 50%</dt>
+                        <dd>{formatCurrency(depositAmount)}</dd>
+                      </div>
+                    )}
+                    <div className='flex justify-between gap-3 font-bold text-[#0D4949]'>
+                      <dt>Đã thu</dt>
+                      <dd>{formatCurrency(paidAmount)}</dd>
+                    </div>
+                    <div className='flex justify-between gap-3'>
+                      <dt>
+                        {booking.bookingStatus === 'cancelled'
+                          ? 'Còn lại theo booking'
+                          : 'Còn thu khi khách đến'}
+                      </dt>
+                      <dd>{formatCurrency(remainingAmount)}</dd>
+                    </div>
+                  </>
+                )}
               </dl>
               <p className='mt-3 rounded-lg bg-[#F3F6F5] px-3 py-2 text-[9px] font-bold text-slate-500 uppercase'>
                 Phương thức: {booking.paymentMethod}

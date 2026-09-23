@@ -1,15 +1,25 @@
+'use client';
+
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 export function AuthLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const t = useTranslations('AuthLayout');
+  const highlights = [
+    'mountainViews',
+    'localExperiences',
+    'peacefulStays',
+  ] as const;
+
   return (
     <main className='relative min-h-dvh overflow-x-hidden overflow-y-auto bg-[#0D4949] px-4 py-4 sm:px-7 sm:py-6 lg:flex lg:h-dvh lg:items-center lg:px-10 lg:py-6 xl:px-14'>
       <Image
         src='/images/background-slider.png'
-        alt='Laxsik Ecolodge mountain landscape'
+        alt={t('imageAlt')}
         fill
         priority
         sizes='100vw'
@@ -30,26 +40,23 @@ export function AuthLayout({
           />
 
           <p className='mt-5 text-[11px] font-bold text-white/70 uppercase xl:mt-7 xl:text-xs'>
-            A peaceful nature retreat
+            {t('eyebrow')}
           </p>
           <h1 className='font-lora mt-3 max-w-[620px] text-4xl leading-[1.1] font-semibold xl:mt-4 xl:text-5xl 2xl:text-6xl'>
-            Return to nature. Rest in comfort.
+            {t('title')}
           </h1>
           <p className='mt-4 max-w-[540px] text-sm leading-6 text-white/78 xl:mt-5 xl:text-base xl:leading-7'>
-            Sign in to continue your booking and keep every detail of your Sapa
-            stay in one place.
+            {t('description')}
           </p>
 
           <div className='mt-6 flex flex-wrap gap-2.5 text-xs font-semibold xl:mt-8 xl:gap-3 xl:text-sm'>
-            {['Mountain views', 'Local experiences', 'Peaceful stays'].map(
-              (item) => (
-                <span
-                  key={item}
-                  className='rounded-full border border-white/20 bg-white/10 px-3.5 py-2 backdrop-blur-sm xl:px-4 xl:py-2.5'>
-                  {item}
-                </span>
-              )
-            )}
+            {highlights.map((item) => (
+              <span
+                key={item}
+                className='rounded-full border border-white/20 bg-white/10 px-3.5 py-2 backdrop-blur-sm xl:px-4 xl:py-2.5'>
+                {t(`highlights.${item}`)}
+              </span>
+            ))}
           </div>
         </section>
 

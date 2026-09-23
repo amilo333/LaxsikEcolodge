@@ -10,9 +10,11 @@ import GuestSelect, {
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ROUTERS } from '@/routers';
+import { useTranslations } from 'next-intl';
 
 export function BookingBar(props: TBookingBarProps) {
   const { onClickHide } = props;
+  const t = useTranslations('BookingBar');
   const router = useRouter();
   const [guest, setGuest] = useState<TGuestSelection>({ room: 1, person: 2 });
   const [dateError, setDateError] = useState<string>();
@@ -30,17 +32,17 @@ export function BookingBar(props: TBookingBarProps) {
     const { checkinDate, checkoutDate } = data;
 
     if (!checkinDate || !checkoutDate) {
-      setDateError('Please select both check-in and check-out dates.');
+      setDateError(t('errors.requiredDates'));
       return;
     }
 
     if (checkinDate.compare(currentDate) < 0) {
-      setDateError('Check-in date cannot be in the past.');
+      setDateError(t('errors.pastCheckIn'));
       return;
     }
 
     if (checkoutDate.compare(checkinDate) <= 0) {
-      setDateError('Check-out must be after check-in.');
+      setDateError(t('errors.invalidCheckOut'));
       return;
     }
 
@@ -61,13 +63,13 @@ export function BookingBar(props: TBookingBarProps) {
     <div className='absolute top-[146%] left-1/2 z-10 w-full -translate-x-1/2 -translate-y-1/2 bg-white px-[48px] pt-5 shadow-lg'>
       <div className='flex items-center gap-[10px]'>
         <div className='flex w-[80%] gap-[10px]'>
-          <Field control={control} name='checkinDate' label='Checkin Date'>
-            <DatePicker label='Checkin Date' minValue={currentDate} />
+          <Field control={control} name='checkinDate' label={t('checkIn')}>
+            <DatePicker label={t('checkIn')} minValue={currentDate} />
           </Field>
 
-          <Field control={control} name='checkoutDate' label='Checkout Date'>
+          <Field control={control} name='checkoutDate' label={t('checkOut')}>
             <DatePicker
-              label='Checkout Date'
+              label={t('checkOut')}
               minValue={
                 checkinDate
                   ? checkinDate.add({ days: 1 })
@@ -82,13 +84,13 @@ export function BookingBar(props: TBookingBarProps) {
         <Button
           className='h-[48px] w-[148px]! text-lg!'
           onClick={handleSubmit(handleFindNow)}>
-          Find Now
+          {t('findNow')}
         </Button>
 
         <div className='absolute top-[-6px] right-[142px] flex flex-col items-center'>
           <Image
             src='/images/chevron_down.png'
-            alt='down'
+            alt={t('collapse')}
             width={12}
             height={6}
             className='h-[6px] w-[12px] rotate-180 brightness-0 contrast-[300%] invert'
@@ -98,7 +100,7 @@ export function BookingBar(props: TBookingBarProps) {
             variant='danger'
             className='h-[24px] w-[90px] bg-white text-[14px]! text-black!'
             onClick={onClickHide}>
-            HIDE
+            {t('hide')}
           </Button>
         </div>
       </div>

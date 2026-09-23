@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { TRoom } from '../types/room-type';
+import { useTranslations } from 'next-intl';
 
 type TRoomItemProps = {
   room: TRoom;
@@ -18,6 +19,7 @@ export function RoomItem({
   detailHref,
   isPriority = false,
 }: TRoomItemProps) {
+  const t = useTranslations('Rooms.item');
   const router = useRouter();
 
   const handleViewRoom = () => router.push(detailHref);
@@ -26,7 +28,7 @@ export function RoomItem({
     <article className='group grid w-full overflow-hidden rounded-[22px] border border-[#DCE6E2] bg-white shadow-[0_18px_48px_rgba(13,73,73,0.09)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_58px_rgba(13,73,73,0.13)] md:min-h-[380px] md:grid-cols-[46%_54%] xl:min-h-[400px]'>
       <Link
         href={detailHref}
-        aria-label={`View ${room.title}`}
+        aria-label={t('viewNamed', { name: room.title })}
         className='relative block min-h-[220px] overflow-hidden bg-[#E7EEEB] sm:min-h-[260px] md:min-h-full'>
         <Image
           fill
@@ -88,7 +90,7 @@ export function RoomItem({
               alt=''
               className='h-[15px] w-[15px] object-contain'
             />
-            {room.capacity} guests
+            {t('guestCount', { count: room.capacity })}
           </span>
           {room.views && (
             <span className='flex min-h-8 w-fit items-center gap-2 rounded-full bg-[#F1F5F3] px-3 py-2 text-[10px] font-medium text-[#53625D]'>
@@ -98,7 +100,7 @@ export function RoomItem({
                 className='h-[15px] w-[15px] shrink-0 fill-[#6A7C76]'>
                 <path d='M10 3c4.5 0 7.8 3.6 8.7 6.2a2.4 2.4 0 0 1 0 1.6C17.8 13.4 14.5 17 10 17s-7.8-3.6-8.7-6.2a2.4 2.4 0 0 1 0-1.6C2.2 6.6 5.5 3 10 3Zm0 2C6.6 5 3.9 7.6 3.2 10c.7 2.4 3.4 5 6.8 5s6.1-2.6 6.8-5c-.7-2.4-3.4-5-6.8-5Zm0 2.2a2.8 2.8 0 1 1 0 5.6 2.8 2.8 0 0 1 0-5.6Z' />
               </svg>
-              View {room.views}
+              {t('view')} {room.views}
             </span>
           )}
         </div>
@@ -106,7 +108,7 @@ export function RoomItem({
         <div className='mt-4 flex flex-col gap-4 border-t border-[#E1E8E5] pt-4 sm:flex-row sm:items-end sm:justify-between'>
           <div>
             <p className='text-[10px] font-semibold tracking-[0.04em] text-[#71807B] uppercase'>
-              Avg. price per night
+              {t('averagePrice')}
             </p>
             <p className='mt-1 text-lg font-extrabold text-[#0D4949] tabular-nums sm:text-xl'>
               {formatCurrency(room.price)}
@@ -116,7 +118,7 @@ export function RoomItem({
           <Button
             onClick={handleViewRoom}
             className='h-11! w-full! rounded-full! px-6! text-xs! font-bold! uppercase sm:w-auto! sm:min-w-[132px]!'>
-            View Room
+            {t('viewRoom')}
           </Button>
         </div>
       </div>

@@ -10,3 +10,15 @@ export const bookingDetailsSchema = z.object({
     message: 'Please accept the terms and conditions.',
   }),
 });
+
+export const createBookingDetailsSchema = (t: (key: string) => string) =>
+  z.object({
+    fullNameContact: z.string().trim().min(2, t('guestName')),
+    emailContact: z.email(t('email')),
+    phoneContact: z.string().trim().min(8, t('phone')),
+    note: z.string().trim().max(1000, t('note')),
+    paymentMethod: z.literal('vnpay'),
+    acceptTerms: z.boolean().refine((value) => value, {
+      message: t('terms'),
+    }),
+  });

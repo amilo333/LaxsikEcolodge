@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Popover, Button } from '@heroui/react';
 import clsx from 'clsx';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 export type TGuestSelection = {
   room: number;
@@ -26,11 +27,12 @@ type TGuestRowProps = {
 };
 
 export default function GuestSelect({
-  label = 'Guest',
+  label,
   className,
   value,
   onChange,
 }: TGuestSelectProps) {
+  const t = useTranslations('GuestSelect');
   const [isOpen, setIsOpen] = useState(false);
 
   const [internalGuest, setInternalGuest] = useState<TGuestSelection>({
@@ -50,12 +52,17 @@ export default function GuestSelect({
     onChange?.(nextGuest);
   };
 
-  const summary = `${guest.person} Person - ${guest.room} Room`;
+  const summary = t('summary', {
+    people: guest.person,
+    rooms: guest.room,
+  });
 
   return (
     <div className={clsx('flex w-full flex-col gap-0.5', className)}>
       {/* Label */}
-      <div className='font-Montserrat text-[14px] font-semibold'>{label}</div>
+      <div className='font-Montserrat text-[14px] font-semibold'>
+        {label ?? t('label')}
+      </div>
 
       <Popover isOpen={isOpen} onOpenChange={setIsOpen}>
         {/* Trigger */}
@@ -71,7 +78,7 @@ export default function GuestSelect({
 
             <Image
               src='/images/icon/ic_chevron_down.png'
-              alt='arrow'
+              alt={t('open')}
               width={18}
               height={10}
               className='h-[10px] w-[18px]'
@@ -103,7 +110,7 @@ export default function GuestSelect({
             <div className='w-full'>
               {/* Room */}
               <GuestRow
-                label='Room'
+                label={t('room')}
                 value={guest.room}
                 min={1}
                 onDecrease={() => handleChange('room', guest.room - 1)}
@@ -112,7 +119,7 @@ export default function GuestSelect({
 
               {/* Person */}
               <GuestRow
-                label='Person'
+                label={t('person')}
                 value={guest.person}
                 min={1}
                 onDecrease={() => handleChange('person', guest.person - 1)}
@@ -125,7 +132,7 @@ export default function GuestSelect({
                   type='button'
                   onPress={() => setIsOpen(false)}
                   className='float-right ml-auto h-[48px] w-[148px] rounded-full bg-[#0D4949] text-[18px] font-semibold text-white'>
-                  DONE
+                  {t('done')}
                 </Button>
               </div>
             </div>

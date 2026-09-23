@@ -35,6 +35,30 @@
   }
 }
 
+@keyframes laxsik-pet-frame-primary {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes laxsik-pet-frame-secondary {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 .laxsik-pet-icon {
   animation: laxsik-pet-float 3.2s ease-in-out infinite;
   transform-origin: 50% 82%;
@@ -50,6 +74,20 @@
   animation: laxsik-pet-working 0.55s ease-in-out infinite;
 }
 
+.laxsik-pet-frame {
+  position: absolute;
+  inset: 0;
+}
+
+.laxsik-pet-frame-primary {
+  animation: laxsik-pet-frame-primary 8s step-end infinite;
+}
+
+.laxsik-pet-frame-secondary {
+  opacity: 0;
+  animation: laxsik-pet-frame-secondary 8s step-end infinite;
+}
+
 .chatbot-launcher:hover .laxsik-pet-icon {
   animation-duration: 1.5s;
 }
@@ -57,7 +95,9 @@
 @media (prefers-reduced-motion: reduce) {
   .laxsik-pet-icon,
   .laxsik-pet-eyes,
-  .laxsik-pet-working {
+  .laxsik-pet-working,
+  .laxsik-pet-frame-primary,
+  .laxsik-pet-frame-secondary {
     animation: none;
   }
 }

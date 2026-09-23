@@ -6,6 +6,7 @@ import { formatCurrency } from '@/utils';
 import Image from 'next/image';
 import { useDeferredValue, useState } from 'react';
 import { useAdminRoomsApi, useDeleteAdminRoomApi } from '../common';
+import { AdminItemDetailDialog } from './admin-item-detail-dialog';
 import { RoomFormModal } from './room-form-modal';
 
 const ROOM_STATUS_LABELS = {
@@ -25,6 +26,7 @@ export function RoomsManagement() {
   });
   const deleteRoom = useDeleteAdminRoomApi();
   const [editingRoom, setEditingRoom] = useState<TRoom | null | undefined>();
+  const [selectedRoom, setSelectedRoom] = useState<TRoom | null>(null);
   const rooms = roomsQuery.data?.data ?? [];
   const pagination = roomsQuery.data?.pagination;
 
@@ -110,7 +112,10 @@ export function RoomsManagement() {
                 </thead>
                 <tbody className='divide-y divide-[#E8EEEC] text-xs'>
                   {rooms.map((room) => (
-                    <tr key={room._id} className='hover:bg-[#FAFCFB]'>
+                    <tr
+                      key={room._id}
+                      onClick={() => setSelectedRoom(room)}
+                      className='cursor-pointer hover:bg-[#FAFCFB]'>
                       <td className='px-6 py-4'>
                         <div className='flex items-center gap-3'>
                           <Image
@@ -121,9 +126,15 @@ export function RoomsManagement() {
                             className='h-11 w-14 rounded-xl object-cover'
                           />
                           <span className='min-w-0'>
-                            <span className='block max-w-[260px] truncate font-extrabold text-[#263F3C]'>
+                            <button
+                              type='button'
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                setSelectedRoom(room);
+                              }}
+                              className='block max-w-[260px] truncate text-left font-extrabold text-[#263F3C] hover:underline'>
                               {room.title}
-                            </span>
+                            </button>
                             <span className='mt-1 block text-[10px] text-[#74817D]'>
                               {room.bed} · {room.area} m²
                             </span>
@@ -147,7 +158,9 @@ export function RoomsManagement() {
                           {ROOM_STATUS_LABELS[room.status]}
                         </span>
                       </td>
-                      <td className='px-6 py-4'>
+                      <td
+                        className='px-6 py-4'
+                        onClick={(event) => event.stopPropagation()}>
                         <div className='flex justify-end gap-2'>
                           <button
                             type='button'
@@ -196,6 +209,30 @@ export function RoomsManagement() {
         <RoomFormModal
           room={editingRoom}
           onClose={() => setEditingRoom(undefined)}
+        />
+      )}
+      {selectedRoom && (
+        <AdminItemDetailDialog
+          category='phòng'
+          title={selectedRoom.title}
+          image={selectedRoom.thumbnail}
+          images={selectedRoom.images}
+          description={selectedRoom.description}
+          fields={[
+            { label: 'Giá mỗi đêm', value: formatCurrency(selectedRoom.price) },
+            {
+              label: 'Trạng thái',
+              value: ROOM_STATUS_LABELS[selectedRoom.status],
+            },
+            { label: 'Loại giường', value: selectedRoom.bed },
+            { label: 'Diện tích', value: `${selectedRoom.area} m²` },
+            { label: 'Sức chứa', value: `${selectedRoom.capacity} khách` },
+            { label: 'Số lượng', value: selectedRoom.quantity },
+            { label: 'Phòng tắm', value: selectedRoom.bathroom },
+            { label: 'Lò sưởi', value: selectedRoom.fireplace },
+            { label: 'Tầm nhìn', value: selectedRoom.views },
+          ]}
+          onClose={() => setSelectedRoom(null)}
         />
       )}
     </>

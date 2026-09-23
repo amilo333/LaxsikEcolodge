@@ -35,6 +35,38 @@ export type TAdminBooking = TBooking & {
   userId: TAdminUser | null;
 };
 
+export type TOccupancyRangeParams = {
+  dateFrom: string;
+  days: number;
+};
+
+export type TAdminRoomOccupancy = {
+  dateFrom: string;
+  dateTo: string;
+  days: number;
+  totalRooms: number;
+  occupiedRoomNights: number;
+  freeRoomNights: number;
+  availableRoomNights: number;
+  occupancyRate: number;
+  roomPerformance: Array<{
+    roomId: string;
+    title: string;
+    quantity: number;
+    bookings: number;
+    bookedRoomNights: number;
+    freeRoomNights: number;
+    availableRoomNights: number;
+    occupancyRate: number;
+  }>;
+  dailyOccupancy: Array<{
+    date: string;
+    usedRooms: number;
+    freeRooms: number;
+    totalRooms: number;
+  }>;
+};
+
 export type TAdminSummary = {
   totalUsers: number;
   activeUsers: number;
@@ -78,6 +110,55 @@ export type TAdminSummary = {
   maintenanceRooms: number;
 };
 
+export type TAdminAnalyticsPeriod =
+  | 'today'
+  | 'yesterday'
+  | 'last7Days'
+  | 'thisMonth'
+  | 'lastMonth';
+
+export type TAdminAnalyticsGroup = 'day' | 'weekday' | 'month';
+
+export type TAdminAnalyticsParams = {
+  period: TAdminAnalyticsPeriod;
+  groupBy: TAdminAnalyticsGroup;
+};
+
+export type TAdminAnalytics = {
+  period: TAdminAnalyticsPeriod;
+  groupBy: TAdminAnalyticsGroup;
+  dateFrom: string;
+  dateTo: string;
+  trendDateFrom: string;
+  trendDateTo: string;
+  metrics: {
+    revenue: number;
+    bookings: number;
+    roomNights: number;
+    bookedRooms: number;
+    customers: number;
+    averageBookingValue: number;
+    averageNights: number;
+    averageRooms: number;
+    revenueGrowthPercent: number | null;
+    bookingGrowthPercent: number | null;
+  };
+  trend: Array<{
+    key: string;
+    label: string;
+    revenue: number;
+    bookings: number;
+    roomNights: number;
+  }>;
+  roomPerformance: Array<{
+    roomId: string;
+    title: string;
+    bookings: number;
+    roomNights: number;
+    grossRevenue: number;
+  }>;
+};
+
 export type TAdminExperienceKind = 'dining' | 'spa';
 
 export type TAdminVoucher = {
@@ -113,6 +194,7 @@ export type TAdminExperience = {
   status: 'active' | 'inactive';
   createdAt: string;
   updatedAt: string;
+  translations?: TAdminExperienceTranslations;
 };
 
 export type TAdminExperienceService = {
@@ -125,6 +207,12 @@ export type TAdminExperienceService = {
   spaId?: string | Pick<TAdminExperience, '_id' | 'title' | 'thumbnail'>;
   createdAt: string;
   updatedAt: string;
+  translations?: TAdminExperienceTranslations;
+};
+
+type TAdminExperienceTranslations = {
+  vi?: { title: string; description: string };
+  en?: { title: string; description: string };
 };
 
 export type TUpdateAdminBookingPayload = Partial<

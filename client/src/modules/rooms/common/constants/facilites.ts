@@ -2,17 +2,17 @@ import { TFacilites } from '../types/facilitie-type';
 export const FACILITES: TFacilites[] = [
   {
     id: '1',
-    name: 'FREE WIFI',
+    name: 'wifi',
     image: '/images/icon/ic-wifi.png',
   },
   {
     id: '2',
-    name: 'room-services',
+    name: 'roomService',
     image: '/images/icon/ic-desk-bell.png',
   },
   {
     id: '3',
-    name: 'car park',
+    name: 'parking',
     image: '/images/icon/ic-parking.png',
   },
   {
@@ -27,7 +27,7 @@ export const FACILITES: TFacilites[] = [
   },
   {
     id: '6',
-    name: 'SPA',
+    name: 'spa',
     image: '/images/icon/ic-spa.png',
   },
   {

@@ -19,9 +19,6 @@ cloudinary.config({
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Connect to database
-connectDB();
-
 // CORS (đặt trước routes)
 app.use(
   cors({
@@ -38,6 +35,9 @@ app.use(cookieParser());
 route(app);
 // Routes
 // app.use("/api/user", userRoutes);
+
+// Do not accept requests until MongoDB is ready.
+await connectDB();
 
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);

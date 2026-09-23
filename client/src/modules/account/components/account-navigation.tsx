@@ -1,5 +1,6 @@
 import { TUser } from '@/modules/auth/common';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 type TAccountNavigationProps = {
   activeView: 'bookings' | 'profile';
@@ -9,7 +10,7 @@ type TAccountNavigationProps = {
 const NAV_ITEMS = [
   {
     value: 'bookings' as const,
-    label: 'Phòng đã đặt',
+    label: 'bookings',
     href: '/account/bookings',
     icon: (
       <svg
@@ -22,7 +23,7 @@ const NAV_ITEMS = [
   },
   {
     value: 'profile' as const,
-    label: 'Thông tin cá nhân',
+    label: 'profile',
     href: '/account/profile',
     icon: (
       <svg
@@ -40,6 +41,7 @@ export function AccountNavigation({
   activeView,
   user,
 }: TAccountNavigationProps) {
+  const t = useTranslations('Account.navigation');
   return (
     <aside className='rounded-[16px] border border-[#DCE7E3] bg-white p-3 shadow-[0_16px_45px_rgba(13,73,73,0.08)] lg:sticky lg:top-6 lg:self-start'>
       <div className='hidden border-b border-[#E5ECEA] px-3 pt-2 pb-5 lg:block'>
@@ -66,7 +68,7 @@ export function AccountNavigation({
                   : 'text-[#526460] hover:bg-[#EEF5F3] hover:text-[#0D4949]'
               }`}>
               {item.icon}
-              {item.label}
+              {t(item.label)}
             </Link>
           );
         })}

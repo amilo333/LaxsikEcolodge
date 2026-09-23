@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useDeferredValue, useState } from 'react';
 
 import { useAdminToursApi, useDeleteAdminTourApi } from '../common';
+import { AdminItemDetailDialog } from './admin-item-detail-dialog';
 import { TourFormModal } from './tour-form-modal';
 
 export function ToursManagement() {
@@ -19,6 +20,7 @@ export function ToursManagement() {
   });
   const deleteTour = useDeleteAdminTourApi();
   const [editingTour, setEditingTour] = useState<TTour | null | undefined>();
+  const [selectedTour, setSelectedTour] = useState<TTour | null>(null);
   const tours = toursQuery.data?.data ?? [];
   const pagination = toursQuery.data?.pagination;
 
@@ -105,7 +107,10 @@ export function ToursManagement() {
                 </thead>
                 <tbody className='divide-y divide-[#E8EEEC] text-xs'>
                   {tours.map((tour) => (
-                    <tr key={tour._id} className='hover:bg-[#FAFCFB]'>
+                    <tr
+                      key={tour._id}
+                      onClick={() => setSelectedTour(tour)}
+                      className='cursor-pointer hover:bg-[#FAFCFB]'>
                       <td className='px-6 py-4'>
                         <div className='flex items-center gap-3'>
                           <Image
@@ -116,9 +121,15 @@ export function ToursManagement() {
                             className='h-12 w-16 rounded-xl object-cover'
                           />
                           <span className='min-w-0'>
-                            <span className='block max-w-[300px] truncate font-extrabold text-[#263F3C]'>
+                            <button
+                              type='button'
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                setSelectedTour(tour);
+                              }}
+                              className='block max-w-[300px] truncate text-left font-extrabold text-[#263F3C] hover:underline'>
                               {tour.title}
-                            </span>
+                            </button>
                             <span className='mt-1 block max-w-[300px] truncate text-[10px] text-[#74817D]'>
                               {tour.eyebrow}
                             </span>
@@ -144,7 +155,9 @@ export function ToursManagement() {
                             : 'Đang ẩn'}
                         </span>
                       </td>
-                      <td className='px-6 py-4'>
+                      <td
+                        className='px-6 py-4'
+                        onClick={(event) => event.stopPropagation()}>
                         <div className='flex justify-end gap-2'>
                           <button
                             type='button'
@@ -193,6 +206,27 @@ export function ToursManagement() {
         <TourFormModal
           tour={editingTour}
           onClose={() => setEditingTour(undefined)}
+        />
+      )}
+      {selectedTour && (
+        <AdminItemDetailDialog
+          category='tour'
+          title={selectedTour.title}
+          image={selectedTour.thumbnail}
+          description={selectedTour.description}
+          highlights={selectedTour.highlights}
+          fields={[
+            { label: 'Nhãn ngắn', value: selectedTour.eyebrow },
+            { label: 'Thời lượng', value: selectedTour.duration },
+            { label: 'Độ khó', value: selectedTour.rhythm },
+            { label: 'Thứ tự hiển thị', value: selectedTour.sortOrder },
+            {
+              label: 'Trạng thái',
+              value:
+                selectedTour.status === 'active' ? 'Đang hiển thị' : 'Đang ẩn',
+            },
+          ]}
+          onClose={() => setSelectedTour(null)}
         />
       )}
     </>

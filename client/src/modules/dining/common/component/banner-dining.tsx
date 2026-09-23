@@ -1,11 +1,15 @@
+'use client';
+
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 export function BannerDining() {
+  const t = useTranslations('Dining.banner');
   return (
     <div className='relative mb-50 h-[500px] w-full'>
       <Image
         src='/images/banner/banner-dinning.png'
-        alt='banner-dining'
+        alt={t('imageAlt')}
         fill
         className='object-cover'
         sizes='100vw'
@@ -21,14 +25,10 @@ export function BannerDining() {
       </div>
       <div className='flex flex-col gap-4 px-37.5 pt-125'>
         <div className='font-lora mt-5 text-center text-[56px] font-semibold text-[#0D4949]'>
-          MUONG HOA RESTAURANT
+          {t('title')}
         </div>
         <div className='font-montserrat text-center text-[18px] text-[#333333]'>
-          Muong Hoa Restaurant offers a refined dining experience inspired by
-          the rich flavors and fresh ingredients of Northwest Vietnam. Set
-          against the breathtaking scenery of Muong Hoa Valley, the restaurant
-          combines traditional Vietnamese cuisine with a modern touch, creating
-          memorable dishes for every occasion.
+          {t('description')}
         </div>
       </div>
     </div>

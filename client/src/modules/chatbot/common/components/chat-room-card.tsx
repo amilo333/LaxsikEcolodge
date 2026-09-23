@@ -6,8 +6,10 @@ import { useState } from 'react';
 
 import { buildRoomDetailUrl } from '@/utils/booking-search';
 import { formatCurrency } from '@/utils/currency';
+import { localizeContentText } from '@/utils/localized-content';
 
 import type { TChatRoom } from '../types';
+import { useLocale, useTranslations } from 'next-intl';
 
 type Props = {
   room: TChatRoom;
@@ -15,6 +17,14 @@ type Props = {
 };
 
 export function ChatRoomCard({ room, onNavigate }: Props) {
+  const t = useTranslations('Chatbot.roomCard');
+  const locale = useLocale();
+  const storedContent = room.translations?.[locale === 'vi' ? 'vi' : 'en'];
+  const roomTitle =
+    storedContent?.title ?? localizeContentText(room.title, locale);
+  const roomView =
+    storedContent?.views ??
+    (room.views ? localizeContentText(room.views, locale) : null);
   const [imageFailed, setImageFailed] = useState(false);
   const params = new URLSearchParams();
   if (room.stay) {
@@ -28,7 +38,7 @@ export function ChatRoomCard({ room, onNavigate }: Props) {
     <Link
       href={buildRoomDetailUrl(room.id, params)}
       onClick={onNavigate}
-      aria-label={`Xem phòng ${room.title}`}
+      aria-label={t('viewNamed', { name: roomTitle })}
       className='group block overflow-hidden rounded-2xl border border-[#D8E5DF] bg-white shadow-sm transition hover:border-[#0D5653] hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#0D5653]'>
       <div className='flex gap-3 p-3'>
         <div className='relative h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-[#EAF3F0]'>
@@ -49,14 +59,18 @@ export function ChatRoomCard({ room, onNavigate }: Props) {
         </div>
         <div className='min-w-0 flex-1 text-[11px] leading-4 text-[#5F7772]'>
           <h3 className='text-xs leading-5 font-semibold break-words text-[#173F39]'>
-            {room.title}
+            {roomTitle}
           </h3>
-          {room.capacity !== null && <p>Tối đa {room.capacity} khách/phòng</p>}
-          {room.views && <p className='mt-1 break-words'>View: {room.views}</p>}
+          {room.capacity !== null && (
+            <p>{t('capacity', { count: room.capacity })}</p>
+          )}
+          {roomView && (
+            <p className='mt-1 break-words'>{t('view', { view: roomView })}</p>
+          )}
           <p className='mt-2 font-semibold text-[#0D5653]'>
             {room.pricePerNight !== null
-              ? `${formatCurrency(room.pricePerNight)} / đêm`
-              : 'Liên hệ để xem giá'}
+              ? t('perNight', { price: formatCurrency(room.pricePerNight) })
+              : t('contactPrice')}
           </p>
         </div>
       </div>
@@ -64,17 +78,17 @@ export function ChatRoomCard({ room, onNavigate }: Props) {
         <span className='text-[10px] leading-4 text-[#5F7772]'>
           {room.stay ? (
             <>
-              Còn {room.stay.availableQuantity} phòng
+              {t('available', { count: room.stay.availableQuantity })}
               <span className='block'>
                 {room.stay.checkInDate} → {room.stay.checkOutDate}
               </span>
             </>
           ) : (
-            'Chưa kiểm tra phòng trống theo ngày'
+            t('notChecked')
           )}
         </span>
         <span className='shrink-0 text-[11px] font-semibold text-[#0D5653]'>
-          Xem phòng <span aria-hidden='true'>→</span>
+          {t('viewRoom')} <span aria-hidden='true'>→</span>
         </span>
       </div>
     </Link>

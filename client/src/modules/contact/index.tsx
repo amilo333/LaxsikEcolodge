@@ -2,34 +2,15 @@
 
 import { Footer, Header } from '@/components/layouts';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 const MAP_EMBED_URL =
   'https://www.google.com/maps?q=Laxsik%20Ecolodge%20Lao%20Chai%20Sa%20Pa%20Vietnam&output=embed';
 const DIRECTIONS_URL =
   'https://www.google.com/maps/search/?api=1&query=Laxsik%20Ecolodge%20Lao%20Chai%20Sa%20Pa%20Vietnam';
 
-const CONTACT_COPY = {
-  heroEyebrow: 'Lao Chai · Sa Pa · Vietnam',
-  heroTitle: 'Contact Laxsik Ecolodge',
-  heroDescription:
-    'We are here to help with your stay, the journey to Lao Chai and any questions before you arrive.',
-  heroAlt: 'Laxsik Ecolodge illuminated in the mountains at night',
-  sectionEyebrow: 'Find your way to the valley',
-  sectionTitle: 'We look forward to hearing from you',
-  sectionDescription:
-    'Laxsik Ecolodge is set among the rice terraces of Lao Chai. Use the map for directions or reach our team directly by phone and email.',
-  mapTitle: 'Location of Laxsik Ecolodge on Google Maps',
-  directions: 'Open directions',
-  addressLabel: 'Address',
-  address: 'Lao Chai, Sa Pa, Lao Cai, Vietnam',
-  hotlineLabel: 'Hotline',
-  emailLabel: 'Email',
-  responseNote:
-    'For the quickest response, please call our hotline. Email enquiries are welcomed at any time.',
-} as const;
-
 export function ContactModule() {
-  const copy = CONTACT_COPY;
+  const t = useTranslations('Contact');
 
   return (
     <div className="min-h-screen bg-[url('/images/bg-screen.jpg')] bg-[length:720px_720px] text-[#163E3B]">
@@ -39,7 +20,7 @@ export function ContactModule() {
         <section className='relative min-h-[420px] overflow-hidden sm:min-h-[480px]'>
           <Image
             src='/images/contact_us_header.png'
-            alt={copy.heroAlt}
+            alt={t('heroAlt')}
             fill
             priority
             sizes='100vw'
@@ -49,13 +30,13 @@ export function ContactModule() {
 
           <div className='relative z-10 mx-auto flex min-h-[420px] max-w-6xl flex-col justify-center px-5 pb-14 text-white sm:min-h-[480px] sm:px-8'>
             <p className='text-xs font-bold tracking-[0.24em] text-white/72 uppercase sm:text-sm'>
-              {copy.heroEyebrow}
+              {t('heroEyebrow')}
             </p>
             <h1 className='font-lora mt-5 max-w-3xl text-4xl leading-tight font-semibold sm:text-6xl lg:text-7xl'>
-              {copy.heroTitle}
+              {t('heroTitle')}
             </h1>
             <p className='mt-6 max-w-2xl text-sm leading-7 text-white/82 sm:text-base sm:leading-8'>
-              {copy.heroDescription}
+              {t('heroDescription')}
             </p>
           </div>
 
@@ -72,13 +53,13 @@ export function ContactModule() {
         <section className='px-5 py-20 sm:px-8 sm:py-24 lg:py-32'>
           <div className='mx-auto max-w-6xl text-center'>
             <p className='text-xs font-bold tracking-[0.2em] text-[#70837E] uppercase'>
-              {copy.sectionEyebrow}
+              {t('sectionEyebrow')}
             </p>
             <h2 className='font-lora mt-4 text-3xl font-semibold text-[#0D5653] sm:text-5xl'>
-              {copy.sectionTitle}
+              {t('sectionTitle')}
             </h2>
             <p className='mx-auto mt-6 max-w-2xl text-sm leading-7 text-[#60746F] sm:text-base sm:leading-8'>
-              {copy.sectionDescription}
+              {t('sectionDescription')}
             </p>
           </div>
 
@@ -86,7 +67,7 @@ export function ContactModule() {
             <div className='relative h-[380px] bg-[#E8EEEB] sm:h-[500px] lg:h-[560px]'>
               <iframe
                 src={MAP_EMBED_URL}
-                title={copy.mapTitle}
+                title={t('mapTitle')}
                 loading='lazy'
                 allowFullScreen
                 referrerPolicy='no-referrer-when-downgrade'
@@ -105,7 +86,7 @@ export function ContactModule() {
                   <path d='M12 21s7-5.1 7-12a7 7 0 1 0-14 0c0 6.9 7 12 7 12Z' />
                   <circle cx='12' cy='9' r='2.5' />
                 </svg>
-                {copy.directions}
+                {t('directions')}
               </a>
             </div>
 
@@ -121,10 +102,10 @@ export function ContactModule() {
                   </svg>
                 </div>
                 <h3 className='mt-5 text-xs font-bold tracking-[0.18em] text-[#70837E] uppercase'>
-                  {copy.addressLabel}
+                  {t('addressLabel')}
                 </h3>
                 <p className='mt-3 text-sm leading-7 font-semibold text-[#183F3C]'>
-                  {copy.address}
+                  {t('address')}
                 </p>
               </article>
 
@@ -138,7 +119,7 @@ export function ContactModule() {
                   </svg>
                 </div>
                 <h3 className='mt-5 text-xs font-bold tracking-[0.18em] text-[#70837E] uppercase'>
-                  {copy.hotlineLabel}
+                  {t('hotlineLabel')}
                 </h3>
                 <a
                   href='tel:+842143892999'
@@ -158,7 +139,7 @@ export function ContactModule() {
                   </svg>
                 </div>
                 <h3 className='mt-5 text-xs font-bold tracking-[0.18em] text-[#70837E] uppercase'>
-                  {copy.emailLabel}
+                  {t('emailLabel')}
                 </h3>
                 <div className='mt-3 flex flex-col items-start gap-1 text-sm leading-7 font-semibold'>
                   <a
@@ -177,7 +158,7 @@ export function ContactModule() {
           </div>
 
           <p className='mx-auto mt-10 max-w-2xl text-center text-sm leading-7 text-[#667A75]'>
-            {copy.responseNote}
+            {t('responseNote')}
           </p>
         </section>
       </main>

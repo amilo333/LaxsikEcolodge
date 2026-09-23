@@ -1,11 +1,15 @@
+'use client';
+
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 export function BannerSpa() {
+  const t = useTranslations('Spa.banner');
   return (
     <div className='relative mb-50 h-[500px] w-full'>
       <Image
         src='/images/banner/banner-spa.png'
-        alt='banner-spa'
+        alt={t('imageAlt')}
         fill
         className='object-cover'
         sizes='100vw'
@@ -21,14 +25,10 @@ export function BannerSpa() {
       </div>
       <div className='flex flex-col gap-4 px-37.5 pt-125'>
         <div className='font-lora mt-5 text-center text-[56px] font-semibold text-[#0D4949]'>
-          {"LAXSIK'S SPA"}
+          {t('title')}
         </div>
         <div className='font-montserrat text-center text-[18px] text-[#333333]'>
-          A peaceful sanctuary surrounded by the beauty of nature, where
-          traditional wellness treatments and modern relaxation come together.
-          From soothing massages to restorative therapies, every experience is
-          thoughtfully designed to help you release tension, refresh your body,
-          and reconnect with a sense of calm.
+          {t('description')}
         </div>
       </div>
     </div>

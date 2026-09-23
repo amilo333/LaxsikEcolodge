@@ -54,12 +54,15 @@ export function TourFormModal({ tour, onClose }: TTourFormModalProps) {
   } = useForm<TTourForm>({
     resolver: zodResolver(tourSchema),
     defaultValues: {
-      title: tour?.title ?? '',
-      eyebrow: tour?.eyebrow ?? '',
-      description: tour?.description ?? '',
-      duration: tour?.duration ?? '',
-      rhythm: tour?.rhythm ?? '',
-      highlightsText: tour?.highlights.join('\n') ?? '',
+      title: tour?.translations?.vi?.title ?? tour?.title ?? '',
+      eyebrow: tour?.translations?.vi?.eyebrow ?? tour?.eyebrow ?? '',
+      description:
+        tour?.translations?.vi?.description ?? tour?.description ?? '',
+      duration: tour?.translations?.vi?.duration ?? tour?.duration ?? '',
+      rhythm: tour?.translations?.vi?.rhythm ?? tour?.rhythm ?? '',
+      highlightsText:
+        (tour?.translations?.vi?.highlights ?? tour?.highlights)?.join('\n') ??
+        '',
       sortOrder: tour?.sortOrder ?? 0,
       status: tour?.status ?? 'active',
     },
@@ -115,7 +118,8 @@ export function TourFormModal({ tour, onClose }: TTourFormModalProps) {
               {tour ? 'Chỉnh sửa tour' : 'Thêm tour mới'}
             </h2>
             <p className='mt-1 text-xs text-[#75827E]'>
-              Nội dung đang hoạt động sẽ xuất hiện trên trang Tours.
+              Nhập nội dung bằng tiếng Việt. Hệ thống sẽ tự tạo bản tiếng Anh
+              khi lưu.
             </p>
           </div>
           <button
@@ -134,7 +138,7 @@ export function TourFormModal({ tour, onClose }: TTourFormModalProps) {
               Tên tour
               <input
                 {...register('title')}
-                placeholder='Ví dụ: Hau Chu Ngai Highland Trail'
+                placeholder='Ví dụ: Cung đường vùng cao Hầu Chư Ngài'
                 className={inputClassName}
               />
               {errors.title && (
@@ -148,7 +152,7 @@ export function TourFormModal({ tour, onClose }: TTourFormModalProps) {
               Nhãn ngắn
               <input
                 {...register('eyebrow')}
-                placeholder='Ví dụ: Remote paths & mountain villages'
+                placeholder='Ví dụ: Lối mòn xa và bản làng vùng cao'
                 className={inputClassName}
               />
               {errors.eyebrow && (

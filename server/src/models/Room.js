@@ -1,4 +1,14 @@
 import mongoose from "mongoose";
+import { createTranslationsSchema } from "./translation-schema.js";
+
+const roomTranslationsSchema = createTranslationsSchema({
+  title: { type: String, required: true, trim: true },
+  description: { type: String, required: true, trim: true },
+  bed: { type: String, required: true, trim: true },
+  bathroom: { type: String, default: "", trim: true },
+  fireplace: { type: String, default: "", trim: true },
+  views: { type: String, default: "", trim: true },
+});
 
 const roomSchema = new mongoose.Schema(
   {
@@ -63,6 +73,11 @@ const roomSchema = new mongoose.Schema(
     views: {
       type: String,
       trim: true,
+    },
+
+    translations: {
+      type: roomTranslationsSchema,
+      default: undefined,
     },
 
     quantity: {

@@ -99,6 +99,18 @@ const bookingSchema = new mongoose.Schema(
       min: 0,
     },
 
+    // Số tiền cần trả qua VNPay khi đặt phòng (50% tổng tiền).
+    depositAmount: {
+      type: Number,
+      min: 0,
+    },
+
+    // Tổng số tiền đã thu, bao gồm cọc và khoản thu tại resort.
+    paidAmount: {
+      type: Number,
+      min: 0,
+    },
+
     bookingStatus: {
       type: String,
       enum: ["pending", "confirmed", "cancelled", "completed"],
@@ -107,7 +119,7 @@ const bookingSchema = new mongoose.Schema(
 
     paymentStatus: {
       type: String,
-      enum: ["unpaid", "pending", "paid", "failed", "refunded"],
+      enum: ["unpaid", "pending", "deposit_paid", "paid", "failed", "refunded"],
       default: "unpaid",
     },
 

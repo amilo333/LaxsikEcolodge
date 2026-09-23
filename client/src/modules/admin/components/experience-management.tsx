@@ -13,6 +13,7 @@ import {
   useDeleteAdminExperienceApi,
   useDeleteAdminExperienceServiceApi,
 } from '../common';
+import { AdminItemDetailDialog } from './admin-item-detail-dialog';
 import { ExperienceFormModal } from './experience-form-modal';
 import { ServiceFormModal } from './service-form-modal';
 
@@ -42,6 +43,11 @@ export function ExperienceManagement({ kind }: TExperienceManagementProps) {
   const [editingService, setEditingService] = useState<
     TAdminExperienceService | null | undefined
   >();
+  const [selectedItem, setSelectedItem] = useState<TAdminExperience | null>(
+    null
+  );
+  const [selectedService, setSelectedService] =
+    useState<TAdminExperienceService | null>(null);
   const itemsQuery = useAdminExperiencesApi(kind, {
     page: contentPage,
     limit: 6,
@@ -171,7 +177,8 @@ export function ExperienceManagement({ kind }: TExperienceManagementProps) {
                 {items.map((item) => (
                   <article
                     key={item._id}
-                    className='overflow-hidden rounded-[16px] border border-[#DCE6E3] bg-[#FAFCFB]'>
+                    onClick={() => setSelectedItem(item)}
+                    className='cursor-pointer overflow-hidden rounded-[16px] border border-[#DCE6E3] bg-[#FAFCFB] hover:border-[#8EB8AD]'>
                     <div className='relative h-40 w-full'>
                       <Image
                         src={item.thumbnail}
@@ -184,7 +191,15 @@ export function ExperienceManagement({ kind }: TExperienceManagementProps) {
                     <div className='p-4'>
                       <div className='flex items-start justify-between gap-3'>
                         <h3 className='font-lora line-clamp-1 text-lg font-semibold text-[#183F3D]'>
-                          {item.title}
+                          <button
+                            type='button'
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              setSelectedItem(item);
+                            }}
+                            className='text-left hover:underline'>
+                            {item.title}
+                          </button>
                         </h3>
                         <span
                           className={`shrink-0 rounded-full px-2.5 py-1 text-[9px] font-bold ${
@@ -198,7 +213,9 @@ export function ExperienceManagement({ kind }: TExperienceManagementProps) {
                       <p className='mt-2 line-clamp-2 min-h-10 text-xs leading-5 text-[#65736F]'>
                         {item.description}
                       </p>
-                      <div className='mt-4 flex gap-2 border-t border-[#E1E9E6] pt-4'>
+                      <div
+                        className='mt-4 flex gap-2 border-t border-[#E1E9E6] pt-4'
+                        onClick={(event) => event.stopPropagation()}>
                         <button
                           type='button'
                           onClick={() => setEditingItem(item)}
@@ -278,7 +295,10 @@ export function ExperienceManagement({ kind }: TExperienceManagementProps) {
                   </thead>
                   <tbody className='divide-y divide-[#E8EEEC] text-xs'>
                     {services.map((service) => (
-                      <tr key={service._id} className='hover:bg-[#FAFCFB]'>
+                      <tr
+                        key={service._id}
+                        onClick={() => setSelectedService(service)}
+                        className='cursor-pointer hover:bg-[#FAFCFB]'>
                         <td className='px-6 py-4'>
                           <div className='flex items-center gap-3'>
                             <Image
@@ -289,9 +309,15 @@ export function ExperienceManagement({ kind }: TExperienceManagementProps) {
                               className='h-10 w-10 rounded-xl object-contain'
                             />
                             <span>
-                              <span className='block font-bold text-[#263F3C]'>
+                              <button
+                                type='button'
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  setSelectedService(service);
+                                }}
+                                className='block text-left font-bold text-[#263F3C] hover:underline'>
                                 {service.title}
-                              </span>
+                              </button>
                               <span className='mt-1 block max-w-[340px] truncate text-[10px] text-[#74817D]'>
                                 {service.description}
                               </span>
@@ -311,7 +337,9 @@ export function ExperienceManagement({ kind }: TExperienceManagementProps) {
                             {service.status}
                           </span>
                         </td>
-                        <td className='px-6 py-4'>
+                        <td
+                          className='px-6 py-4'
+                          onClick={(event) => event.stopPropagation()}>
                           <div className='flex justify-end gap-2'>
                             <button
                               type='button'
@@ -372,6 +400,65 @@ export function ExperienceManagement({ kind }: TExperienceManagementProps) {
           service={editingService}
           parents={parents}
           onClose={() => setEditingService(undefined)}
+        />
+      )}
+      {selectedItem && (
+        <AdminItemDetailDialog
+          category={label}
+          title={selectedItem.title}
+          image={selectedItem.thumbnail}
+          images={selectedItem.images}
+          description={selectedItem.description}
+          fields={[
+            {
+              label: 'Trạng thái',
+              value:
+                selectedItem.status === 'active' ? 'Đang hiển thị' : 'Đang ẩn',
+            },
+            {
+              label: 'Ngày tạo',
+              value: new Date(selectedItem.createdAt).toLocaleString('vi-VN'),
+            },
+            {
+              label: 'Cập nhật lần cuối',
+              value: new Date(selectedItem.updatedAt).toLocaleString('vi-VN'),
+            },
+          ]}
+          onClose={() => setSelectedItem(null)}
+        />
+      )}
+      {selectedService && (
+        <AdminItemDetailDialog
+          category={`dịch vụ ${label}`}
+          title={selectedService.title}
+          image={selectedService.icon}
+          description={selectedService.description}
+          fields={[
+            {
+              label: `Thuộc ${label}`,
+              value: getParentTitle(kind, selectedService),
+            },
+            {
+              label: 'Trạng thái',
+              value:
+                selectedService.status === 'active'
+                  ? 'Đang hiển thị'
+                  : 'Đang ẩn',
+            },
+            {
+              label: 'Ngày tạo',
+              value: new Date(selectedService.createdAt).toLocaleString(
+                'vi-VN'
+              ),
+            },
+            {
+              label: 'Cập nhật lần cuối',
+              value: new Date(selectedService.updatedAt).toLocaleString(
+                'vi-VN'
+              ),
+            },
+          ]}
+          onClose={() => setSelectedService(null)}
         />
       )}
     </>

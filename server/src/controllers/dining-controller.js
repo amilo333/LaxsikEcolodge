@@ -1,6 +1,7 @@
 import Dining from "../models/Dining.js";
 import DiningService from "../models/DiningService.js";
 import { uploadOnCloudinary } from "../service/cloudinary.js";
+import { createBilingualContent } from "../service/content-translation.js";
 import { ResponseUtil } from "../utils/response.util.js";
 
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -24,9 +25,14 @@ export const getAllDining = async (req, res) => {
     }
 
     if (search) {
+      const expression = { $regex: escapeRegExp(search), $options: "i" };
       query.$or = [
-        { title: { $regex: escapeRegExp(search), $options: "i" } },
-        { description: { $regex: escapeRegExp(search), $options: "i" } },
+        { title: expression },
+        { description: expression },
+        { "translations.vi.title": expression },
+        { "translations.en.title": expression },
+        { "translations.vi.description": expression },
+        { "translations.en.description": expression },
       ];
     }
 
@@ -125,10 +131,16 @@ export const createDining = async (req, res) => {
       return ResponseUtil.badRequest(res, "Thumbnail file is required");
     }
 
+    if (!title || !description) {
+      return ResponseUtil.badRequest(res, "Title and description are required");
+    }
+
     // Tối đa 5 ảnh gallery
     if (imageFiles.length > 5) {
       return ResponseUtil.badRequest(res, "Maximum 5 images are allowed");
     }
+
+    const translations = await createBilingualContent({ title, description });
 
     // Upload Cloudinary
     const [uploadedThumbnail, ...uploadedImages] = await Promise.all([
@@ -141,6 +153,7 @@ export const createDining = async (req, res) => {
     const dining = new Dining({
       title,
       description,
+      translations,
 
       thumbnail: uploadedThumbnail.url,
 
@@ -176,12 +189,21 @@ export const updateDining = async (req, res) => {
 
     const { title, description, status } = req.body;
 
-    const updateData = {
-      title: title ?? dining.title,
-      description: description ?? dining.description,
-      status: status ?? dining.status,
-      updatedBy: req.user._id,
-    };
+    if (title !== undefined || description !== undefined) {
+      const vietnameseContent = {
+        title: title ?? dining.translations?.vi?.title ?? dining.title,
+        description:
+          description ??
+          dining.translations?.vi?.description ??
+          dining.description,
+      };
+      dining.translations = await createBilingualContent(vietnameseContent);
+      dining.title = vietnameseContent.title;
+      dining.description = vietnameseContent.description;
+    }
+
+    if (status !== undefined) dining.status = status;
+    dining.updatedBy = req.user._id;
 
     const uploadedFiles = req.files || [];
 
@@ -196,7 +218,7 @@ export const updateDining = async (req, res) => {
         "mern-images",
       );
 
-      updateData.thumbnail = uploadedThumbnail.url;
+      dining.thumbnail = uploadedThumbnail.url;
     }
 
     // Nếu gửi images mới
@@ -213,17 +235,10 @@ export const updateDining = async (req, res) => {
         imageFiles.map((file) => uploadOnCloudinary(file.path, "mern-images")),
       );
 
-      updateData.images = uploadedImages.map((image) => image.url);
+      dining.images = uploadedImages.map((image) => image.url);
     }
 
-    const updatedDining = await Dining.findByIdAndUpdate(
-      req.params.id,
-      updateData,
-      {
-        new: true,
-        runValidators: true,
-      },
-    );
+    const updatedDining = await dining.save();
 
     res.status(200).json({
       success: true,

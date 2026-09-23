@@ -7,6 +7,10 @@ export type TChatRoom = {
   pricePerNight: number | null;
   capacity: number | null;
   views: string | null;
+  translations?: {
+    vi?: { title?: string; views?: string };
+    en?: { title?: string; views?: string };
+  };
   stay: {
     checkInDate: string;
     checkOutDate: string;

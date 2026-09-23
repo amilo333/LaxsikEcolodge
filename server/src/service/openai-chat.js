@@ -27,7 +27,23 @@ const isVietnamese = (text) =>
 const formatVnd = (value) =>
   `${new Intl.NumberFormat("vi-VN").format(Number(value) || 0)} VND`;
 
+const localizeRoom = (room, vietnamese) => {
+  const values = room.translations?.[vietnamese ? "vi" : "en"];
+  if (!values) return room;
+
+  return {
+    ...room,
+    title: values.title ?? room.title,
+    description: values.description ?? room.description,
+    bed: values.bed ?? room.bed,
+    bathroom: values.bathroom ?? room.bathroom,
+    fireplace: values.fireplace ?? room.fireplace,
+    views: values.views ?? room.views,
+  };
+};
+
 const roomLine = (room, includeAvailability = false, vietnamese = true) => {
+  room = localizeRoom(room, vietnamese);
   const details = [
     `${formatVnd(room.pricePerNight)}/${vietnamese ? "đêm" : "night"}`,
     vietnamese
@@ -100,7 +116,7 @@ const renderToolResult = (toolName, result, vietnamese) => {
         : "I could not find a room with that exact id or title.";
     }
 
-    const room = result.room;
+    const room = localizeRoom(result.room, vietnamese);
     const facilities = [
       room.bed,
       `${room.area} m²`,

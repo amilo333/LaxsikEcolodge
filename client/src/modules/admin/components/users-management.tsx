@@ -9,6 +9,7 @@ import {
   useDeleteAdminUserApi,
   useUpdateAdminUserApi,
 } from '../common';
+import { AdminItemDetailDialog } from './admin-item-detail-dialog';
 import { UserFormModal } from './user-form-modal';
 
 type TUsersManagementProps = {
@@ -19,6 +20,7 @@ export function UsersManagement({ currentUser }: TUsersManagementProps) {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [editingUser, setEditingUser] = useState<TAdminUser | null>(null);
+  const [selectedUser, setSelectedUser] = useState<TAdminUser | null>(null);
   const deferredSearch = useDeferredValue(search.trim());
   const usersQuery = useAdminUsersApi({
     page,
@@ -106,21 +108,30 @@ export function UsersManagement({ currentUser }: TUsersManagementProps) {
                     const isCurrentUser = currentUser._id === user._id;
 
                     return (
-                      <tr key={user._id} className='hover:bg-[#FAFCFB]'>
+                      <tr
+                        key={user._id}
+                        onClick={() => setSelectedUser(user)}
+                        className='cursor-pointer hover:bg-[#FAFCFB]'>
                         <td className='px-6 py-4'>
                           <div className='flex items-center gap-3'>
                             <span className='flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#EAF4F1] text-[11px] font-black text-[#0D4949]'>
                               {user.full_name.charAt(0).toUpperCase()}
                             </span>
                             <span className='min-w-0'>
-                              <span className='block truncate font-extrabold text-[#263F3C]'>
+                              <button
+                                type='button'
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  setSelectedUser(user);
+                                }}
+                                className='block truncate text-left font-extrabold text-[#263F3C] hover:underline'>
                                 {user.full_name}
                                 {isCurrentUser && (
                                   <span className='ml-2 text-[9px] text-[#0D665A]'>
                                     Bạn
                                   </span>
                                 )}
-                              </span>
+                              </button>
                               <span className='mt-1 block truncate text-[10px] text-[#74817D]'>
                                 {user.email}
                               </span>
@@ -130,7 +141,9 @@ export function UsersManagement({ currentUser }: TUsersManagementProps) {
                         <td className='px-4 py-4 text-[#52635F]'>
                           {user.phone}
                         </td>
-                        <td className='px-4 py-4'>
+                        <td
+                          className='px-4 py-4'
+                          onClick={(event) => event.stopPropagation()}>
                           <select
                             value={user.role}
                             disabled={isCurrentUser || updateUser.isPending}
@@ -145,7 +158,9 @@ export function UsersManagement({ currentUser }: TUsersManagementProps) {
                             <option value='admin'>Admin</option>
                           </select>
                         </td>
-                        <td className='px-4 py-4'>
+                        <td
+                          className='px-4 py-4'
+                          onClick={(event) => event.stopPropagation()}>
                           <button
                             type='button'
                             disabled={isCurrentUser || updateUser.isPending}
@@ -163,7 +178,9 @@ export function UsersManagement({ currentUser }: TUsersManagementProps) {
                             {user.status ? 'Hoạt động' : 'Đã khóa'}
                           </button>
                         </td>
-                        <td className='px-6 py-4 text-right'>
+                        <td
+                          className='px-6 py-4 text-right'
+                          onClick={(event) => event.stopPropagation()}>
                           <div className='flex justify-end gap-2'>
                             <button
                               type='button'
@@ -222,6 +239,34 @@ export function UsersManagement({ currentUser }: TUsersManagementProps) {
           user={editingUser}
           isCurrentUser={editingUser._id === currentUser._id}
           onClose={() => setEditingUser(null)}
+        />
+      )}
+      {selectedUser && (
+        <AdminItemDetailDialog
+          category='người dùng'
+          title={selectedUser.full_name}
+          fields={[
+            { label: 'Email', value: selectedUser.email },
+            { label: 'Số điện thoại', value: selectedUser.phone },
+            {
+              label: 'Vai trò',
+              value:
+                selectedUser.role === 'admin' ? 'Quản trị viên' : 'Người dùng',
+            },
+            {
+              label: 'Trạng thái',
+              value: selectedUser.status ? 'Hoạt động' : 'Đã khóa',
+            },
+            {
+              label: 'Ngày tạo',
+              value: new Date(selectedUser.createdAt).toLocaleString('vi-VN'),
+            },
+            {
+              label: 'Cập nhật lần cuối',
+              value: new Date(selectedUser.updatedAt).toLocaleString('vi-VN'),
+            },
+          ]}
+          onClose={() => setSelectedUser(null)}
         />
       )}
     </>

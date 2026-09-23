@@ -7,12 +7,14 @@ import axios from 'axios';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { AccountNavigation, MyBookingsPanel, ProfilePanel } from './components';
+import { useTranslations } from 'next-intl';
 
 type TAccountModuleProps = {
   view: 'bookings' | 'profile';
 };
 
 export function AccountModule({ view }: TAccountModuleProps) {
+  const t = useTranslations('Account');
   const router = useRouter();
   const pathname = usePathname();
   const profileQuery = useProfileApi();
@@ -37,10 +39,10 @@ export function AccountModule({ view }: TAccountModuleProps) {
       <main className='mx-auto min-h-[620px] w-[calc(100%-32px)] max-w-[1180px] py-8 sm:py-12'>
         <div className='mb-7'>
           <p className='text-[11px] font-bold text-[#0D4949]/60 uppercase'>
-            Member area
+            {t('eyebrow')}
           </p>
           <h1 className='mt-1 text-3xl font-extrabold text-[#123F3D]'>
-            Tài khoản của tôi
+            {t('title')}
           </h1>
         </div>
 
@@ -49,12 +51,12 @@ export function AccountModule({ view }: TAccountModuleProps) {
         ) : profileQuery.isError || !user ? (
           <div className='rounded-[16px] border border-[#E7B8B8] bg-white p-8 text-center'>
             <h2 className='text-lg font-extrabold text-[#8F2F2F]'>
-              Không thể tải thông tin tài khoản
+              {t('loadError')}
             </h2>
             <Button
               onClick={() => void profileQuery.refetch()}
               className='mx-auto mt-5 h-11! w-auto! rounded-full! px-6! text-sm!'>
-              Thử lại
+              {t('tryAgain')}
             </Button>
           </div>
         ) : (

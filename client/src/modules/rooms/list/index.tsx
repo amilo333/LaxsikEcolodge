@@ -6,22 +6,25 @@ import { RoomItem } from '../common/components/room-item';
 import { useAvailableRoomsApi, useRoomListApi } from '../common/hooks';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { buildRoomDetailUrl } from '@/utils';
+import { buildRoomDetailUrl, localizeRoomContent } from '@/utils';
 import { useEffect } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 
 const PRICE_RANGES: Array<{
-  label: string;
+  key: 'all' | 'under2m' | '2to3m' | '3to5m' | 'over5m';
   minPrice?: number;
   maxPrice?: number;
 }> = [
-  { label: 'All prices' },
-  { label: 'Under 2M', maxPrice: 2_000_000 },
-  { label: '2M – 3M', minPrice: 2_000_000, maxPrice: 3_000_000 },
-  { label: '3M – 5M', minPrice: 3_000_000, maxPrice: 5_000_000 },
-  { label: '5M+', minPrice: 5_000_000 },
+  { key: 'all' },
+  { key: 'under2m', maxPrice: 2_000_000 },
+  { key: '2to3m', minPrice: 2_000_000, maxPrice: 3_000_000 },
+  { key: '3to5m', minPrice: 3_000_000, maxPrice: 5_000_000 },
+  { key: 'over5m', minPrice: 5_000_000 },
 ];
 
 export function RoomListModule() {
+  const t = useTranslations('Rooms.list');
+  const locale = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
   const checkInDate = searchParams.get('checkInDate');
@@ -152,10 +155,10 @@ export function RoomListModule() {
 
               <div>
                 <p className='text-[11px] font-bold text-[#0D4949]/55 uppercase'>
-                  Your stay
+                  {t('yourStay')}
                 </p>
                 <h2 className='font-lora mt-0.5 text-xl font-semibold'>
-                  Available rooms
+                  {t('availableRooms')}
                 </h2>
               </div>
             </div>
@@ -163,7 +166,7 @@ export function RoomListModule() {
             <div className='flex flex-col gap-3 border-y border-[#0D4949]/10 py-4 sm:flex-row sm:items-center sm:gap-6 lg:border-y-0 lg:border-l lg:py-0 lg:pl-6'>
               <div>
                 <p className='text-[11px] font-bold text-[#0D4949]/55 uppercase'>
-                  Dates
+                  {t('dates')}
                 </p>
                 <p className='mt-1 text-sm font-medium'>
                   {checkInDate}{' '}
@@ -175,12 +178,12 @@ export function RoomListModule() {
               <div className='flex flex-wrap gap-2'>
                 {guests && (
                   <span className='rounded-full bg-white px-3 py-1.5 text-xs font-semibold shadow-sm ring-1 ring-[#0D4949]/10'>
-                    {guests} guest{guests === '1' ? '' : 's'}
+                    {t('guestCount', { count: Number(guests) })}
                   </span>
                 )}
                 {roomCount && (
                   <span className='rounded-full bg-white px-3 py-1.5 text-xs font-semibold shadow-sm ring-1 ring-[#0D4949]/10'>
-                    {roomCount} room{roomCount === '1' ? '' : 's'}
+                    {t('roomCount', { count: Number(roomCount) })}
                   </span>
                 )}
               </div>
@@ -189,7 +192,7 @@ export function RoomListModule() {
             <Link
               href='/rooms'
               className='inline-flex h-10 shrink-0 items-center justify-center rounded-full border border-[#0D4949]/20 bg-white px-5 text-sm font-semibold transition-colors hover:border-[#0D4949] hover:bg-[#0D4949] hover:text-white focus-visible:ring-2 focus-visible:ring-[#0D4949] focus-visible:ring-offset-2 focus-visible:outline-none'>
-              Clear search
+              {t('clearSearch')}
             </Link>
           </div>
         </div>
@@ -211,7 +214,7 @@ export function RoomListModule() {
             </span>
             <div>
               <p className='mt-0.5 text-sm font-bold text-[#0D4949]'>
-                Price per night
+                {t('pricePerNight')}
               </p>
             </div>
           </div>
@@ -223,7 +226,7 @@ export function RoomListModule() {
 
               return (
                 <button
-                  key={range.label}
+                  key={range.key}
                   type='button'
                   aria-pressed={isActive}
                   onClick={() => handlePriceRangeChange(range)}
@@ -232,28 +235,29 @@ export function RoomListModule() {
                       ? 'border-[#0D4949] bg-[#0D4949] text-white shadow-sm'
                       : 'border-[#D5E1DD] bg-[#F8FAF9] text-[#52615C] hover:border-[#0D4949]/50 hover:bg-[#EEF5F3]'
                   }`}>
-                  {range.label}
+                  {t(`priceRanges.${range.key}`)}
                 </button>
               );
             })}
           </div>
 
           <p className='mt-4 border-t border-[#E2EAE7] pt-4 text-[10px] font-semibold text-[#71807B]'>
-            {pagination?.total ?? rooms?.length ?? 0} room
-            {(pagination?.total ?? rooms?.length ?? 0) === 1 ? '' : 's'} found
+            {t('roomsFound', {
+              count: pagination?.total ?? rooms?.length ?? 0,
+            })}
           </p>
         </aside>
 
         <div className='flex min-w-0 flex-col gap-7 sm:gap-9'>
           {isLoading && (
-            <p className='py-12 text-center text-[#0D4949]'>Searching rooms…</p>
+            <p className='py-12 text-center text-[#0D4949]'>{t('searching')}</p>
           )}
           {!isLoading &&
             rooms?.map((room, index) => {
               return (
                 <RoomItem
                   key={room._id}
-                  room={room}
+                  room={localizeRoomContent(room, locale)}
                   detailHref={buildRoomDetailUrl(room._id, searchParams)}
                   isPriority={index === 0}
                 />
@@ -262,21 +266,15 @@ export function RoomListModule() {
           {!isLoading && rooms?.length === 0 && (
             <div className='rounded-xl bg-white px-8 py-12 text-center shadow-lg'>
               <p className='text-xl font-semibold text-[#0D4949]'>
-                {isPriceFiltered
-                  ? 'No rooms in this price range'
-                  : 'No rooms available'}
+                {isPriceFiltered ? t('noRoomsPrice') : t('noRooms')}
               </p>
               <p className='mt-2 text-sm'>
-                {isPriceFiltered
-                  ? 'Try another price range or clear the filter.'
-                  : 'Try different dates or fewer guests.'}
+                {isPriceFiltered ? t('tryPrice') : t('tryDates')}
               </p>
             </div>
           )}
           {isError && (
-            <p className='py-12 text-center text-red-700'>
-              Unable to load rooms. Please try again.
-            </p>
+            <p className='py-12 text-center text-red-700'>{t('loadError')}</p>
           )}
           {!isLoading &&
             !isError &&

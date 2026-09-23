@@ -3,18 +3,22 @@ import { TPaginationResponse } from '@/types';
 import { TRoom } from '@/modules/rooms/common/types';
 import { TTour } from '@/modules/tours/types';
 import {
+  TAdminAnalytics,
+  TAdminAnalyticsParams,
   TAdminBooking,
   TAdminExperience,
   TAdminExperienceKind,
   TAdminExperienceService,
   TAdminListParams,
   TAdminRoomPayload,
+  TAdminRoomOccupancy,
   TAdminSummary,
   TAdminUser,
   TAdminVoucher,
   TAdminVoucherPayload,
   TUpdateAdminBookingPayload,
   TUpdateAdminUserPayload,
+  TOccupancyRangeParams,
 } from '../types';
 
 type TDataResponse<TData> = {
@@ -134,6 +138,24 @@ export const getAdminBookingsApi = async (params: TAdminListParams) => {
 export const getAdminSummaryApi = async () => {
   const response = await axiosInstance.get<TDataResponse<TAdminSummary>>(
     '/booking/admin/summary'
+  );
+  return response.data.data;
+};
+
+export const getAdminAnalyticsApi = async (params: TAdminAnalyticsParams) => {
+  const response = await axiosInstance.get<TDataResponse<TAdminAnalytics>>(
+    '/booking/admin/analytics',
+    { params }
+  );
+  return response.data.data;
+};
+
+export const getAdminRoomOccupancyApi = async (
+  params: TOccupancyRangeParams
+) => {
+  const response = await axiosInstance.get<TDataResponse<TAdminRoomOccupancy>>(
+    '/booking/admin/occupancy',
+    { params }
   );
   return response.data.data;
 };

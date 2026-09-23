@@ -5,9 +5,11 @@ import { TNavbarProps } from '../types';
 import Link from 'next/link';
 import { MENUS } from '../contants';
 import { AccountMenu } from './account-menu';
+import { useTranslations } from 'next-intl';
 
 export function Navbar(props: TNavbarProps) {
   const { onClickFind, isBookingBarVisible } = props;
+  const t = useTranslations('Navigation');
 
   return (
     <div className="relative isolate bg-[url('/images/banner/bg_header.png')] bg-cover bg-center text-white">
@@ -41,7 +43,7 @@ export function Navbar(props: TNavbarProps) {
                   <Link
                     href={item.href}
                     className='transition hover:text-white'>
-                    {item.label}
+                    {t(item.label)}
                   </Link>
                 </li>
               ))}
@@ -54,7 +56,7 @@ export function Navbar(props: TNavbarProps) {
             <Button
               className='hidden h-10! w-[116px]! bg-white! text-[13px]! text-[#0D4949]! shadow-none! lg:flex'
               onClick={onClickFind}>
-              Book Now
+              {t('bookNow')}
             </Button>
           )}
           <AccountMenu />

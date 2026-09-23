@@ -1,9 +1,13 @@
+'use client';
+
 import Image from 'next/image';
 import { FOOTER_DATA } from './constant';
+import { useTranslations } from 'next-intl';
 
 export function Footer() {
-  const { logo, title, address, hotline, email, menus, socials, copyright } =
-    FOOTER_DATA;
+  const t = useTranslations('Footer');
+  const { logo, title, hotline, email, socials } = FOOTER_DATA;
+  const menus = ['careers', 'partner', 'privacy', 'terms'] as const;
 
   return (
     <footer>
@@ -24,10 +28,14 @@ export function Footer() {
           className='h-[160px] w-[234px] object-contain'
         />
 
-        <p className='mt-4 text-center text-[17px] font-semibold'>{address}</p>
+        <p className='mt-4 text-center text-[17px] font-semibold'>
+          {t('address')}
+        </p>
 
         <div className='flex flex-col items-center'>
-          <p className='mt-3 text-[17px]'>Hotline: {hotline}</p>
+          <p className='mt-3 text-[17px]'>
+            {t('hotline')}: {hotline}
+          </p>
 
           <p className='mt-1 text-[17px]'>Email: {email}</p>
         </div>
@@ -52,13 +60,13 @@ export function Footer() {
 
         <div className='mt-10 flex flex-wrap justify-center gap-10 text-[16px] font-semibold uppercase'>
           {menus.map((menu) => (
-            <div key={menu}>{menu}</div>
+            <div key={menu}>{t(`menus.${menu}`)}</div>
           ))}
         </div>
       </div>
 
       <div className='bg-[#0D4949] py-2 text-center text-[16px] text-white'>
-        {copyright}
+        {t('copyright')}
       </div>
     </footer>
   );

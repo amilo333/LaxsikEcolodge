@@ -1,4 +1,7 @@
+'use client';
+
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 
 import { TCheckoutPaymentMethod } from '../types';
 
@@ -15,14 +18,12 @@ export function PaymentMethodSelector({
   error,
   isDisabled = false,
 }: TPaymentMethodSelectorProps) {
+  const t = useTranslations('Booking.paymentMethod');
   return (
     <fieldset>
-      <legend className='text-sm font-bold text-[#0D4949]'>
-        Payment method
-      </legend>
+      <legend className='text-sm font-bold text-[#0D4949]'>{t('title')}</legend>
       <p className='mt-1 text-xs leading-5 text-[#68726E]'>
-        Fast and secure online payment through Vietnam&apos;s trusted payment
-        gateway.
+        {t('description')}
       </p>
 
       <label
@@ -61,13 +62,13 @@ export function PaymentMethodSelector({
                 className='h-3.5 w-3.5 fill-current'>
                 <path d='M10 1.5 16.5 4v4.9c0 4.2-2.7 7.9-6.5 9.6-3.8-1.7-6.5-5.4-6.5-9.6V4L10 1.5Zm3.1 5.7-4 4-2.2-2.1-1.1 1.1 3.3 3.3 5.1-5.2-1.1-1.1Z' />
               </svg>
-              Secure payment
+              {t('secure')}
             </span>
             <span className='mt-2 block text-base font-bold text-[#0D4949]'>
-              Pay securely with VNPay
+              {t('payWithVnpay')}
             </span>
             <span className='mt-1 block text-xs leading-5 text-[#5F6D6B] sm:text-sm'>
-              Scan a VNPay QR code or pay with a supported bank account or card.
+              {t('methodDescription')}
             </span>
           </span>
 
@@ -78,7 +79,7 @@ export function PaymentMethodSelector({
               className='h-4 w-4 fill-current'>
               <path d='m7.8 14.3-4-4 1.4-1.4 2.6 2.6 7-7 1.4 1.4-8.4 8.4Z' />
             </svg>
-            <span className='sr-only'>Selected</span>
+            <span className='sr-only'>{t('selected')}</span>
           </span>
         </span>
 
@@ -89,8 +90,7 @@ export function PaymentMethodSelector({
             className='mt-0.5 h-3.5 w-3.5 shrink-0 fill-[#A66641]'>
             <path d='M6.5 8V6.5a3.5 3.5 0 1 1 7 0V8H15a1.5 1.5 0 0 1 1.5 1.5v7A1.5 1.5 0 0 1 15 18H5a1.5 1.5 0 0 1-1.5-1.5v-7A1.5 1.5 0 0 1 5 8h1.5Zm1.7 0h3.6V6.5a1.8 1.8 0 1 0-3.6 0V8Z' />
           </svg>
-          You will be redirected to VNPay to complete the transaction after
-          confirming.
+          {t('redirectNote')}
         </span>
       </label>
 

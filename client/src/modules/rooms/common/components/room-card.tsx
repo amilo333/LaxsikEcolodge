@@ -4,12 +4,14 @@ import { Button } from '@/components/core';
 import { buildBookingUrl, formatCurrency } from '@/utils';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { TRoom } from '../types';
+import { useTranslations } from 'next-intl';
 
 type TRoomCardProps = {
   room: TRoom;
 };
 
 export function RoomCard({ room }: TRoomCardProps) {
+  const t = useTranslations('Rooms.card');
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -31,7 +33,7 @@ export function RoomCard({ room }: TRoomCardProps) {
         <hr className='h-0.1 w-full bg-[#ccc]' />
         <div className='flex flex-col items-center justify-between gap-2'>
           <div className='flex items-center gap-2 text-[18px]'>
-            <div>Avg. price per night</div>
+            <div>{t('averagePrice')}</div>
             <div className='text-[32px] font-extrabold text-[#0D4949] tabular-nums'>
               {formatCurrency(room.price)}
             </div>
@@ -39,7 +41,7 @@ export function RoomCard({ room }: TRoomCardProps) {
           <Button
             onClick={handleBookNow}
             className='h-[clamp(52px,4.5vw,71px)]! w-[clamp(180px,18vw,260px)]! text-[clamp(20px,2vw,28px)]!'>
-            BOOK NOW
+            {t('bookNow')}
           </Button>
         </div>
       </div>

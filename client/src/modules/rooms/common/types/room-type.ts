@@ -14,4 +14,17 @@ export type TRoom = {
   capacity: number;
   quantity: number;
   status: 'available' | 'maintenance' | 'inactive';
+  translations?: {
+    vi?: TRoomTranslation;
+    en?: TRoomTranslation;
+  };
+};
+
+export type TRoomTranslation = {
+  title: string;
+  description: string;
+  bed: string;
+  bathroom?: string;
+  fireplace?: string;
+  views?: string;
 };

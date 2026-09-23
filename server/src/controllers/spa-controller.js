@@ -1,6 +1,7 @@
 import Spa from "../models/Spa.js";
 import SpaService from "../models/SpaService.js";
 import { uploadOnCloudinary } from "../service/cloudinary.js";
+import { createBilingualContent } from "../service/content-translation.js";
 import { ResponseUtil } from "../utils/response.util.js";
 
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -24,9 +25,14 @@ export const getAllSpa = async (req, res) => {
     }
 
     if (search) {
+      const expression = { $regex: escapeRegExp(search), $options: "i" };
       query.$or = [
-        { title: { $regex: escapeRegExp(search), $options: "i" } },
-        { description: { $regex: escapeRegExp(search), $options: "i" } },
+        { title: expression },
+        { description: expression },
+        { "translations.vi.title": expression },
+        { "translations.en.title": expression },
+        { "translations.vi.description": expression },
+        { "translations.en.description": expression },
       ];
     }
 
@@ -118,6 +124,8 @@ export const createSpa = async (req, res) => {
       return ResponseUtil.badRequest(res, "Thumbnail file is required");
     }
 
+    const translations = await createBilingualContent({ title, description });
+
     // Upload thumbnail lên Cloudinary
     const uploadedThumbnail = await uploadOnCloudinary(req.file.path, "spa");
 
@@ -129,6 +137,7 @@ export const createSpa = async (req, res) => {
     const spa = new Spa({
       title,
       description,
+      translations,
 
       thumbnail: uploadedThumbnail.url,
 
@@ -162,13 +171,15 @@ export const updateSpa = async (req, res) => {
 
     const { title, description, status } = req.body;
 
-    // Update text
-    if (title !== undefined) {
-      spa.title = title;
-    }
-
-    if (description !== undefined) {
-      spa.description = description;
+    if (title !== undefined || description !== undefined) {
+      const vietnameseContent = {
+        title: title ?? spa.translations?.vi?.title ?? spa.title,
+        description:
+          description ?? spa.translations?.vi?.description ?? spa.description,
+      };
+      spa.translations = await createBilingualContent(vietnameseContent);
+      spa.title = vietnameseContent.title;
+      spa.description = vietnameseContent.description;
     }
 
     if (status !== undefined) {

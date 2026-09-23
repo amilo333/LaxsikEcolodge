@@ -5,6 +5,7 @@ import axios from 'axios';
 import Script from 'next/script';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { GoogleAccountLinkForm } from './google-account-link-form';
+import { useLocale, useTranslations } from 'next-intl';
 
 type TGoogleCredentialResponse = {
   credential: string;
@@ -17,7 +18,7 @@ type TGoogleButtonOptions = {
   text: 'signin_with';
   shape: 'pill';
   logo_alignment: 'left';
-  locale: 'en';
+  locale: 'en' | 'vi';
   width: number;
 };
 
@@ -48,6 +49,8 @@ type TGoogleSignInButtonProps = {
 const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
 
 export function GoogleSignInButton({ onSuccess }: TGoogleSignInButtonProps) {
+  const locale = useLocale() as 'en' | 'vi';
+  const t = useTranslations('Auth.google');
   const buttonRef = useRef<HTMLDivElement>(null);
   const isGoogleInitializedRef = useRef(false);
   const [linkCredential, setLinkCredential] = useState<string | null>(null);
@@ -87,10 +90,10 @@ export function GoogleSignInButton({ onSuccess }: TGoogleSignInButtonProps) {
       text: 'signin_with',
       shape: 'pill',
       logo_alignment: 'left',
-      locale: 'en',
+      locale,
       width: Math.min(buttonRef.current.clientWidth || 400, 400),
     });
-  }, [mutate, onSuccess]);
+  }, [locale, mutate, onSuccess]);
 
   useEffect(() => {
     if (!linkCredential) renderButton();
@@ -99,7 +102,7 @@ export function GoogleSignInButton({ onSuccess }: TGoogleSignInButtonProps) {
   if (!googleClientId) {
     return (
       <p className='rounded-2xl bg-amber-50 px-4 py-3 text-center text-xs text-amber-800'>
-        Google sign-in is not configured yet.
+        {t('notConfigured')}
       </p>
     );
   }
@@ -117,7 +120,7 @@ export function GoogleSignInButton({ onSuccess }: TGoogleSignInButtonProps) {
   return (
     <>
       <Script
-        src='https://accounts.google.com/gsi/client?hl=en'
+        src={`https://accounts.google.com/gsi/client?hl=${locale}`}
         strategy='afterInteractive'
         onReady={renderButton}
       />

@@ -1,14 +1,18 @@
+'use client';
+
 import Image from 'next/image';
 import { POLICIES } from '../constants/policies';
+import { useTranslations } from 'next-intl';
 
 export function Policies() {
+  const t = useTranslations('Rooms.policies');
   return (
     <section className='min-h-[480px] bg-[#F9F6F1] py-10 sm:py-15'>
       <div className='mx-auto flex max-w-6xl flex-col gap-2 px-5 lg:flex-row lg:gap-16 lg:px-6'>
         {/* Left */}
         <div className='shrink-0 pt-2 pb-3 lg:w-60 lg:py-[32px]'>
           <h2 className='font-times text-2xl font-semibold text-[#0D4949] uppercase sm:text-[32px]'>
-            Policies
+            {t('title')}
           </h2>
         </div>
 
@@ -24,7 +28,7 @@ export function Policies() {
               <div className='w-9 shrink-0 sm:w-12'>
                 <Image
                   src={item.image}
-                  alt={item.title}
+                  alt={t(`items.${item.id}.title`)}
                   width={36}
                   height={36}
                   className='h-8 w-8 object-contain sm:h-9 sm:w-9'
@@ -34,11 +38,11 @@ export function Policies() {
               {/* Content */}
               <div className='min-w-0'>
                 <h3 className='mb-2 text-sm font-semibold text-black uppercase sm:text-base'>
-                  {item.title}
+                  {t(`items.${item.id}.title`)}
                 </h3>
 
                 <p className='text-xs leading-6 text-black/80 sm:text-sm'>
-                  {item.description}
+                  {t(`items.${item.id}.description`)}
                 </p>
               </div>
             </div>

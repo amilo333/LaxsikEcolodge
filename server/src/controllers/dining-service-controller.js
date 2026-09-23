@@ -2,6 +2,7 @@ import DiningService from "../models/DiningService.js";
 import Dining from "../models/Dining.js";
 
 import { uploadOnCloudinary } from "../service/cloudinary.js";
+import { createBilingualContent } from "../service/content-translation.js";
 
 import { ResponseUtil } from "../utils/response.util.js";
 
@@ -34,9 +35,14 @@ export const getAllDiningServices = async (req, res) => {
 
     if (req.query.search?.trim()) {
       const search = escapeRegExp(req.query.search.trim());
+      const expression = { $regex: search, $options: "i" };
       filter.$or = [
-        { title: { $regex: search, $options: "i" } },
-        { description: { $regex: search, $options: "i" } },
+        { title: expression },
+        { description: expression },
+        { "translations.vi.title": expression },
+        { "translations.en.title": expression },
+        { "translations.vi.description": expression },
+        { "translations.en.description": expression },
       ];
     }
 
@@ -129,6 +135,8 @@ export const createDiningService = async (req, res) => {
       return ResponseUtil.badRequest(res, "Icon file is required");
     }
 
+    const translations = await createBilingualContent({ title, description });
+
     // Upload icon lên Cloudinary
     const uploadedIcon = await uploadOnCloudinary(
       iconFile.path,
@@ -144,6 +152,7 @@ export const createDiningService = async (req, res) => {
       diningId,
       title,
       description,
+      translations,
       icon: uploadedIcon.url,
       status: status || "active",
     });
@@ -183,12 +192,17 @@ export const updateDiningService = async (req, res) => {
       service.diningId = diningId;
     }
 
-    if (title !== undefined) {
-      service.title = title;
-    }
-
-    if (description !== undefined) {
-      service.description = description;
+    if (title !== undefined || description !== undefined) {
+      const vietnameseContent = {
+        title: title ?? service.translations?.vi?.title ?? service.title,
+        description:
+          description ??
+          service.translations?.vi?.description ??
+          service.description,
+      };
+      service.translations = await createBilingualContent(vietnameseContent);
+      service.title = vietnameseContent.title;
+      service.description = vietnameseContent.description;
     }
 
     if (status !== undefined) {

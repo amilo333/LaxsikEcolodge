@@ -7,21 +7,26 @@ import {
   useUpdateProfileApi,
 } from '@/modules/auth/common';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-
-const profileSchema = z.object({
-  full_name: z.string().trim().min(2, 'Vui lòng nhập họ và tên.'),
-  email: z.email('Vui lòng nhập đúng địa chỉ email.'),
-  phone: z.string().trim().min(8, 'Vui lòng nhập đúng số điện thoại.'),
-});
+import { useTranslations } from 'next-intl';
 
 type TProfilePanelProps = {
   user: TUser;
 };
 
 export function ProfilePanel({ user }: TProfilePanelProps) {
+  const t = useTranslations('Account.profile');
+  const profileSchema = useMemo(
+    () =>
+      z.object({
+        full_name: z.string().trim().min(2, t('validation.name')),
+        email: z.email(t('validation.email')),
+        phone: z.string().trim().min(8, t('validation.phone')),
+      }),
+    [t]
+  );
   const updateProfile = useUpdateProfileApi();
   const {
     control,
@@ -60,20 +65,18 @@ export function ProfilePanel({ user }: TProfilePanelProps) {
   return (
     <div className='rounded-[16px] border border-[#DCE7E3] bg-white p-5 shadow-[0_16px_45px_rgba(13,73,73,0.08)] sm:p-7'>
       <div className='border-b border-[#E5ECEA] pb-5'>
-        <h2 className='text-xl font-extrabold text-[#193D3B]'>
-          Thông tin cá nhân
-        </h2>
+        <h2 className='text-xl font-extrabold text-[#193D3B]'>{t('title')}</h2>
         <p className='mt-2 text-sm leading-6 text-[#6E7B77]'>
-          Thông tin này sẽ được dùng làm dữ liệu liên hệ mặc định khi đặt phòng.
+          {t('description')}
         </p>
       </div>
 
       <div className='mt-6 grid gap-5 sm:grid-cols-2'>
         <div className='sm:col-span-2'>
-          <Field control={control} name='full_name' label='Họ và tên'>
+          <Field control={control} name='full_name' label={t('fullName')}>
             <Textfield
-              label='Họ và tên'
-              placeholder='Nhập họ và tên'
+              label={t('fullName')}
+              placeholder={t('fullNamePlaceholder')}
               autoComplete='name'
               inputClassName='h-[52px]! rounded-[16px]! bg-[#F7F9F8]! shadow-none! ring-1 ring-[#DDE6E3] focus-within:ring-2 focus-within:ring-[#0D4949]/45 [&_input]:px-4!'
               error={errors.full_name?.message}
@@ -81,9 +84,9 @@ export function ProfilePanel({ user }: TProfilePanelProps) {
           </Field>
         </div>
 
-        <Field control={control} name='email' label='Email'>
+        <Field control={control} name='email' label={t('email')}>
           <Textfield
-            label='Email'
+            label={t('email')}
             type='email'
             placeholder='you@example.com'
             autoComplete='email'
@@ -92,11 +95,11 @@ export function ProfilePanel({ user }: TProfilePanelProps) {
           />
         </Field>
 
-        <Field control={control} name='phone' label='Số điện thoại'>
+        <Field control={control} name='phone' label={t('phone')}>
           <Textfield
-            label='Số điện thoại'
+            label={t('phone')}
             type='tel'
-            placeholder='Nhập số điện thoại'
+            placeholder={t('phonePlaceholder')}
             autoComplete='tel'
             inputClassName='h-[52px]! rounded-[16px]! bg-[#F7F9F8]! shadow-none! ring-1 ring-[#DDE6E3] focus-within:ring-2 focus-within:ring-[#0D4949]/45 [&_input]:px-4!'
             error={errors.phone?.message}
@@ -110,7 +113,7 @@ export function ProfilePanel({ user }: TProfilePanelProps) {
           isDisabled={!isDirty || updateProfile.isPending}
           onClick={handleSubmit(onSubmit)}
           className='h-12! w-auto! min-w-[190px]! rounded-full! px-8! text-sm!'>
-          {updateProfile.isPending ? 'Đang lưu…' : 'Lưu thay đổi'}
+          {updateProfile.isPending ? t('saving') : t('save')}
         </Button>
       </div>
     </div>

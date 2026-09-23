@@ -1,27 +1,27 @@
 export const MENUS = [
   {
-    label: 'OVERVIEW',
+    label: 'overview',
     href: '/home',
   },
   {
-    label: 'ROOMS',
+    label: 'rooms',
     href: '/rooms',
   },
   {
-    label: 'DINING',
+    label: 'dining',
     href: '/dining',
   },
   {
-    label: 'TOURS',
+    label: 'tours',
     href: '/tours',
   },
   {
-    label: 'SPA & MASSAGE',
+    label: 'spa',
     href: '/spa-massage',
   },
 
   {
-    label: 'CONTACT',
+    label: 'contact',
     href: '/contact',
   },
 ];

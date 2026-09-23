@@ -58,8 +58,9 @@ export function ServiceFormModal({
     resolver: zodResolver(serviceSchema),
     defaultValues: {
       parentId: getParentId(kind, service) ?? parents[0]?._id ?? '',
-      title: service?.title ?? '',
-      description: service?.description ?? '',
+      title: service?.translations?.vi?.title ?? service?.title ?? '',
+      description:
+        service?.translations?.vi?.description ?? service?.description ?? '',
       status: service?.status ?? 'active',
     },
   });
@@ -108,7 +109,8 @@ export function ServiceFormModal({
               {service ? 'Chỉnh sửa dịch vụ' : `Thêm dịch vụ ${label}`}
             </h2>
             <p className='mt-1 text-xs text-[#75827E]'>
-              Service sẽ hiển thị trên trang {label} tương ứng.
+              Nhập nội dung bằng tiếng Việt. Hệ thống sẽ tự tạo bản tiếng Anh
+              khi lưu.
             </p>
           </div>
           <button
@@ -165,8 +167,8 @@ export function ServiceFormModal({
             <label className='text-xs font-bold text-[#344B47]'>
               Trạng thái
               <select {...register('status')} className={inputClassName}>
-                <option value='active'>Active</option>
-                <option value='inactive'>Inactive</option>
+                <option value='active'>Đang hiển thị</option>
+                <option value='inactive'>Đang ẩn</option>
               </select>
             </label>
 

@@ -1,6 +1,7 @@
 import Room from "../models/Room.js";
 import Booking from "../models/Booking.js";
 import { uploadOnCloudinary } from "../service/cloudinary.js";
+import { createBilingualContent } from "../service/content-translation.js";
 import {
   findAvailableRooms,
   RoomAvailabilityError,
@@ -36,10 +37,23 @@ export const getAllRooms = async (req, res) => {
     const query = {};
 
     if (search) {
+      const expression = { $regex: escapeRegExp(search), $options: "i" };
       query.$or = [
-        { title: { $regex: escapeRegExp(search), $options: "i" } },
-        { bed: { $regex: escapeRegExp(search), $options: "i" } },
-        { views: { $regex: escapeRegExp(search), $options: "i" } },
+        { title: expression },
+        { bed: expression },
+        { views: expression },
+        { "translations.vi.title": expression },
+        { "translations.en.title": expression },
+        { "translations.vi.bed": expression },
+        { "translations.en.bed": expression },
+        { "translations.vi.views": expression },
+        { "translations.en.views": expression },
+        { "translations.vi.description": expression },
+        { "translations.en.description": expression },
+        { "translations.vi.bathroom": expression },
+        { "translations.en.bathroom": expression },
+        { "translations.vi.fireplace": expression },
+        { "translations.en.fireplace": expression },
       ];
     }
 
@@ -151,9 +165,26 @@ export const createRoom = async (req, res) => {
       return ResponseUtil.badRequest(res, "Thumbnail file is required");
     }
 
+    if (!title || !description || !bed) {
+      return ResponseUtil.badRequest(
+        res,
+        "Title, description and bed are required",
+      );
+    }
+
     if (imageFiles.length > 5) {
       return ResponseUtil.badRequest(res, "Maximum 5 images are allowed");
     }
+
+    const roomContent = {
+      title,
+      description,
+      bed,
+      bathroom: bathroom ?? "",
+      fireplace: fireplace ?? "",
+      views: views ?? "",
+    };
+    const translations = await createBilingualContent(roomContent);
 
     const [uploadedThumbnail, ...uploadedImages] = await Promise.all([
       uploadOnCloudinary(thumbnailFile.path, "mern-images"),
@@ -176,6 +207,7 @@ export const createRoom = async (req, res) => {
       bathroom,
       fireplace,
       views,
+      translations,
     });
 
     await room.save();
@@ -200,38 +232,46 @@ export const updateRoom = async (req, res) => {
       });
     }
 
-    const allowedFields = [
+    const contentFields = [
       "title",
       "description",
-      "price",
       "bed",
-      "area",
-      "capacity",
-      "quantity",
-      "status",
       "bathroom",
       "fireplace",
       "views",
     ];
-    const updates = allowedFields.reduce((result, field) => {
+    const allowedFields = [
+      "price",
+      "area",
+      "capacity",
+      "quantity",
+      "status",
+    ];
+
+    if (contentFields.some((field) => typeof req.body[field] !== "undefined")) {
+      const vietnameseContent = Object.fromEntries(
+        contentFields.map((field) => [
+          field,
+          typeof req.body[field] !== "undefined"
+            ? req.body[field]
+            : (room.translations?.vi?.[field] ?? room[field] ?? ""),
+        ]),
+      );
+
+      room.translations = await createBilingualContent(vietnameseContent);
+      contentFields.forEach((field) => {
+        room[field] = vietnameseContent[field];
+      });
+    }
+
+    allowedFields.forEach((field) => {
       if (typeof req.body[field] !== "undefined") {
-        result[field] = req.body[field];
+        room[field] = req.body[field];
       }
+    });
 
-      return result;
-    }, {});
-
-    const updatedRoom = await Room.findByIdAndUpdate(
-      req.params.id,
-      {
-        ...updates,
-        updatedBy: req.user._id,
-      },
-      {
-        new: true,
-        runValidators: true,
-      },
-    );
+    room.updatedBy = req.user._id;
+    const updatedRoom = await room.save();
 
     res.status(200).json({
       success: true,

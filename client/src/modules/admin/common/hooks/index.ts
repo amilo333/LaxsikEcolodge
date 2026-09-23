@@ -15,10 +15,12 @@ import {
   deleteAdminTourApi,
   deleteAdminUserApi,
   deleteAdminVoucherApi,
+  getAdminAnalyticsApi,
   getAdminBookingsApi,
   getAdminExperiencesApi,
   getAdminExperienceServicesApi,
   getAdminRoomsApi,
+  getAdminRoomOccupancyApi,
   getAdminToursApi,
   getAdminSummaryApi,
   getAdminUsersApi,
@@ -32,8 +34,10 @@ import {
   updateAdminVoucherApi,
 } from '../apis';
 import {
+  TAdminAnalyticsParams,
   TAdminExperienceKind,
   TAdminListParams,
+  TOccupancyRangeParams,
   TAdminVoucherPayload,
 } from '../types';
 
@@ -101,6 +105,9 @@ export const useCreateAdminRoomApi = () => {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['admin', 'rooms'] });
       void queryClient.invalidateQueries({ queryKey: ['admin', 'summary'] });
+      void queryClient.invalidateQueries({
+        queryKey: ['admin', 'room-occupancy'],
+      });
       void queryClient.invalidateQueries({ queryKey: ['roomList'] });
       toast.success('Đã tạo phòng.');
     },
@@ -116,6 +123,9 @@ export const useUpdateAdminRoomApi = () => {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['admin', 'rooms'] });
       void queryClient.invalidateQueries({ queryKey: ['admin', 'summary'] });
+      void queryClient.invalidateQueries({
+        queryKey: ['admin', 'room-occupancy'],
+      });
       void queryClient.invalidateQueries({ queryKey: ['roomList'] });
       toast.success('Đã cập nhật phòng.');
     },
@@ -131,6 +141,9 @@ export const useDeleteAdminRoomApi = () => {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['admin', 'rooms'] });
       void queryClient.invalidateQueries({ queryKey: ['admin', 'summary'] });
+      void queryClient.invalidateQueries({
+        queryKey: ['admin', 'room-occupancy'],
+      });
       void queryClient.invalidateQueries({ queryKey: ['roomList'] });
       toast.success('Đã xóa phòng.');
     },
@@ -200,6 +213,21 @@ export const useAdminSummaryApi = () =>
   useQuery({
     queryKey: ['admin', 'summary'],
     queryFn: getAdminSummaryApi,
+    retry: false,
+  });
+
+export const useAdminAnalyticsApi = (params: TAdminAnalyticsParams) =>
+  useQuery({
+    queryKey: ['admin', 'analytics', params],
+    queryFn: () => getAdminAnalyticsApi(params),
+    placeholderData: (previousData) => previousData,
+    retry: false,
+  });
+
+export const useAdminRoomOccupancyApi = (params: TOccupancyRangeParams) =>
+  useQuery({
+    queryKey: ['admin', 'room-occupancy', params],
+    queryFn: () => getAdminRoomOccupancyApi(params),
     retry: false,
   });
 
@@ -398,6 +426,10 @@ export const useUpdateAdminBookingApi = () => {
     onSuccess: (_, variables) => {
       void queryClient.invalidateQueries({ queryKey: ['admin', 'bookings'] });
       void queryClient.invalidateQueries({ queryKey: ['admin', 'summary'] });
+      void queryClient.invalidateQueries({ queryKey: ['admin', 'analytics'] });
+      void queryClient.invalidateQueries({
+        queryKey: ['admin', 'room-occupancy'],
+      });
       void queryClient.invalidateQueries({
         queryKey: ['booking', variables.bookingId],
       });

@@ -9,10 +9,18 @@ import { useForm } from 'react-hook-form';
 import { TUser, useLoginApi } from '../../common';
 import { GoogleSignInButton } from './google-sign-in-button';
 import { LOGIN_FORM_DEFAULT_VALUES } from '../constants';
-import { loginSchema } from '../schema';
 import { TLoginForm } from '../types';
+import { useTranslations } from 'next-intl';
+import { useMemo } from 'react';
+import { createLoginSchema } from '../schema';
 
 export function LoginForm() {
+  const t = useTranslations('Auth.login.form');
+  const validationT = useTranslations('Auth.validation');
+  const localizedSchema = useMemo(
+    () => createLoginSchema(validationT),
+    [validationT]
+  );
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectParam = searchParams.get('redirect');
@@ -30,7 +38,7 @@ export function LoginForm() {
     formState: { errors },
     handleSubmit,
   } = useForm<TLoginForm>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(localizedSchema),
     defaultValues: LOGIN_FORM_DEFAULT_VALUES,
   });
 
@@ -56,10 +64,10 @@ export function LoginForm() {
   return (
     <div className='flex flex-col gap-4'>
       <div className='flex flex-col gap-3.5'>
-        <Field control={control} name='email' label='Email'>
+        <Field control={control} name='email' label={t('email')}>
           <Textfield
-            label='Email'
-            placeholder='you@example.com'
+            label={t('email')}
+            placeholder={t('emailPlaceholder')}
             autoComplete='email'
             className='gap-1.5'
             inputClassName='h-[48px]! rounded-[14px]! bg-[#F7F9F8]! shadow-none! ring-1 ring-[#DDE6E3] transition focus-within:ring-2 focus-within:ring-[#0D4949]/45 [&_input]:px-4!'
@@ -67,11 +75,11 @@ export function LoginForm() {
           />
         </Field>
 
-        <Field control={control} name='password' label='Password'>
+        <Field control={control} name='password' label={t('password')}>
           <Textfield
-            label='Password'
+            label={t('password')}
             type='password'
-            placeholder='Enter your password'
+            placeholder={t('passwordPlaceholder')}
             autoComplete='current-password'
             className='gap-1.5'
             inputClassName='h-[48px]! rounded-[14px]! bg-[#F7F9F8]! shadow-none! ring-1 ring-[#DDE6E3] transition focus-within:ring-2 focus-within:ring-[#0D4949]/45 [&_input]:px-4!'
@@ -83,7 +91,7 @@ export function LoginForm() {
           <Link
             href={forgotPasswordHref}
             className='text-xs font-semibold text-[#0D4949] underline-offset-4 hover:underline sm:text-[13px]'>
-            Forgot password?
+            {t('forgotPassword')}
           </Link>
         </div>
       </div>
@@ -93,12 +101,12 @@ export function LoginForm() {
         isDisabled={isPending}
         className='h-[48px]! w-full! rounded-full! bg-[#0D4949]! text-sm! font-bold! text-white! shadow-[0_10px_24px_rgba(13,73,73,0.2)] transition hover:bg-[#0A3B3B]!'
         onClick={handleSubmit(onSubmit)}>
-        {isPending ? 'Signing in…' : 'Sign in'}
+        {isPending ? t('signingIn') : t('signIn')}
       </Button>
 
       <div className='flex items-center gap-3 text-[9px] font-bold text-[#87938F] uppercase'>
         <span className='h-px flex-1 bg-[#E3E9E7]' />
-        Or continue with
+        {t('continueWith')}
         <span className='h-px flex-1 bg-[#E3E9E7]' />
       </div>
 
@@ -106,16 +114,16 @@ export function LoginForm() {
 
       <div className='flex items-center gap-3 text-[9px] font-bold text-[#87938F] uppercase'>
         <span className='h-px flex-1 bg-[#E3E9E7]' />
-        New to Laxsik?
+        {t('newToLaxsik')}
         <span className='h-px flex-1 bg-[#E3E9E7]' />
       </div>
 
       <div className='text-center text-xs text-[#687570] sm:text-[13px]'>
-        Don&apos;t have an account?{' '}
+        {t('noAccount')}{' '}
         <Link
           href={registerHref}
           className='font-bold text-[#0D4949] underline-offset-4 hover:underline'>
-          Create account
+          {t('createAccount')}
         </Link>
       </div>
     </div>

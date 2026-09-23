@@ -3,6 +3,7 @@
 import useEmblaCarousel from 'embla-carousel-react';
 import Image from 'next/image';
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 
 type SlideImageProps = {
   images?: string[];
@@ -21,9 +22,11 @@ const DEFAULT_IMAGES = [
 
 export function SlideImage({
   images = DEFAULT_IMAGES,
-  title = "MUONG HOA'S GALLERY",
+  title,
   className = '',
 }: SlideImageProps) {
+  const t = useTranslations('Dining.gallery');
+  const displayTitle = title ?? t('title');
   const initialIndex = Math.floor(images.length / 2);
 
   const [emblaRef, emblaApi] = useEmblaCarousel({
@@ -60,9 +63,9 @@ export function SlideImage({
       className={`relative w-full overflow-hidden select-none ${className}`}>
       <div className='relative z-10 my-30 flex w-full flex-col items-center gap-8 md:gap-12'>
         {/* TITLE */}
-        {title && (
+        {displayTitle && (
           <h2 className='font-lora text-center text-[32px] font-semibold text-[#0D4949] uppercase'>
-            {title}
+            {displayTitle}
           </h2>
         )}
 
@@ -89,7 +92,7 @@ export function SlideImage({
                     } `}>
                     <Image
                       src={img}
-                      alt={`${title} - image ${index + 1}`}
+                      alt={t('imageAlt', { index: index + 1 })}
                       fill
                       sizes='
                         (max-width: 640px) 80vw,

@@ -6,10 +6,11 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 import { Button } from '@/components/core';
-import { buildRoomDetailUrl } from '@/utils';
+import { buildRoomDetailUrl, localizeRoomContent } from '@/utils';
 import { useAvailableRoomsApi, useRoomListApi } from '../hooks';
 import { TRoom } from '../types';
 import { useSearchParams } from 'next/navigation';
+import { useLocale, useTranslations } from 'next-intl';
 
 type SlideRoomProps = {
   currentRoomId: string;
@@ -18,7 +19,10 @@ type SlideRoomProps = {
 };
 
 export function SlideRoom(props: SlideRoomProps) {
-  const { currentRoomId, title = 'OTHER ROOMS', onExploreRoom } = props;
+  const { currentRoomId, title, onExploreRoom } = props;
+  const t = useTranslations('Rooms.slider');
+  const locale = useLocale();
+  const displayTitle = title === undefined ? t('otherRooms') : title;
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -43,7 +47,9 @@ export function SlideRoom(props: SlideRoomProps) {
     ? availableRoomsQuery.isError
     : roomListQuery.isError;
 
-  const displayRooms = rooms.filter((room) => room._id !== currentRoomId);
+  const displayRooms = rooms
+    .filter((room) => room._id !== currentRoomId)
+    .map((room) => localizeRoomContent(room, locale));
 
   const initialIndex = displayRooms.length > 2 ? 2 : 0;
 
@@ -92,9 +98,7 @@ export function SlideRoom(props: SlideRoomProps) {
   if (isLoading) {
     return (
       <section className='flex w-full justify-center py-16'>
-        <p className='font-montserrat text-sm text-[#0D4949]'>
-          Loading rooms...
-        </p>
+        <p className='font-montserrat text-sm text-[#0D4949]'>{t('loading')}</p>
       </section>
     );
   }
@@ -106,9 +110,7 @@ export function SlideRoom(props: SlideRoomProps) {
   if (isError) {
     return (
       <section className='flex w-full justify-center py-16'>
-        <p className='font-montserrat text-sm text-red-500'>
-          Failed to load rooms.
-        </p>
+        <p className='font-montserrat text-sm text-red-500'>{t('loadError')}</p>
       </section>
     );
   }
@@ -132,9 +134,9 @@ export function SlideRoom(props: SlideRoomProps) {
             TITLE
         ========================= */}
 
-        {title && (
+        {displayTitle && (
           <h2 className='font-lora mb-10 text-[32px] font-bold text-[#0D4949] uppercase md:text-3xl'>
-            {title}
+            {displayTitle}
           </h2>
         )}
 
@@ -230,7 +232,7 @@ export function SlideRoom(props: SlideRoomProps) {
                             type='button'
                             onClick={() => handleExplore(room)}
                             className='h-[40px]! w-full! max-w-[320px]! bg-[#0D4949]! px-4! text-[16px]! font-semibold text-white! transition-colors duration-200 hover:bg-[#083B3B]!'>
-                            Explore Now
+                            {t('explore')}
                           </Button>
                         </div>
                       )}

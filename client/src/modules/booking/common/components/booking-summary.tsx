@@ -6,6 +6,7 @@ import { useBookingStore } from '../stores';
 import { TAvailableRoom } from '../types';
 import { formatCurrency } from '../utils';
 import { VoucherSelector } from './voucher-selector';
+import { useTranslations } from 'next-intl';
 
 type TBookingSummaryProps = {
   rooms: TAvailableRoom[];
@@ -18,6 +19,7 @@ export function BookingSummary({
   numberOfNights,
   onContinue,
 }: TBookingSummaryProps) {
+  const t = useTranslations('Booking.summary');
   const appliedVoucher = useBookingStore((state) => state.appliedVoucher);
   const checkoutMessage = useBookingStore((state) => state.checkoutMessage);
   const setCheckoutMessage = useBookingStore(
@@ -27,7 +29,7 @@ export function BookingSummary({
 
   const handleCheckout = () => {
     if (pricing.selectedRoomCount === 0) {
-      setCheckoutMessage('Please select at least one room to continue.');
+      setCheckoutMessage(t('selectRoomError'));
       return;
     }
 
@@ -38,12 +40,8 @@ export function BookingSummary({
   return (
     <div className='mt-6 grid gap-7 border-t border-[#E5EAE8] pt-6 lg:grid-cols-[1fr_440px] lg:items-start'>
       <div className='rounded-[16px] bg-[#F5F7F6] px-4 py-4 text-[11px] leading-5 text-[#505754] sm:px-5'>
-        <p className='font-bold text-[#202522]'>Good to know</p>
-        <p className='mt-1'>
-          Room availability is held after your booking is confirmed. Taxes and
-          service fees are calculated from the room total after any eligible
-          voucher discount. You can cancel up to 48 hours before check-in.
-        </p>
+        <p className='font-bold text-[#202522]'>{t('goodToKnow')}</p>
+        <p className='mt-1'>{t('notice')}</p>
       </div>
 
       <div>
@@ -51,7 +49,7 @@ export function BookingSummary({
 
         <dl className='mt-5 space-y-2 text-xs'>
           <div className='flex justify-between gap-4 text-[#555E5A]'>
-            <dt>Room subtotal</dt>
+            <dt>{t('subtotal')}</dt>
             <dd>{formatCurrency(pricing.subtotal)}</dd>
           </div>
           {appliedVoucher && (
@@ -61,34 +59,50 @@ export function BookingSummary({
             </div>
           )}
           <div className='flex justify-between gap-4 text-[#555E5A]'>
-            <dt>Service charge (5%)</dt>
+            <dt>{t('serviceCharge')}</dt>
             <dd>{formatCurrency(pricing.serviceCharge)}</dd>
           </div>
           <div className='flex justify-between gap-4 text-[#555E5A]'>
-            <dt>Tax (10%)</dt>
+            <dt>{t('tax')}</dt>
             <dd>{formatCurrency(pricing.taxAmount)}</dd>
+          </div>
+        </dl>
+
+        <dl className='mt-4 space-y-2 border-t border-[#DCE3E0] pt-4 text-xs'>
+          <div className='flex justify-between gap-4 text-[#555E5A]'>
+            <dt>{t('total')}</dt>
+            <dd>{formatCurrency(pricing.totalAmount)}</dd>
+          </div>
+          <div className='flex justify-between gap-4 font-bold text-[#0D4949]'>
+            <dt>{t('deposit')}</dt>
+            <dd>{formatCurrency(pricing.depositAmount)}</dd>
+          </div>
+          <div className='flex justify-between gap-4 text-[#555E5A]'>
+            <dt>{t('balance')}</dt>
+            <dd>{formatCurrency(pricing.balanceAmount)}</dd>
           </div>
         </dl>
 
         <div className='mt-4 flex flex-col gap-4 border-t border-[#DCE3E0] pt-4 sm:flex-row sm:items-center sm:justify-between'>
           <div>
             <p className='text-[10px] font-bold text-[#69726E] uppercase'>
-              Total
+              {t('payNow')}
             </p>
             <p className='mt-0.5 text-xl font-bold'>
-              {formatCurrency(pricing.totalAmount)}
+              {formatCurrency(pricing.depositAmount)}
             </p>
             <p className='mt-0.5 text-[10px] text-[#6E7773]'>
-              for {pricing.selectedRoomCount} room
-              {pricing.selectedRoomCount === 1 ? '' : 's'} · {numberOfNights}{' '}
-              night{numberOfNights === 1 ? '' : 's'}
+              {t('staySummary', {
+                rooms: pricing.selectedRoomCount,
+                nights: numberOfNights,
+              })}
             </p>
           </div>
 
           <Button
             onClick={handleCheckout}
             className='h-12! w-auto! min-w-[170px]! rounded-full! px-8! text-sm! uppercase'>
-            Continue
+            {t('continue')}
           </Button>
         </div>
 
