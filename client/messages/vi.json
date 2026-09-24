@@ -255,11 +255,48 @@
         "3to5m": "3 – 5 triệu",
         "over5m": "Từ 5 triệu"
       },
+      "filters": {
+        "eyebrow": "Lọc phòng",
+        "title": "Chọn phòng phù hợp",
+        "capacity": "Sức chứa",
+        "capacityOptions": {
+          "all": "Tất cả",
+          "two": "2+ khách",
+          "three": "3+ khách",
+          "four": "4+ khách",
+          "five": "5+ khách"
+        },
+        "area": "Diện tích",
+        "areaOptions": {
+          "all": "Tất cả",
+          "compact": "Đến 35 m²",
+          "medium": "36–45 m²",
+          "spacious": "Từ 46 m²"
+        },
+        "bed": "Loại giường",
+        "bedOptions": {
+          "all": "Tất cả",
+          "king": "Giường King",
+          "single": "Giường đơn"
+        },
+        "view": "Hướng nhìn",
+        "viewOptions": {
+          "all": "Tất cả",
+          "mountain": "Núi",
+          "valley": "Thung lũng",
+          "terrace": "Ruộng bậc thang",
+          "pool": "Hồ bơi"
+        },
+        "fireplace": "Có lò sưởi",
+        "clearAll": "Xóa toàn bộ bộ lọc"
+      },
       "roomsFound": "Tìm thấy {count} phòng",
       "searching": "Đang tìm phòng…",
       "noRoomsPrice": "Không có phòng trong khoảng giá này",
+      "noRoomsFiltered": "Không có phòng phù hợp",
       "noRooms": "Không có phòng trống",
       "tryPrice": "Hãy chọn khoảng giá khác hoặc xóa bộ lọc.",
+      "tryFilters": "Hãy thay đổi hoặc xóa bớt bộ lọc.",
       "tryDates": "Hãy thử ngày khác hoặc giảm số khách.",
       "loadError": "Không thể tải danh sách phòng. Vui lòng thử lại."
     },

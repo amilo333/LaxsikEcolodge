@@ -7,6 +7,10 @@ import {
   RoomAvailabilityError,
 } from "../service/room-availability.js";
 import { ResponseUtil } from "../utils/response.util.js";
+import {
+  buildRoomAttributeFilter,
+  RoomFilterError,
+} from "../utils/room-filter.js";
 
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -21,20 +25,7 @@ export const getAllRooms = async (req, res) => {
       100,
     );
     const search = req.query.search?.trim();
-    const hasMinPrice = req.query.minPrice != null && req.query.minPrice !== "";
-    const hasMaxPrice = req.query.maxPrice != null && req.query.maxPrice !== "";
-    const minPrice = hasMinPrice ? Number(req.query.minPrice) : undefined;
-    const maxPrice = hasMaxPrice ? Number(req.query.maxPrice) : undefined;
-
-    if (
-      (hasMinPrice && (!Number.isFinite(minPrice) || minPrice < 0)) ||
-      (hasMaxPrice && (!Number.isFinite(maxPrice) || maxPrice < 0)) ||
-      (minPrice !== undefined && maxPrice !== undefined && minPrice > maxPrice)
-    ) {
-      return ResponseUtil.badRequest(res, "Invalid room price range");
-    }
-
-    const query = {};
+    const query = buildRoomAttributeFilter(req.query);
 
     if (search) {
       const expression = { $regex: escapeRegExp(search), $options: "i" };
@@ -55,13 +46,6 @@ export const getAllRooms = async (req, res) => {
         { "translations.vi.fireplace": expression },
         { "translations.en.fireplace": expression },
       ];
-    }
-
-    if (minPrice !== undefined || maxPrice !== undefined) {
-      query.price = {
-        ...(minPrice !== undefined ? { $gte: minPrice } : {}),
-        ...(maxPrice !== undefined ? { $lte: maxPrice } : {}),
-      };
     }
 
     const skip = (page - 1) * limit;
@@ -96,6 +80,9 @@ export const getAllRooms = async (req, res) => {
       "Rooms fetched successfully",
     );
   } catch (error) {
+    if (error instanceof RoomFilterError) {
+      return ResponseUtil.badRequest(res, error.message);
+    }
     ResponseUtil.serverError(res, error.message);
   }
 };
@@ -337,6 +324,12 @@ export const getAvailableRooms = async (req, res) => {
       rooms: roomCount,
       minPrice,
       maxPrice,
+      minCapacity,
+      minArea,
+      maxArea,
+      bed,
+      view,
+      hasFireplace,
     } = req.query;
     const availableRooms = await findAvailableRooms({
       checkInDate,
@@ -345,6 +338,12 @@ export const getAvailableRooms = async (req, res) => {
       roomCount,
       minPrice,
       maxPrice,
+      minCapacity,
+      minArea,
+      maxArea,
+      bed,
+      view,
+      hasFireplace,
     });
 
     const shouldPaginate = Boolean(req.query.page || req.query.limit);

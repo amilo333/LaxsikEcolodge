@@ -7,6 +7,12 @@ export type TRoomListParams = {
   limit: number;
   minPrice?: number;
   maxPrice?: number;
+  minCapacity?: number;
+  minArea?: number;
+  maxArea?: number;
+  bed?: string;
+  view?: string;
+  hasFireplace?: boolean;
 };
 
 export const getRoomListApi = async (params: TRoomListParams) => {
@@ -26,6 +32,12 @@ export type TAvailableRoomsParams = {
   limit?: number;
   minPrice?: number;
   maxPrice?: number;
+  minCapacity?: number;
+  minArea?: number;
+  maxArea?: number;
+  bed?: string;
+  view?: string;
+  hasFireplace?: boolean;
 };
 
 export type TAvailableRoomsResponse = {

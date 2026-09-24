@@ -23,6 +23,12 @@ type TAvailableRoomsSearch = {
   limit?: number;
   minPrice?: number;
   maxPrice?: number;
+  minCapacity?: number;
+  minArea?: number;
+  maxArea?: number;
+  bed?: string;
+  view?: string;
+  hasFireplace?: boolean;
 };
 
 export const useAvailableRoomsApi = (
@@ -38,6 +44,12 @@ export const useAvailableRoomsApi = (
     limit,
     minPrice,
     maxPrice,
+    minCapacity,
+    minArea,
+    maxArea,
+    bed,
+    view,
+    hasFireplace,
   } = search;
   const canSearch = enabled && Boolean(checkInDate && checkOutDate);
 
@@ -52,6 +64,12 @@ export const useAvailableRoomsApi = (
       limit,
       minPrice,
       maxPrice,
+      minCapacity,
+      minArea,
+      maxArea,
+      bed,
+      view,
+      hasFireplace,
     ],
     queryFn: () =>
       getAvailableRoomsApi({
@@ -63,6 +81,12 @@ export const useAvailableRoomsApi = (
         ...(limit ? { limit } : {}),
         ...(minPrice !== undefined ? { minPrice } : {}),
         ...(maxPrice !== undefined ? { maxPrice } : {}),
+        ...(minCapacity !== undefined ? { minCapacity } : {}),
+        ...(minArea !== undefined ? { minArea } : {}),
+        ...(maxArea !== undefined ? { maxArea } : {}),
+        ...(bed ? { bed } : {}),
+        ...(view ? { view } : {}),
+        ...(hasFireplace ? { hasFireplace } : {}),
       }),
     enabled: canSearch,
   });

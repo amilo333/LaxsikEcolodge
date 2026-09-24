@@ -22,6 +22,75 @@ const PRICE_RANGES: Array<{
   { key: 'over5m', minPrice: 5_000_000 },
 ];
 
+const CAPACITY_OPTIONS = [
+  { key: 'all', value: undefined },
+  { key: 'two', value: 2 },
+  { key: 'three', value: 3 },
+  { key: 'four', value: 4 },
+  { key: 'five', value: 5 },
+] as const;
+
+const AREA_RANGES = [
+  { key: 'all', minArea: undefined, maxArea: undefined },
+  { key: 'compact', minArea: undefined, maxArea: 35 },
+  { key: 'medium', minArea: 36, maxArea: 45 },
+  { key: 'spacious', minArea: 46, maxArea: undefined },
+] as const;
+
+const BED_OPTIONS = [
+  { key: 'all', value: undefined },
+  { key: 'king', value: 'king' },
+  { key: 'single', value: 'single' },
+] as const;
+
+const VIEW_OPTIONS = [
+  { key: 'all', value: undefined },
+  { key: 'mountain', value: 'mountain' },
+  { key: 'valley', value: 'valley' },
+  { key: 'terrace', value: 'terrace' },
+  { key: 'pool', value: 'pool' },
+] as const;
+
+function FilterPills({
+  title,
+  options,
+  activeKey,
+  onChange,
+}: {
+  title: string;
+  options: Array<{ key: string; label: string }>;
+  activeKey: string;
+  onChange: (key: string) => void;
+}) {
+  return (
+    <section className='border-t border-[#E2EAE7] pt-4'>
+      <h3 className='text-[11px] font-bold tracking-[0.08em] text-[#0D4949]/70 uppercase'>
+        {title}
+      </h3>
+      <div className='mt-2.5 flex flex-wrap gap-2'>
+        {options.map((option) => {
+          const isActive = activeKey === option.key;
+
+          return (
+            <button
+              key={option.key}
+              type='button'
+              aria-pressed={isActive}
+              onClick={() => onChange(option.key)}
+              className={`rounded-full border px-3 py-1.5 text-[10px] font-bold transition-all focus-visible:ring-2 focus-visible:ring-[#0D4949] focus-visible:ring-offset-2 focus-visible:outline-none ${
+                isActive
+                  ? 'border-[#0D4949] bg-[#0D4949] text-white shadow-sm'
+                  : 'border-[#D5E1DD] bg-[#F8FAF9] text-[#52615C] hover:border-[#0D4949]/50 hover:bg-[#EEF5F3]'
+              }`}>
+              {option.label}
+            </button>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
 export function RoomListModule() {
   const t = useTranslations('Rooms.list');
   const locale = useLocale();
@@ -49,7 +118,34 @@ export function RoomListModule() {
     parsedMaxPrice >= 0
       ? parsedMaxPrice
       : undefined;
-  const isPriceFiltered = minPrice !== undefined || maxPrice !== undefined;
+  const minCapacityParam = Number(searchParams.get('minCapacity'));
+  const minCapacity =
+    Number.isInteger(minCapacityParam) && minCapacityParam > 0
+      ? minCapacityParam
+      : undefined;
+  const minAreaParam = Number(searchParams.get('minArea'));
+  const maxAreaParam = Number(searchParams.get('maxArea'));
+  const minArea =
+    Number.isFinite(minAreaParam) && minAreaParam > 0
+      ? minAreaParam
+      : undefined;
+  const maxArea =
+    Number.isFinite(maxAreaParam) && maxAreaParam > 0
+      ? maxAreaParam
+      : undefined;
+  const bed = searchParams.get('bed') || undefined;
+  const view = searchParams.get('view') || undefined;
+  const hasFireplace = searchParams.get('hasFireplace') === 'true';
+  const hasRoomFilters = Boolean(
+    minPrice !== undefined ||
+    maxPrice !== undefined ||
+    minCapacity !== undefined ||
+    minArea !== undefined ||
+    maxArea !== undefined ||
+    bed ||
+    view ||
+    hasFireplace
+  );
   const requestedPage = Number(searchParams.get('page'));
   const page =
     Number.isInteger(requestedPage) && requestedPage > 0 ? requestedPage : 1;
@@ -61,6 +157,12 @@ export function RoomListModule() {
       limit: pageSize,
       ...(minPrice !== undefined ? { minPrice } : {}),
       ...(maxPrice !== undefined ? { maxPrice } : {}),
+      ...(minCapacity !== undefined ? { minCapacity } : {}),
+      ...(minArea !== undefined ? { minArea } : {}),
+      ...(maxArea !== undefined ? { maxArea } : {}),
+      ...(bed ? { bed } : {}),
+      ...(view ? { view } : {}),
+      ...(hasFireplace ? { hasFireplace } : {}),
     },
     !isSearching
   );
@@ -73,6 +175,12 @@ export function RoomListModule() {
     limit: pageSize,
     minPrice,
     maxPrice,
+    minCapacity,
+    minArea,
+    maxArea,
+    bed,
+    view,
+    hasFireplace,
   });
   const rooms = isSearching
     ? availableRoomsQuery.data?.data
@@ -135,6 +243,48 @@ export function RoomListModule() {
     const query = params.toString();
     router.push(`/rooms${query ? `?${query}` : ''}`);
   };
+
+  const updateRoomFilters = (updates: Record<string, string | undefined>) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    Object.entries(updates).forEach(([key, value]) => {
+      if (value === undefined) params.delete(key);
+      else params.set(key, value);
+    });
+
+    params.delete('page');
+    const query = params.toString();
+    router.push(`/rooms${query ? `?${query}` : ''}`);
+  };
+
+  const clearRoomFilters = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    [
+      'minPrice',
+      'maxPrice',
+      'minCapacity',
+      'minArea',
+      'maxArea',
+      'bed',
+      'view',
+      'hasFireplace',
+      'page',
+    ].forEach((key) => params.delete(key));
+    const query = params.toString();
+    router.push(`/rooms${query ? `?${query}` : ''}`);
+  };
+
+  const activeCapacity =
+    CAPACITY_OPTIONS.find((option) => option.value === minCapacity)?.key ??
+    'all';
+  const activeArea =
+    AREA_RANGES.find(
+      (range) => range.minArea === minArea && range.maxArea === maxArea
+    )?.key ?? 'all';
+  const activeBed =
+    BED_OPTIONS.find((option) => option.value === bed)?.key ?? 'all';
+  const activeView =
+    VIEW_OPTIONS.find((option) => option.value === view)?.key ?? 'all';
 
   return (
     <div className="font-montserrat min-h-screen bg-[url('/images/bg-screen.jpg')] bg-[length:720px_720px] text-[#151515]">
@@ -199,7 +349,7 @@ export function RoomListModule() {
       )}
 
       <div
-        className={`mx-auto grid w-[92%] gap-7 lg:grid-cols-[260px_minmax(0,1fr)] lg:items-start xl:w-[88%] ${
+        className={`mx-auto grid w-[92%] gap-7 lg:grid-cols-[290px_minmax(0,1fr)] lg:items-start xl:w-[88%] ${
           isSearching ? 'my-6' : 'my-10'
         }`}>
         <aside className='rounded-[18px] border border-[#DCE6E2] bg-white p-4 shadow-[0_12px_32px_rgba(13,73,73,0.07)] sm:p-5 lg:sticky lg:top-5 lg:p-6'>
@@ -213,13 +363,19 @@ export function RoomListModule() {
               </svg>
             </span>
             <div>
+              <p className='text-[10px] font-bold tracking-[0.12em] text-[#0D4949]/55 uppercase'>
+                {t('filters.eyebrow')}
+              </p>
               <p className='mt-0.5 text-sm font-bold text-[#0D4949]'>
-                {t('pricePerNight')}
+                {t('filters.title')}
               </p>
             </div>
           </div>
 
           <div className='mt-4 flex flex-wrap gap-2 lg:flex-col'>
+            <h3 className='mb-0.5 text-[11px] font-bold tracking-[0.08em] text-[#0D4949]/70 uppercase'>
+              {t('pricePerNight')}
+            </h3>
             {PRICE_RANGES.map((range) => {
               const isActive =
                 minPrice === range.minPrice && maxPrice === range.maxPrice;
@@ -240,6 +396,103 @@ export function RoomListModule() {
               );
             })}
           </div>
+
+          <div className='mt-4 space-y-4'>
+            <FilterPills
+              title={t('filters.capacity')}
+              options={CAPACITY_OPTIONS.map((option) => ({
+                key: option.key,
+                label: t(`filters.capacityOptions.${option.key}`),
+              }))}
+              activeKey={activeCapacity}
+              onChange={(key) => {
+                const option = CAPACITY_OPTIONS.find(
+                  (item) => item.key === key
+                );
+                updateRoomFilters({
+                  minCapacity: option?.value ? String(option.value) : undefined,
+                });
+              }}
+            />
+
+            <FilterPills
+              title={t('filters.area')}
+              options={AREA_RANGES.map((option) => ({
+                key: option.key,
+                label: t(`filters.areaOptions.${option.key}`),
+              }))}
+              activeKey={activeArea}
+              onChange={(key) => {
+                const option = AREA_RANGES.find((item) => item.key === key);
+                updateRoomFilters({
+                  minArea: option?.minArea ? String(option.minArea) : undefined,
+                  maxArea: option?.maxArea ? String(option.maxArea) : undefined,
+                });
+              }}
+            />
+
+            <FilterPills
+              title={t('filters.bed')}
+              options={BED_OPTIONS.map((option) => ({
+                key: option.key,
+                label: t(`filters.bedOptions.${option.key}`),
+              }))}
+              activeKey={activeBed}
+              onChange={(key) => {
+                const option = BED_OPTIONS.find((item) => item.key === key);
+                updateRoomFilters({ bed: option?.value });
+              }}
+            />
+
+            <FilterPills
+              title={t('filters.view')}
+              options={VIEW_OPTIONS.map((option) => ({
+                key: option.key,
+                label: t(`filters.viewOptions.${option.key}`),
+              }))}
+              activeKey={activeView}
+              onChange={(key) => {
+                const option = VIEW_OPTIONS.find((item) => item.key === key);
+                updateRoomFilters({ view: option?.value });
+              }}
+            />
+
+            <section className='border-t border-[#E2EAE7] pt-4'>
+              <button
+                type='button'
+                aria-pressed={hasFireplace}
+                onClick={() =>
+                  updateRoomFilters({
+                    hasFireplace: hasFireplace ? undefined : 'true',
+                  })
+                }
+                className={`flex w-full items-center justify-between rounded-xl border px-3.5 py-3 text-left text-[11px] font-bold transition-all focus-visible:ring-2 focus-visible:ring-[#0D4949] focus-visible:ring-offset-2 focus-visible:outline-none ${
+                  hasFireplace
+                    ? 'border-[#0D4949] bg-[#EAF3F0] text-[#0D4949]'
+                    : 'border-[#D5E1DD] bg-[#F8FAF9] text-[#52615C] hover:border-[#0D4949]/50'
+                }`}>
+                <span>{t('filters.fireplace')}</span>
+                <span
+                  aria-hidden='true'
+                  className={`flex h-5 w-5 items-center justify-center rounded-full border text-[11px] ${
+                    hasFireplace
+                      ? 'border-[#0D4949] bg-[#0D4949] text-white'
+                      : 'border-[#AAB9B4] bg-white text-transparent'
+                  }`}>
+                  ✓
+                </span>
+              </button>
+            </section>
+          </div>
+
+          {hasRoomFilters && (
+            <button
+              type='button'
+              onClick={clearRoomFilters}
+              className='mt-4 w-full rounded-full border border-[#0D4949]/20 px-4 py-2 text-[11px] font-bold text-[#0D4949] transition-colors hover:border-[#0D4949] hover:bg-[#0D4949] hover:text-white'>
+              {t('filters.clearAll')}
+            </button>
+          )}
 
           <p className='mt-4 border-t border-[#E2EAE7] pt-4 text-[10px] font-semibold text-[#71807B]'>
             {t('roomsFound', {
@@ -266,10 +519,10 @@ export function RoomListModule() {
           {!isLoading && rooms?.length === 0 && (
             <div className='rounded-xl bg-white px-8 py-12 text-center shadow-lg'>
               <p className='text-xl font-semibold text-[#0D4949]'>
-                {isPriceFiltered ? t('noRoomsPrice') : t('noRooms')}
+                {hasRoomFilters ? t('noRoomsFiltered') : t('noRooms')}
               </p>
               <p className='mt-2 text-sm'>
-                {isPriceFiltered ? t('tryPrice') : t('tryDates')}
+                {hasRoomFilters ? t('tryFilters') : t('tryDates')}
               </p>
             </div>
           )}

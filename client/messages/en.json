@@ -255,11 +255,48 @@
         "3to5m": "3M – 5M",
         "over5m": "5M+"
       },
+      "filters": {
+        "eyebrow": "Room filters",
+        "title": "Find your ideal room",
+        "capacity": "Capacity",
+        "capacityOptions": {
+          "all": "All",
+          "two": "2+ guests",
+          "three": "3+ guests",
+          "four": "4+ guests",
+          "five": "5+ guests"
+        },
+        "area": "Room size",
+        "areaOptions": {
+          "all": "All",
+          "compact": "Up to 35 m²",
+          "medium": "36–45 m²",
+          "spacious": "46 m²+"
+        },
+        "bed": "Bed type",
+        "bedOptions": {
+          "all": "All",
+          "king": "King bed",
+          "single": "Single beds"
+        },
+        "view": "View",
+        "viewOptions": {
+          "all": "All",
+          "mountain": "Mountain",
+          "valley": "Valley",
+          "terrace": "Rice terraces",
+          "pool": "Pool"
+        },
+        "fireplace": "Fireplace",
+        "clearAll": "Clear all filters"
+      },
       "roomsFound": "{count, plural, one {# room found} other {# rooms found}}",
       "searching": "Searching rooms…",
       "noRoomsPrice": "No rooms in this price range",
+      "noRoomsFiltered": "No rooms match these filters",
       "noRooms": "No rooms available",
       "tryPrice": "Try another price range or clear the filter.",
+      "tryFilters": "Change or clear some filters.",
       "tryDates": "Try different dates or fewer guests.",
       "loadError": "Unable to load rooms. Please try again."
     },
