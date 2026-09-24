@@ -1,10 +1,15 @@
 import multer from "multer";
+import fs from "node:fs";
+import path from "node:path";
 import imageFileFilter from "../utils/imageFileFilter.js";
 
+const uploadDirectory = process.env.VERCEL ? "/tmp" : "uploads";
+fs.mkdirSync(uploadDirectory, { recursive: true });
+
 const storage = multer.diskStorage({
-  destination: "uploads/",
+  destination: uploadDirectory,
   filename: (_, file, cb) => {
-    cb(null, Date.now() + "-" + file.originalname);
+    cb(null, `${Date.now()}-${path.basename(file.originalname)}`);
   },
 });
 

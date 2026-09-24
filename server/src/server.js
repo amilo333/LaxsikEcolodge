@@ -8,7 +8,10 @@ import { setServers } from "node:dns/promises";
 import { v2 as cloudinary } from "cloudinary";
 
 dotenv.config();
-setServers(["1.1.1.1", "8.8.8.8"]);
+
+if (!process.env.VERCEL) {
+  setServers(["1.1.1.1", "8.8.8.8"]);
+}
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -32,13 +35,31 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+app.use(async (_req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error("MongoDB connection failed:", error.message);
+    res.status(503).json({ message: "Database connection unavailable" });
+  }
+});
+
+app.get("/api/health", (_req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
 route(app);
 // Routes
 // app.use("/api/user", userRoutes);
 
-// Do not accept requests until MongoDB is ready.
-await connectDB();
+export default app;
 
-app.listen(PORT, () => {
-  console.log(`Server is running at http://localhost:${PORT}`);
-});
+if (!process.env.VERCEL) {
+  // Do not accept local requests until MongoDB is ready.
+  await connectDB();
+
+  app.listen(PORT, () => {
+    console.log(`Server is running at http://localhost:${PORT}`);
+  });
+}
