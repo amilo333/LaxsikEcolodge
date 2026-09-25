@@ -96,6 +96,12 @@ const getDayLabel = (value: string, locale: string) =>
     timeZone: 'UTC',
   }).format(parseDateKey(value));
 
+const getMonthLabel = (value: string, locale: string) =>
+  new Intl.DateTimeFormat(locale === 'vi' ? 'vi-VN' : 'en-GB', {
+    month: 'short',
+    timeZone: 'UTC',
+  }).format(parseDateKey(value));
+
 const getRoomId = (booking: TAdminBooking, itemIndex: number) => {
   const roomId = booking.bookingItems[itemIndex]?.roomId;
   if (!roomId) return null;
@@ -673,7 +679,7 @@ export default function BookingsManagement() {
                               {date.getUTCDate()}
                             </p>
                             <p className='text-[8px] font-semibold'>
-                              Thg {date.getUTCMonth() + 1}
+                              {getMonthLabel(day, locale)}
                             </p>
                           </div>
                         );

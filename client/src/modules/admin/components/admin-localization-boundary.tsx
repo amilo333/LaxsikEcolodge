@@ -35,6 +35,7 @@ const PAIRS: TranslationPair[] = [
   ['Chăm sóc & mát-xa', 'Spa & massage'],
   ['Trải nghiệm', 'Tour'],
   ['Xem đặt phòng', 'View booking'],
+  ['Xem booking', 'View booking'],
   ['STT', 'No.'],
 
   ['Hôm nay', 'Today'],
@@ -142,6 +143,10 @@ const PAIRS: TranslationPair[] = [
   ['Tổng tiền', 'Total amount'],
   ['Tỷ lệ trạng thái booking', 'Booking status distribution'],
   ['Tỷ lệ trạng thái trên toàn hệ thống', 'Status share across the system'],
+  ['Tỷ lệ Chờ xác nhận', 'Pending confirmation rate'],
+  ['Tỷ lệ Đã xác nhận', 'Confirmed rate'],
+  ['Tỷ lệ Đã hủy', 'Cancelled rate'],
+  ['Tỷ lệ Hoàn thành', 'Completed rate'],
   ['Nhóm số liệu thống kê', 'Statistics group'],
   ['Chưa có dữ liệu', 'No data yet'],
   ['Chưa có dữ liệu đặt phòng trong kỳ.', 'No booking data for this period.'],
@@ -653,6 +658,9 @@ function translateDynamic(value: string, locale: string) {
       .replace(/^(\d+(?:[,.]\d+)?) tr$/u, '$1M')
       .replace(/^(\d+) kết quả cho “(.+)”$/u, '$1 results for “$2”')
       .replace(/^(\d+) phòng đang bảo trì\.$/u, '$1 rooms under maintenance.')
+      .replace(/^(\d+) đang hoạt động$/u, '$1 active')
+      .replace(/^(.+) phòng mở bán mỗi ngày$/u, '$1 rooms for sale each day')
+      .replace(/^Xem (.+)$/u, 'View $1')
       .replace(/^(\d+) lượt$/u, '$1 uses')
       .replace(/^đến (.+)$/u, 'to $1')
       .replace(
@@ -694,6 +702,9 @@ function translateDynamic(value: string, locale: string) {
     .replace(/^(\d+(?:[,.]\d+)?)M$/u, '$1 triệu')
     .replace(/^(\d+) results for “(.+)”$/u, '$1 kết quả cho “$2”')
     .replace(/^(\d+) rooms under maintenance\.$/u, '$1 phòng đang bảo trì.')
+    .replace(/^(\d+) active$/u, '$1 đang hoạt động')
+    .replace(/^(.+) rooms for sale each day$/u, '$1 phòng mở bán mỗi ngày')
+    .replace(/^View (.+)$/u, 'Xem $1')
     .replace(/^(\d+) uses$/u, '$1 lượt')
     .replace(/^to (.+)$/u, 'đến $1');
 }
