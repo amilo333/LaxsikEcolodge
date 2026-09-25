@@ -7,7 +7,7 @@ import { FormEvent, useEffect, useRef, useState } from 'react';
 
 import { TChatMessage, TChatResponse, useSendChatMessageApi } from './common';
 import { ChatRoomCard } from './common/components/chat-room-card';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 const createMessageId = () =>
   `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -59,6 +59,7 @@ function SendIcon() {
 
 export function ChatbotWidget() {
   const t = useTranslations('Chatbot');
+  const locale = useLocale() as 'vi' | 'en';
   const welcomeMessage: TChatMessage = {
     id: 'welcome',
     role: 'assistant',
@@ -113,10 +114,13 @@ export function ChatbotWidget() {
     setErrorMessage('');
 
     sendMessage.mutate(
-      nextMessages.map(({ role, content: messageContent }) => ({
-        role,
-        content: messageContent,
-      })),
+      {
+        locale,
+        messages: nextMessages.map(({ role, content: messageContent }) => ({
+          role,
+          content: messageContent,
+        })),
+      },
       {
         onSuccess: (response) => {
           setChatMeta(response);

@@ -19,14 +19,19 @@ export function Navbar(props: TNavbarProps) {
       />
       <div className='mx-auto flex h-[88px] w-full max-w-[1600px] items-center justify-between gap-3 px-4 sm:h-[104px] sm:gap-5 sm:px-6 xl:px-12 2xl:px-[60px]'>
         <div className='flex min-w-0 items-center gap-6'>
-          <Image
-            src='/images/logo/logo_2.png'
-            alt='Laxsik Ecolodge'
-            width={111}
-            height={68}
-            priority
-            className='h-14 w-auto shrink-0 sm:h-16 xl:h-[68px]'
-          />
+          <Link
+            href='/home'
+            aria-label={t('overview')}
+            className='shrink-0 rounded-md focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0D4949] focus-visible:outline-none'>
+            <Image
+              src='/images/logo/logo_2.png'
+              alt='Laxsik Ecolodge'
+              width={111}
+              height={68}
+              priority
+              className='h-14 w-auto sm:h-16 xl:h-[68px]'
+            />
+          </Link>
 
           <div className='hidden h-11 w-px bg-white/25 xl:block'></div>
 

@@ -5,9 +5,16 @@ type TChatApiResponse = {
   data: TChatResponse;
 };
 
-export const sendChatMessageApi = async (messages: TChatApiMessage[]) => {
+export const sendChatMessageApi = async ({
+  messages,
+  locale,
+}: {
+  messages: TChatApiMessage[];
+  locale: 'vi' | 'en';
+}) => {
   const response = await axiosInstance.post<TChatApiResponse>('/chat', {
     messages,
+    locale,
   });
   return response.data.data;
 };

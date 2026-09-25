@@ -52,6 +52,7 @@ const PAIRS: TranslationPair[] = [
   ['Tiền thực tế đã thu', 'Actual amount collected'],
   ['Số tiền thực tế đã thu', 'Actual amount collected'],
   ['Tổng quan kinh doanh', 'Business overview'],
+  ['Bức tranh kinh doanh', 'Business performance snapshot'],
   ['Bức tranh đặt phòng', 'Booking overview'],
   [
     'Theo dõi doanh thu thực thu, booking và hiệu quả phòng trong cùng một màn hình.',

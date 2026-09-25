@@ -1,4 +1,5 @@
 import { createOpenAIChatReply } from "../service/openai-chat.js";
+import { detectChatLanguage } from "../utils/chat-language.js";
 
 const buckets = new Map();
 const RATE_LIMIT = 15;
@@ -17,18 +18,24 @@ const isRateLimited = (key) => {
   return bucket.count > RATE_LIMIT;
 };
 
-const getFallbackReply = (message) => {
+const getFallbackReply = (message, language) => {
   const normalized = message.toLowerCase();
 
   if (/xin chào|chào|hello|hi\b/.test(normalized)) {
-    return "Xin chào! Tôi là trợ lý của Laxsik Ecolodge. Bạn muốn tìm phòng, xem giá hay cần hỗ trợ về kỳ nghỉ tại Sa Pa?";
+    return language === "vi"
+      ? "Xin chào! Tôi là trợ lý của Laxsik Ecolodge. Bạn muốn tìm phòng, xem giá hay cần hỗ trợ về kỳ nghỉ tại Sa Pa?"
+      : "Hello! I am the Laxsik Ecolodge assistant. Would you like to find a room, check prices or plan your stay in Sa Pa?";
   }
 
   if (/phòng|room|giá|price|đặt/.test(normalized)) {
-    return "Bạn hãy cho tôi biết ngày nhận phòng, ngày trả phòng, số khách và số phòng cần đặt. Bạn có thể dùng phần tìm kiếm phòng trên trang để kiểm tra dữ liệu trực tiếp từ hệ thống.";
+    return language === "vi"
+      ? "Bạn hãy cho tôi biết ngày nhận phòng, ngày trả phòng, số khách và số phòng cần đặt. Bạn cũng có thể dùng phần tìm kiếm phòng để kiểm tra trực tiếp."
+      : "Please share your check-in date, check-out date, number of guests and rooms. You can also use the room search to check directly.";
   }
 
-  return "Tôi đã nhận được câu hỏi của bạn. Chatbot hiện đang ở chế độ cơ bản; bạn có thể hỏi về phòng hoặc cung cấp ngày nhận/trả phòng để chuẩn bị tìm kiếm.";
+  return language === "vi"
+    ? "Tôi đã nhận được câu hỏi của bạn. Bạn có thể hỏi về phòng hoặc cung cấp ngày nhận và trả phòng để bắt đầu tìm kiếm."
+    : "I received your question. You can ask about rooms or provide check-in and check-out dates to start a search.";
 };
 
 const normalizeMessages = (messages) =>
@@ -46,10 +53,16 @@ const normalizeMessages = (messages) =>
     }));
 
 export const createChatResponse = async (req, res) => {
+  const preferredLanguage = req.body?.locale === "vi" ? "vi" : "en";
+  let responseLanguage = preferredLanguage;
+
   try {
     if (isRateLimited(req.ip || "anonymous")) {
       return res.status(429).json({
-        message: "Bạn gửi tin nhắn quá nhanh. Vui lòng thử lại sau một phút.",
+        message:
+          preferredLanguage === "vi"
+            ? "Bạn gửi tin nhắn quá nhanh. Vui lòng thử lại sau một phút."
+            : "You are sending messages too quickly. Please try again in one minute.",
       });
     }
 
@@ -66,10 +79,15 @@ export const createChatResponse = async (req, res) => {
       });
     }
 
+    responseLanguage = detectChatLanguage(
+      lastMessage.content,
+      preferredLanguage,
+    );
+
     if (!process.env.OPENAI_API_KEY) {
       return res.status(200).json({
         data: {
-          message: getFallbackReply(lastMessage.content),
+          message: getFallbackReply(lastMessage.content, responseLanguage),
           mode: "fallback",
           model: null,
           toolsUsed: [],
@@ -78,7 +96,9 @@ export const createChatResponse = async (req, res) => {
       });
     }
 
-    const reply = await createOpenAIChatReply(messages);
+    const reply = await createOpenAIChatReply(messages, {
+      language: responseLanguage,
+    });
 
     return res.status(200).json({
       data: { ...reply, mode: "openai" },
@@ -90,7 +110,9 @@ export const createChatResponse = async (req, res) => {
       return res.status(401).json({
         code: "OPENAI_AUTH_ERROR",
         message:
-          "OpenAI API key không hợp lệ. Hãy kiểm tra OPENAI_API_KEY trong server/.env.",
+          responseLanguage === "vi"
+            ? "Chatbot chưa được cấu hình đúng. Vui lòng thử lại sau."
+            : "The chatbot is not configured correctly. Please try again later.",
       });
     }
 
@@ -98,13 +120,18 @@ export const createChatResponse = async (req, res) => {
       return res.status(429).json({
         code: "OPENAI_QUOTA_EXCEEDED",
         message:
-          "Tài khoản OpenAI đã hết hạn mức hoặc chưa có số dư. Hãy nạp credit trong OpenAI Platform rồi thử lại.",
+          responseLanguage === "vi"
+            ? "Chatbot đang tạm hết hạn mức. Vui lòng thử lại sau."
+            : "The chatbot has temporarily reached its usage limit. Please try again later.",
       });
     }
 
     return res.status(502).json({
       code: "CHAT_SERVICE_ERROR",
-      message: "Chatbot đang tạm thời gián đoạn. Vui lòng thử lại sau.",
+      message:
+        responseLanguage === "vi"
+          ? "Chatbot đang tạm thời gián đoạn. Vui lòng thử lại sau."
+          : "The chatbot is temporarily unavailable. Please try again later.",
     });
   }
 };
