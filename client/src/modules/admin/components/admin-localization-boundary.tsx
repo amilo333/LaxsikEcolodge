@@ -652,6 +652,7 @@ function translateDynamic(value: string, locale: string) {
       .replace(/^(\d+) đêm$/u, '$1 nights')
       .replace(/^(\d+(?:[,.]\d+)?) tr$/u, '$1M')
       .replace(/^(\d+) kết quả cho “(.+)”$/u, '$1 results for “$2”')
+      .replace(/^(\d+) phòng đang bảo trì\.$/u, '$1 rooms under maintenance.')
       .replace(/^(\d+) lượt$/u, '$1 uses')
       .replace(/^đến (.+)$/u, 'to $1')
       .replace(
@@ -692,6 +693,7 @@ function translateDynamic(value: string, locale: string) {
     .replace(/^(\d+) nights$/u, '$1 đêm')
     .replace(/^(\d+(?:[,.]\d+)?)M$/u, '$1 triệu')
     .replace(/^(\d+) results for “(.+)”$/u, '$1 kết quả cho “$2”')
+    .replace(/^(\d+) rooms under maintenance\.$/u, '$1 phòng đang bảo trì.')
     .replace(/^(\d+) uses$/u, '$1 lượt')
     .replace(/^to (.+)$/u, 'đến $1');
 }
@@ -739,10 +741,13 @@ function translateValue(source: string, locale: string) {
   if (!trimmed) return source;
 
   const normalized = trimmed.replace(/\s+/gu, ' ');
-  const lookupValue =
+  const restoredValue =
     locale === 'en' ? restoreSourceVietnameseTerms(normalized) : normalized;
   const exact =
-    locale === 'en' ? BY_VI.get(lookupValue) : BY_EN.get(lookupValue);
+    locale === 'en'
+      ? (BY_VI.get(normalized) ?? BY_VI.get(restoredValue))
+      : BY_EN.get(normalized);
+  const lookupValue = exact ? normalized : restoredValue;
   const translatedValue = exact ?? translateDynamic(lookupValue, locale);
   const translated =
     locale === 'vi'
