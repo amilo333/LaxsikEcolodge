@@ -1,6 +1,5 @@
 'use client';
 import { Button, DatePicker, Field } from '@/components/core';
-import Image from 'next/image';
 import { useForm, useWatch } from 'react-hook-form';
 import { TBookingBarFindForm, TBookingBarProps } from '../types';
 import { today, getLocalTimeZone } from '@internationalized/date';
@@ -60,9 +59,9 @@ export function BookingBar(props: TBookingBarProps) {
   };
 
   return (
-    <div className='absolute top-[146%] left-1/2 z-10 w-full -translate-x-1/2 -translate-y-1/2 bg-white px-[48px] pt-5 shadow-lg'>
-      <div className='flex items-center gap-[10px]'>
-        <div className='flex w-[80%] gap-[10px]'>
+    <div className='absolute inset-x-0 top-full z-30 border-t border-[#DCE7E3] bg-white px-4 py-4 text-[#151515] shadow-[0_20px_45px_rgba(4,45,43,0.18)] sm:px-6 lg:px-12'>
+      <div className='mx-auto max-w-[1500px]'>
+        <div className='grid gap-3 md:grid-cols-2 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(240px,0.8fr)_148px] xl:items-end'>
           <Field control={control} name='checkinDate' label={t('checkIn')}>
             <DatePicker label={t('checkIn')} minValue={currentDate} />
           </Field>
@@ -79,36 +78,26 @@ export function BookingBar(props: TBookingBarProps) {
           </Field>
 
           <GuestSelect value={guest} onChange={setGuest} />
-        </div>
-
-        <Button
-          className='h-[48px] w-[148px]! text-lg!'
-          onClick={handleSubmit(handleFindNow)}>
-          {t('findNow')}
-        </Button>
-
-        <div className='absolute top-[-6px] right-[142px] flex flex-col items-center'>
-          <Image
-            src='/images/chevron_down.png'
-            alt={t('collapse')}
-            width={12}
-            height={6}
-            className='h-[6px] w-[12px] rotate-180 brightness-0 contrast-[300%] invert'
-          />
 
           <Button
-            variant='danger'
-            className='h-[24px] w-[90px] bg-white text-[14px]! text-black!'
-            onClick={onClickHide}>
-            {t('hide')}
+            className='h-12! w-full! text-base! md:col-span-2 xl:col-span-1'
+            onClick={handleSubmit(handleFindNow)}>
+            {t('findNow')}
           </Button>
         </div>
+        {dateError && (
+          <p className='mt-2 text-sm text-red-700' role='alert'>
+            {dateError}
+          </p>
+        )}
       </div>
-      {dateError && (
-        <p className='mt-2 text-sm text-red-700' role='alert'>
-          {dateError}
-        </p>
-      )}
+      <button
+        type='button'
+        onClick={onClickHide}
+        aria-label={t('collapse')}
+        className='absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-[#EEF4F2] text-lg text-[#0D4949] transition hover:bg-[#DCE9E5] sm:top-3 sm:right-3'>
+        ×
+      </button>
     </div>
   );
 }

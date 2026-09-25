@@ -13,7 +13,9 @@
     "tours": "TOUR",
     "spa": "SPA & MASSAGE",
     "contact": "LIÊN HỆ",
-    "bookNow": "Đặt phòng"
+    "bookNow": "Đặt phòng",
+    "openMenu": "Mở menu điều hướng",
+    "closeMenu": "Đóng menu điều hướng"
   },
   "AccountMenu": {
     "signIn": "Đăng nhập",

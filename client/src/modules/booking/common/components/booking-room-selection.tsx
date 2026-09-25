@@ -56,7 +56,7 @@ export function BookingRoomSelection({
       </h2>
 
       <div className='mt-4 overflow-hidden rounded-[16px] border border-[#E3E8E6]'>
-        <div className='hidden grid-cols-[minmax(360px,1.5fr)_110px_minmax(190px,1fr)_150px] bg-[#F1F5F3] text-[11px] font-bold md:grid'>
+        <div className='hidden grid-cols-[minmax(320px,1.5fr)_90px_minmax(170px,1fr)_130px] bg-[#F1F5F3] text-[11px] font-bold lg:grid'>
           <div className='px-4 py-3'>{t('roomType')}</div>
           <div className='border-l border-white px-4 py-3'>{t('guests')}</div>
           <div className='border-l border-white px-4 py-3'>{t('price')}</div>

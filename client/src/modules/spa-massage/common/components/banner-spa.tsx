@@ -6,31 +6,25 @@ import { useTranslations } from 'next-intl';
 export function BannerSpa() {
   const t = useTranslations('Spa.banner');
   return (
-    <div className='relative mb-50 h-[500px] w-full'>
-      <Image
-        src='/images/banner/banner-spa.png'
-        alt={t('imageAlt')}
-        fill
-        className='object-cover'
-        sizes='100vw'
-      />
-      <div className='absolute top-106.5 left-0 flex w-full flex-col items-center justify-center gap-4 text-center'>
+    <section className='relative mb-20 w-full sm:mb-24 lg:mb-28'>
+      <div className='relative h-[320px] overflow-hidden sm:h-[420px] lg:h-[500px]'>
         <Image
-          src='/images/maskfix.png'
-          height={200}
-          width={1920}
-          alt='mask'
-          className='height-[250px]! w-full object-fill'
+          src='/images/banner/banner-spa.png'
+          alt={t('imageAlt')}
+          fill
+          className='object-cover'
+          sizes='100vw'
         />
+        <div className='absolute inset-0 bg-gradient-to-t from-[#092F2E]/60 via-transparent to-transparent' />
       </div>
-      <div className='flex flex-col gap-4 px-37.5 pt-125'>
-        <div className='font-lora mt-5 text-center text-[56px] font-semibold text-[#0D4949]'>
+      <div className='relative z-10 mx-auto -mt-12 flex w-[calc(100%-32px)] max-w-5xl flex-col gap-3 rounded-[24px] bg-white px-5 py-8 text-center shadow-[0_22px_70px_rgba(13,73,73,0.14)] sm:-mt-16 sm:px-10 sm:py-10'>
+        <h1 className='font-lora text-3xl font-semibold text-[#0D4949] sm:text-4xl lg:text-[56px]'>
           {t('title')}
-        </div>
-        <div className='font-montserrat text-center text-[18px] text-[#333333]'>
+        </h1>
+        <p className='font-montserrat mx-auto max-w-3xl text-sm leading-7 text-[#4E5D59] sm:text-base lg:text-[18px]'>
           {t('description')}
-        </div>
+        </p>
       </div>
-    </div>
+    </section>
   );
 }

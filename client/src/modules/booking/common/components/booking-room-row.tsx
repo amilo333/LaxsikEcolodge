@@ -53,7 +53,7 @@ export function BookingRoomRow({ room }: TBookingRoomRowProps) {
   };
 
   return (
-    <article className='grid grid-cols-1 border-t border-[#E3E8E6] first:border-t-0 md:grid-cols-[minmax(360px,1.5fr)_110px_minmax(190px,1fr)_150px]'>
+    <article className='grid grid-cols-1 border-t border-[#E3E8E6] first:border-t-0 lg:grid-cols-[minmax(320px,1.5fr)_90px_minmax(170px,1fr)_130px]'>
       <div className='flex flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center'>
         <Image
           src={room.thumbnail}
@@ -83,20 +83,20 @@ export function BookingRoomRow({ room }: TBookingRoomRowProps) {
         </div>
       </div>
 
-      <div className='flex items-center gap-2 border-t border-[#EEF1F0] px-4 py-3 text-sm font-bold md:border-t-0 md:border-l md:border-[#E3E8E6] md:py-4'>
-        <span className='text-[10px] text-[#78807D] uppercase md:hidden'>
+      <div className='flex items-center gap-2 border-t border-[#EEF1F0] px-4 py-3 text-sm font-bold lg:border-t-0 lg:border-l lg:border-[#E3E8E6] lg:py-4'>
+        <span className='text-[10px] text-[#78807D] uppercase lg:hidden'>
           {t('guests')}
         </span>
         {room.capacity}
       </div>
 
-      <div className='border-t border-[#EEF1F0] px-4 py-3 md:border-t-0 md:border-l md:border-[#E3E8E6] md:py-4'>
+      <div className='border-t border-[#EEF1F0] px-4 py-3 lg:border-t-0 lg:border-l lg:border-[#E3E8E6] lg:py-4'>
         <span className='text-sm font-bold'>{formatCurrency(room.price)}</span>
         <p className='mt-1 text-[10px] text-[#777F7C]'>{t('priceNote')}</p>
       </div>
 
-      <div className='flex items-center justify-between border-t border-[#EEF1F0] px-4 py-3 md:justify-center md:border-t-0 md:border-l md:border-[#E3E8E6] md:py-4'>
-        <span className='text-[10px] text-[#78807D] uppercase md:hidden'>
+      <div className='flex items-center justify-between border-t border-[#EEF1F0] px-4 py-3 lg:justify-center lg:border-t-0 lg:border-l lg:border-[#E3E8E6] lg:py-4'>
+        <span className='text-[10px] text-[#78807D] uppercase lg:hidden'>
           {t('selectRooms')}
         </span>
         <div className='flex items-center gap-3'>

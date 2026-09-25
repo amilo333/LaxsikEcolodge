@@ -135,7 +135,7 @@ export function SlideRoom(props: SlideRoomProps) {
         ========================= */}
 
         {displayTitle && (
-          <h2 className='font-lora mb-10 text-[32px] font-bold text-[#0D4949] uppercase md:text-3xl'>
+          <h2 className='font-lora mb-8 px-4 text-center text-2xl font-bold text-[#0D4949] uppercase sm:text-[32px] md:mb-10 md:text-3xl'>
             {displayTitle}
           </h2>
         )}
@@ -161,7 +161,7 @@ export function SlideRoom(props: SlideRoomProps) {
                 <div
                   key={room._id}
                   className={`flex-none transition-all duration-500 ease-out ${
-                    isActive ? 'w-[380px]' : 'w-[300px]'
+                    isActive ? 'w-[min(86vw,380px)]' : 'w-[min(72vw,300px)]'
                   } `}>
                   {/* =========================
                         ROOM CARD
@@ -169,7 +169,9 @@ export function SlideRoom(props: SlideRoomProps) {
 
                   <div
                     className={`flex w-full flex-col overflow-hidden rounded-2xl bg-white shadow-lg transition-all duration-500 ease-out ${
-                      isActive ? 'h-[520px]' : 'h-[470px]'
+                      isActive
+                        ? 'h-[470px] sm:h-[520px]'
+                        : 'h-[420px] sm:h-[470px]'
                     } `}>
                     {/* =========================
                           IMAGE
@@ -177,7 +179,9 @@ export function SlideRoom(props: SlideRoomProps) {
 
                     <div
                       className={`relative w-full flex-none overflow-hidden bg-[#F5F5F5] ${
-                        isActive ? 'h-[300px]' : 'h-[380px]'
+                        isActive
+                          ? 'h-[250px] sm:h-[300px]'
+                          : 'h-[330px] sm:h-[380px]'
                       } `}>
                       <Image
                         src={room.thumbnail}

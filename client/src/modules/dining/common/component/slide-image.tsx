@@ -61,10 +61,10 @@ export function SlideImage({
   return (
     <section
       className={`relative w-full overflow-hidden select-none ${className}`}>
-      <div className='relative z-10 my-30 flex w-full flex-col items-center gap-8 md:gap-12'>
+      <div className='relative z-10 my-16 flex w-full flex-col items-center gap-8 sm:my-20 md:gap-12 lg:my-30'>
         {/* TITLE */}
         {displayTitle && (
-          <h2 className='font-lora text-center text-[32px] font-semibold text-[#0D4949] uppercase'>
+          <h2 className='font-lora px-4 text-center text-2xl font-semibold text-[#0D4949] uppercase sm:text-[32px]'>
             {displayTitle}
           </h2>
         )}
@@ -81,8 +81,8 @@ export function SlideImage({
                   key={`${img}-${index}`}
                   className={`flex flex-[0_0_auto] items-center justify-center transition-all duration-500 ease-out ${
                     isActive
-                      ? 'w-[80vw] max-w-[800px]'
-                      : 'w-[60vw] max-w-[600px]'
+                      ? 'w-[86vw] max-w-[800px] sm:w-[80vw]'
+                      : 'w-[70vw] max-w-[600px] sm:w-[60vw]'
                   } `}>
                   <div
                     className={`relative w-full overflow-hidden bg-white transition-all duration-500 ease-out ${

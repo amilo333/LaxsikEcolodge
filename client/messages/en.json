@@ -13,7 +13,9 @@
     "tours": "TOURS",
     "spa": "SPA & MASSAGE",
     "contact": "CONTACT",
-    "bookNow": "Book Now"
+    "bookNow": "Book Now",
+    "openMenu": "Open navigation",
+    "closeMenu": "Close navigation"
   },
   "AccountMenu": {
     "signIn": "Sign in",

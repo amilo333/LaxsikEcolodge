@@ -18,20 +18,20 @@ export function ContactCta(props: TContactCtaProps) {
 
   return (
     <section
-      className={`mx-auto my-30 flex h-30 w-[80%] max-w-[1600px] items-center rounded-full! border border-white/10 bg-[#0D4949] px-3 py-6 text-white shadow-[0_20px_50px_rgba(0,0,0,0.1)] ${className}`}>
-      <div className='flex w-full items-center justify-around'>
-        <div className='text-[18px] leading-[1.6] sm:text-[20px]'>{title}</div>
+      className={`mx-auto my-16 flex w-[calc(100%-32px)] max-w-[1280px] items-center rounded-[28px] border border-white/10 bg-[#0D4949] px-5 py-7 text-white shadow-[0_20px_50px_rgba(0,0,0,0.1)] sm:my-20 sm:px-7 lg:my-30 lg:w-[80%] lg:rounded-full lg:px-9 ${className}`}>
+      <div className='flex w-full flex-col items-stretch justify-around gap-5 text-center lg:flex-row lg:items-center lg:gap-8 lg:text-left'>
+        <div className='text-base leading-[1.6] sm:text-[20px]'>{title}</div>
 
-        <div className='flex gap-8'>
+        <div className='flex w-full flex-col gap-3 sm:flex-row lg:w-auto lg:gap-4'>
           <a
             href={phoneHref}
-            className='font-Montserrat text-5 inline-flex min-w-[305px] items-center justify-center rounded-full border border-white/20 px-6 py-3 font-semibold text-white uppercase transition hover:bg-white/20 sm:text-base'>
+            className='font-Montserrat inline-flex min-h-12 min-w-0 flex-1 items-center justify-center rounded-full border border-white/20 px-5 py-3 text-sm font-semibold text-white uppercase transition hover:bg-white/20 sm:text-base lg:min-w-[305px]'>
             {phoneLabel} {phone}
           </a>
 
           <Link
             href={contactHref}
-            className='text-5 font-Montserrat inline-flex min-w-[172px] items-center justify-center rounded-full border border-white bg-white px-6 py-3 font-semibold text-[#0D4949] uppercase transition hover:bg-[#F5F5F5]'>
+            className='font-Montserrat inline-flex min-h-12 min-w-0 flex-1 items-center justify-center rounded-full border border-white bg-white px-6 py-3 text-sm font-semibold text-[#0D4949] uppercase transition hover:bg-[#F5F5F5] sm:text-base lg:min-w-[172px]'>
             {contactLabel}
           </Link>
         </div>

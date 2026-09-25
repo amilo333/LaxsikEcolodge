@@ -20,26 +20,26 @@ export function SpaList({ spa = [], className = '', children }: SpaListProps) {
   const t = useTranslations('Spa');
   return (
     <section className={`w-full py-12 select-none md:py-20 ${className}`}>
-      <div className='mx-auto flex w-[90%] max-w-7xl flex-col gap-16 px-4 sm:px-6 md:gap-24 lg:px-8'>
+      <div className='mx-auto flex w-full max-w-7xl flex-col gap-16 px-4 sm:px-6 md:gap-24 lg:px-8'>
         {spa.map((item, index) => {
           const isEven = index % 2 === 0;
           return (
             <React.Fragment key={item.id || index}>
               <div
-                className={`flex items-center justify-between gap-8 lg:gap-14 ${
+                className={`flex flex-col items-center justify-between gap-8 lg:gap-14 ${
                   isEven ? 'lg:flex-row' : 'lg:flex-row-reverse'
                 }`}>
                 {/* TEXT - 55% */}
                 <div className='flex w-full flex-col items-start lg:w-[55%]'>
                   {item.title && (
-                    <h2 className='font-lora text-[32px] font-semibold text-[#0D4949] uppercase'>
+                    <h2 className='font-lora text-2xl font-semibold text-[#0D4949] uppercase sm:text-[32px]'>
                       {item.title}
                     </h2>
                   )}
 
                   <div className='my-4 h-[2px] w-16 bg-[#0D4949]' />
 
-                  <p className='font-montserrat max-w-2xl text-[20px] leading-[1.8] md:text-base'>
+                  <p className='font-montserrat max-w-2xl text-base leading-7 sm:text-lg sm:leading-8'>
                     {item.description}
                   </p>
                 </div>

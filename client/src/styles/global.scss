@@ -3,6 +3,12 @@
 @use './_theme.t';
 @use './_default.t';
 
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
 @keyframes laxsik-pet-float {
   0%,
   100% {

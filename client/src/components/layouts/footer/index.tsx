@@ -19,13 +19,13 @@ export function Footer() {
         className='height-[250px]! w-full object-fill'
       />
 
-      <div className='flex flex-col items-center bg-white px-4 py-10'>
+      <div className='flex flex-col items-center bg-white px-4 py-8 sm:py-10'>
         <Image
           src={logo}
           alt={title}
           width={120}
           height={90}
-          className='h-[160px] w-[234px] object-contain'
+          className='h-auto w-[180px] object-contain sm:w-[220px]'
         />
 
         <p className='mt-4 text-center text-[17px] font-semibold'>
@@ -58,14 +58,14 @@ export function Footer() {
           ))}
         </div>
 
-        <div className='mt-10 flex flex-wrap justify-center gap-10 text-[16px] font-semibold uppercase'>
+        <div className='mt-9 flex flex-wrap justify-center gap-x-6 gap-y-4 text-center text-sm font-semibold uppercase sm:gap-10 sm:text-[16px]'>
           {menus.map((menu) => (
             <div key={menu}>{t(`menus.${menu}`)}</div>
           ))}
         </div>
       </div>
 
-      <div className='bg-[#0D4949] py-2 text-center text-[16px] text-white'>
+      <div className='bg-[#0D4949] px-4 py-3 text-center text-sm text-white sm:text-[16px]'>
         {t('copyright')}
       </div>
     </footer>

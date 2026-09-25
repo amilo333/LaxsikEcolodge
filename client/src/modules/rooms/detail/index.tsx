@@ -47,14 +47,13 @@ export function DetailRoomModule() {
           preload
           sizes='100vw'
           quality={90}
-          className='h-200 w-full object-cover object-center'
+          className='h-[420px] w-full object-cover object-center sm:h-[560px] lg:h-200'
         />
-
-        <div className='absolute top-162.5 left-1/2 w-4/5 -translate-x-1/2'>
-          <RoomCard room={localizedRoom} />
-        </div>
       </div>
-      <div className='mt-110'>
+      <div className='relative z-10 mx-auto -mt-14 w-[calc(100%-32px)] max-w-6xl sm:-mt-20 lg:-mt-36'>
+        <RoomCard room={localizedRoom} />
+      </div>
+      <div className='mt-10 sm:mt-14 lg:mt-20'>
         <ImageSlider images={data.images} title={t('gallery')} />
       </div>
       <DetailFacilities room={localizedRoom} />

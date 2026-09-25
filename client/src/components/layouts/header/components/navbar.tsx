@@ -6,10 +6,12 @@ import Link from 'next/link';
 import { MENUS } from '../contants';
 import { AccountMenu } from './account-menu';
 import { useTranslations } from 'next-intl';
+import { useState } from 'react';
 
 export function Navbar(props: TNavbarProps) {
   const { onClickFind, isBookingBarVisible } = props;
   const t = useTranslations('Navigation');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <div className="relative isolate bg-[url('/images/banner/bg_header.png')] bg-cover bg-center text-white">
@@ -65,8 +67,67 @@ export function Navbar(props: TNavbarProps) {
             </Button>
           )}
           <AccountMenu />
+          <button
+            type='button'
+            aria-label={isMenuOpen ? t('closeMenu') : t('openMenu')}
+            aria-expanded={isMenuOpen}
+            aria-controls='mobile-navigation'
+            onClick={() => setIsMenuOpen((current) => !current)}
+            className='flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/35 bg-white/10 transition hover:bg-white/20 xl:hidden'>
+            <span className='sr-only'>
+              {isMenuOpen ? t('closeMenu') : t('openMenu')}
+            </span>
+            <span className='relative h-4 w-5' aria-hidden='true'>
+              <span
+                className={`absolute left-0 h-0.5 w-5 bg-white transition ${
+                  isMenuOpen ? 'top-[7px] rotate-45' : 'top-0'
+                }`}
+              />
+              <span
+                className={`absolute top-[7px] left-0 h-0.5 w-5 bg-white transition ${
+                  isMenuOpen ? 'opacity-0' : 'opacity-100'
+                }`}
+              />
+              <span
+                className={`absolute left-0 h-0.5 w-5 bg-white transition ${
+                  isMenuOpen ? 'top-[7px] -rotate-45' : 'top-[14px]'
+                }`}
+              />
+            </span>
+          </button>
         </div>
       </div>
+
+      {isMenuOpen && (
+        <div
+          id='mobile-navigation'
+          className='absolute inset-x-0 top-full z-40 border-t border-white/15 bg-[#0D4949]/98 px-4 py-5 shadow-[0_20px_45px_rgba(1,35,34,0.3)] backdrop-blur-xl sm:px-6 xl:hidden'>
+          <nav className='mx-auto max-w-[720px]' aria-label={t('openMenu')}>
+            <ul className='grid grid-cols-2 gap-2 sm:grid-cols-3'>
+              {MENUS.map((item) => (
+                <li key={item.label}>
+                  <Link
+                    href={item.href}
+                    onClick={() => setIsMenuOpen(false)}
+                    className='flex min-h-11 items-center rounded-xl border border-white/10 bg-white/5 px-4 text-xs font-bold text-white transition hover:bg-white/15'>
+                    {t(item.label)}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            {!isBookingBarVisible && (
+              <Button
+                className='mt-4 h-11! w-full! bg-white! text-sm! text-[#0D4949]! shadow-none! lg:hidden'
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  onClickFind();
+                }}>
+                {t('bookNow')}
+              </Button>
+            )}
+          </nav>
+        </div>
+      )}
     </div>
   );
 }

@@ -20,27 +20,27 @@ export function RoomCard({ room }: TRoomCardProps) {
   };
 
   return (
-    <div className='flex max-h-[433px] w-full max-w-[1600px] items-center justify-center rounded-2xl bg-white shadow-2xl'>
-      <div className='flex flex-col items-center gap-[24px] px-[56px] py-[44px]'>
-        <div className='font-lora flex items-center gap-2 text-[32px] font-semibold uppercase'>
+    <div className='flex w-full items-center justify-center rounded-[20px] bg-white shadow-2xl'>
+      <div className='flex w-full flex-col items-center gap-5 px-5 py-7 sm:gap-6 sm:px-9 sm:py-9 lg:px-14 lg:py-11'>
+        <div className='font-lora text-center text-2xl font-semibold uppercase sm:text-[32px]'>
           {room.title}
         </div>
-        <div className='flex flex-col gap-[28px] text-[18px]'>
-          <div className='font-montserrat text-center text-[18px]'>
+        <div className='flex flex-col gap-5 text-base sm:text-[18px]'>
+          <div className='font-montserrat max-w-4xl text-center text-sm leading-7 sm:text-[18px]'>
             {room.description}
           </div>
         </div>
         <hr className='h-0.1 w-full bg-[#ccc]' />
         <div className='flex flex-col items-center justify-between gap-2'>
-          <div className='flex items-center gap-2 text-[18px]'>
-            <div>{t('averagePrice')}</div>
-            <div className='text-[32px] font-extrabold text-[#0D4949] tabular-nums'>
+          <div className='flex flex-col items-center gap-1 text-base sm:flex-row sm:gap-2 sm:text-[18px]'>
+            <div className='text-center'>{t('averagePrice')}</div>
+            <div className='text-2xl font-extrabold text-[#0D4949] tabular-nums sm:text-[32px]'>
               {formatCurrency(room.price)}
             </div>
           </div>
           <Button
             onClick={handleBookNow}
-            className='h-[clamp(52px,4.5vw,71px)]! w-[clamp(180px,18vw,260px)]! text-[clamp(20px,2vw,28px)]!'>
+            className='h-[clamp(48px,4.5vw,64px)]! w-[clamp(180px,55vw,260px)]! text-[clamp(17px,2vw,24px)]!'>
             {t('bookNow')}
           </Button>
         </div>

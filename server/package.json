@@ -11,7 +11,8 @@
     "knowledge:check": "node src/scripts/check-knowledge-search.js",
     "chat:check": "node src/scripts/check-chatbot.js",
     "auth:migrate-indexes": "node src/scripts/migrate-auth-indexes.js",
-    "tours:seed": "node src/scripts/seed-tours.js"
+    "tours:seed": "node src/scripts/seed-tours.js",
+    "rooms:seed-more": "node src/scripts/seed-more-rooms.js"
   },
   "author": "LocNM",
   "license": "ISC",

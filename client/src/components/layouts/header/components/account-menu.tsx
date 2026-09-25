@@ -24,8 +24,9 @@ function GuestActions() {
     <div className='flex shrink-0 items-center gap-1.5 sm:gap-2'>
       <Link
         href={`/auth/login${redirect}`}
-        className='inline-flex h-9 items-center gap-1.5 rounded-full bg-[#DDF2FF] px-3 text-[11px] font-bold text-[#075A93] transition hover:bg-[#C9EAFF] sm:h-10 sm:px-4 sm:text-xs'>
-        <span>{t('signIn')}</span>
+        aria-label={t('signIn')}
+        className='inline-flex h-9 w-9 items-center justify-center gap-1.5 rounded-full bg-[#DDF2FF] text-[11px] font-bold text-[#075A93] transition hover:bg-[#C9EAFF] min-[420px]:w-auto min-[420px]:px-3 sm:h-10 sm:px-4 sm:text-xs'>
+        <span className='hidden min-[420px]:inline'>{t('signIn')}</span>
         <svg
           viewBox='0 0 24 24'
           aria-hidden='true'
@@ -36,7 +37,7 @@ function GuestActions() {
       </Link>
       <Link
         href={`/auth/register${redirect}`}
-        className='inline-flex h-9 items-center rounded-full bg-[#159DE5] px-3 text-[11px] font-bold text-white shadow-[0_7px_18px_rgba(21,157,229,0.22)] transition hover:bg-[#0D8DD1] sm:h-10 sm:px-4 sm:text-xs'>
+        className='hidden h-9 items-center rounded-full bg-[#159DE5] px-3 text-[11px] font-bold text-white shadow-[0_7px_18px_rgba(21,157,229,0.22)] transition hover:bg-[#0D8DD1] min-[380px]:inline-flex sm:h-10 sm:px-4 sm:text-xs'>
         {t('register')}
       </Link>
     </div>
@@ -75,7 +76,7 @@ export function AccountMenu() {
   if (profileQuery.isLoading) {
     return (
       <div
-        className='h-10 w-[136px] animate-pulse rounded-full bg-white/15'
+        className='h-10 w-10 animate-pulse rounded-full bg-white/15 sm:w-[136px]'
         aria-label={t('loading')}
       />
     );
