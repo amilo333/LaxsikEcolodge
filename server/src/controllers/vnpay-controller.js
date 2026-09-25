@@ -491,6 +491,10 @@ export const vnpayReturn = async (req, res) => {
       success,
     });
 
+    if (responseCode === "24") {
+      return res.redirect(`${process.env.CLIENT_URL}/rooms`);
+    }
+
     // ======================================
     // 3. Redirect về frontend React
     // ======================================

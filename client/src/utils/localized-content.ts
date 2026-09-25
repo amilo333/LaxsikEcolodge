@@ -173,6 +173,15 @@ function storedString(
     : localizeContentText(fallback, locale);
 }
 
+export function localizeTranslatedText(
+  item: { translations?: LocalizedTranslations },
+  field: string,
+  fallback: string,
+  locale: string
+) {
+  return storedString(item, field, fallback, locale);
+}
+
 function storedStringArray(
   item: { translations?: LocalizedTranslations },
   field: string,

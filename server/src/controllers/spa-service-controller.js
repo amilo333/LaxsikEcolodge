@@ -52,7 +52,7 @@ export const getAllSpaServices = async (req, res) => {
         .limit(limit)
         .populate({
           path: "spaId",
-          select: "title thumbnail",
+          select: "title translations thumbnail",
         }),
 
       SpaService.countDocuments(filter),
@@ -83,7 +83,7 @@ export const getSpaServiceById = async (req, res) => {
   try {
     const service = await SpaService.findById(req.params.id).populate({
       path: "spaId",
-      select: "title thumbnail",
+      select: "title translations thumbnail",
     });
 
     if (!service) {

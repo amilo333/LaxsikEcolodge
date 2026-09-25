@@ -52,6 +52,7 @@ export type TAdminRoomOccupancy = {
   roomPerformance: Array<{
     roomId: string;
     title: string;
+    translations?: TRoom['translations'];
     quantity: number;
     bookings: number;
     bookedRoomNights: number;
@@ -99,6 +100,7 @@ export type TAdminSummary = {
   roomPerformance: Array<{
     roomId: string;
     title: string;
+    translations?: TRoom['translations'];
     bookings: number;
     bookedRoomNights: number;
     availableRoomNights: number;
@@ -153,6 +155,7 @@ export type TAdminAnalytics = {
   roomPerformance: Array<{
     roomId: string;
     title: string;
+    translations?: TRoom['translations'];
     bookings: number;
     roomNights: number;
     grossRevenue: number;
@@ -203,8 +206,12 @@ export type TAdminExperienceService = {
   description: string;
   icon: string;
   status: 'active' | 'inactive';
-  diningId?: string | Pick<TAdminExperience, '_id' | 'title' | 'thumbnail'>;
-  spaId?: string | Pick<TAdminExperience, '_id' | 'title' | 'thumbnail'>;
+  diningId?:
+    | string
+    | Pick<TAdminExperience, '_id' | 'title' | 'thumbnail' | 'translations'>;
+  spaId?:
+    | string
+    | Pick<TAdminExperience, '_id' | 'title' | 'thumbnail' | 'translations'>;
   createdAt: string;
   updatedAt: string;
   translations?: TAdminExperienceTranslations;

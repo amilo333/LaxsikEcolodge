@@ -11,7 +11,9 @@ import {
 } from '@heroui/react';
 import { formatCurrency } from '@/utils';
 import Link from 'next/link';
+import { useLocale } from 'next-intl';
 import { useState, type FormEvent } from 'react';
+import { localizeTranslatedText } from '@/utils/localized-content';
 import {
   Area,
   AreaChart,
@@ -959,6 +961,7 @@ function RoomOccupancyChart({
 }
 
 export function AdminOverview() {
+  const locale = useLocale();
   const summaryQuery = useAdminSummaryApi();
   const [analyticsPeriod, setAnalyticsPeriod] =
     useState<TAdminAnalyticsPeriod>('last7Days');
@@ -990,9 +993,17 @@ export function AdminOverview() {
     );
   };
   const bookingStatus = summary?.bookingStatus ?? [];
-  const roomPerformance = occupancy?.roomPerformance ?? [];
+  const roomPerformance = (occupancy?.roomPerformance ?? []).map((room) => ({
+    ...room,
+    title: localizeTranslatedText(room, 'title', room.title, locale),
+  }));
   const analyticsTrend = analytics?.trend ?? [];
-  const analyticsRoomPerformance = analytics?.roomPerformance ?? [];
+  const analyticsRoomPerformance = (analytics?.roomPerformance ?? []).map(
+    (room) => ({
+      ...room,
+      title: localizeTranslatedText(room, 'title', room.title, locale),
+    })
+  );
   const applyOccupancyRange = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const days = Number(draftDays);

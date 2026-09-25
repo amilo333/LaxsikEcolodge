@@ -53,7 +53,7 @@ export const getAllDiningServices = async (req, res) => {
         .limit(limit)
         .populate({
           path: "diningId",
-          select: "title thumbnail",
+          select: "title translations thumbnail",
         }),
 
       DiningService.countDocuments(filter),
@@ -84,7 +84,7 @@ export const getDiningServiceById = async (req, res) => {
   try {
     const service = await DiningService.findById(req.params.id).populate({
       path: "diningId",
-      select: "title thumbnail",
+      select: "title translations thumbnail",
     });
 
     if (!service) {

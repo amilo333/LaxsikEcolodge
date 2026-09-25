@@ -3,7 +3,9 @@
 import { Pagination } from '@/components/core';
 import { TRoom } from '@/modules/rooms/common/types';
 import { formatCurrency } from '@/utils';
+import { localizeRoomContent } from '@/utils/localized-content';
 import Image from 'next/image';
+import { useLocale } from 'next-intl';
 import { useDeferredValue, useState } from 'react';
 import { useAdminRoomsApi, useDeleteAdminRoomApi } from '../common';
 import { AdminItemDetailDialog } from './admin-item-detail-dialog';
@@ -16,6 +18,7 @@ const ROOM_STATUS_LABELS = {
 };
 
 export function RoomsManagement() {
+  const locale = useLocale();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const deferredSearch = useDeferredValue(search.trim());
@@ -28,6 +31,13 @@ export function RoomsManagement() {
   const [editingRoom, setEditingRoom] = useState<TRoom | null | undefined>();
   const [selectedRoom, setSelectedRoom] = useState<TRoom | null>(null);
   const rooms = roomsQuery.data?.data ?? [];
+  const displayRooms = rooms.map((room) => ({
+    source: room,
+    localized: localizeRoomContent(room, locale),
+  }));
+  const selectedDisplayRoom = selectedRoom
+    ? localizeRoomContent(selectedRoom, locale)
+    : null;
   const pagination = roomsQuery.data?.pagination;
 
   const handleDelete = (room: TRoom) => {
@@ -111,7 +121,7 @@ export function RoomsManagement() {
                   </tr>
                 </thead>
                 <tbody className='divide-y divide-[#E8EEEC] text-xs'>
-                  {rooms.map((room) => (
+                  {displayRooms.map(({ source: room, localized }) => (
                     <tr
                       key={room._id}
                       onClick={() => setSelectedRoom(room)}
@@ -120,7 +130,7 @@ export function RoomsManagement() {
                         <div className='flex items-center gap-3'>
                           <Image
                             src={room.thumbnail}
-                            alt={room.title}
+                            alt={localized.title}
                             width={56}
                             height={44}
                             className='h-11 w-14 rounded-xl object-cover'
@@ -133,10 +143,10 @@ export function RoomsManagement() {
                                 setSelectedRoom(room);
                               }}
                               className='block max-w-[260px] truncate text-left font-extrabold text-[#263F3C] hover:underline'>
-                              {room.title}
+                              {localized.title}
                             </button>
                             <span className='mt-1 block text-[10px] text-[#74817D]'>
-                              {room.bed} · {room.area} m²
+                              {localized.bed} · {room.area} m²
                             </span>
                           </span>
                         </div>
@@ -211,26 +221,26 @@ export function RoomsManagement() {
           onClose={() => setEditingRoom(undefined)}
         />
       )}
-      {selectedRoom && (
+      {selectedRoom && selectedDisplayRoom && (
         <AdminItemDetailDialog
           category='phòng'
-          title={selectedRoom.title}
+          title={selectedDisplayRoom.title}
           image={selectedRoom.thumbnail}
           images={selectedRoom.images}
-          description={selectedRoom.description}
+          description={selectedDisplayRoom.description}
           fields={[
             { label: 'Giá mỗi đêm', value: formatCurrency(selectedRoom.price) },
             {
               label: 'Trạng thái',
               value: ROOM_STATUS_LABELS[selectedRoom.status],
             },
-            { label: 'Loại giường', value: selectedRoom.bed },
+            { label: 'Loại giường', value: selectedDisplayRoom.bed },
             { label: 'Diện tích', value: `${selectedRoom.area} m²` },
             { label: 'Sức chứa', value: `${selectedRoom.capacity} khách` },
             { label: 'Số lượng', value: selectedRoom.quantity },
-            { label: 'Phòng tắm', value: selectedRoom.bathroom },
-            { label: 'Lò sưởi', value: selectedRoom.fireplace },
-            { label: 'Tầm nhìn', value: selectedRoom.views },
+            { label: 'Phòng tắm', value: selectedDisplayRoom.bathroom },
+            { label: 'Lò sưởi', value: selectedDisplayRoom.fireplace },
+            { label: 'Tầm nhìn', value: selectedDisplayRoom.views },
           ]}
           onClose={() => setSelectedRoom(null)}
         />

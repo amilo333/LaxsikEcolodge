@@ -524,7 +524,13 @@ export const getAllBookingsAdmin = async (req, res) => {
         $regex: escapeRegExp(search),
         $options: "i",
       };
-      const roomIds = await Room.find({ title: searchRegex }).distinct("_id");
+      const roomIds = await Room.find({
+        $or: [
+          { title: searchRegex },
+          { "translations.vi.title": searchRegex },
+          { "translations.en.title": searchRegex },
+        ],
+      }).distinct("_id");
 
       query.$or = [
         { bookingCode: searchRegex },
@@ -713,7 +719,7 @@ export const getAdminDashboardSummary = async (_req, res) => {
         },
       ]),
       Room.find({ status: { $in: ["available", "maintenance"] } })
-        .select("title quantity status")
+        .select("title translations quantity status")
         .lean(),
       Booking.find({
         bookingStatus: { $in: ["confirmed", "completed"] },
@@ -794,6 +800,7 @@ export const getAdminDashboardSummary = async (_req, res) => {
           {
             roomId: room._id,
             title: room.title,
+            translations: room.translations,
             bookedRoomNights: 0,
             availableRoomNights: room.quantity * daysInCurrentMonth,
             bookingIds: new Set(),
@@ -828,6 +835,7 @@ export const getAdminDashboardSummary = async (_req, res) => {
       .map((room) => ({
         roomId: room.roomId,
         title: room.title,
+        translations: room.translations,
         bookings: room.bookingIds.size,
         bookedRoomNights: room.bookedRoomNights,
         availableRoomNights: room.availableRoomNights,

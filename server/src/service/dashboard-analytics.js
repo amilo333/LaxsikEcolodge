@@ -322,12 +322,14 @@ const createRoomPerformance = (bookings) => {
         const room = item.roomId;
         const roomId = (room?._id ?? room)?.toString?.() ?? "unknown";
         const title = room?.title ?? "Phòng không còn tồn tại";
+        const translations = room?.translations;
         const quantity = Number(item.quantity ?? 0);
         const roomNights = quantity * Number(booking.totalNights ?? 0);
         const grossRevenue = Number(item.pricePerNight ?? 0) * roomNights;
         const current = rooms.get(roomId) ?? {
           roomId,
           title,
+          translations,
           bookingIds: new Set(),
           roomNights: 0,
           grossRevenue: 0,

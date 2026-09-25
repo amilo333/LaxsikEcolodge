@@ -3,6 +3,8 @@
 import { formatCurrency } from '@/utils';
 import { getBookingPaymentAmounts } from '@/modules/booking/common/utils';
 import { useEffect, useRef, useState } from 'react';
+import { useLocale } from 'next-intl';
+import { localizeTranslatedText } from '@/utils/localized-content';
 import type { TAdminBooking, TUpdateAdminBookingPayload } from '../common';
 import { AdminSelect, type TAdminSelectOption } from './admin-select';
 
@@ -89,16 +91,16 @@ const BOOKING_STATUS_STYLES: Record<TBookingStatus, string> = {
   completed: 'bg-sky-100 text-sky-700',
 };
 
-const formatDate = (value: string) =>
-  new Intl.DateTimeFormat('vi-VN', {
+const formatDate = (value: string, locale: string) =>
+  new Intl.DateTimeFormat(locale === 'vi' ? 'vi-VN' : 'en-GB', {
     weekday: 'short',
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
   }).format(new Date(`${value.slice(0, 10)}T00:00:00`));
 
-const formatCreatedAt = (value: string) =>
-  new Intl.DateTimeFormat('vi-VN', {
+const formatCreatedAt = (value: string, locale: string) =>
+  new Intl.DateTimeFormat(locale === 'vi' ? 'vi-VN' : 'en-GB', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
@@ -135,6 +137,7 @@ export function BookingDetailDialog({
   onClose,
   onUpdate,
 }: TBookingDetailDialogProps) {
+  const locale = useLocale();
   const [bookingStatus, setBookingStatus] = useState(booking.bookingStatus);
   const [paymentStatus, setPaymentStatus] = useState(booking.paymentStatus);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -191,7 +194,7 @@ export function BookingDetailDialog({
               {booking.bookingCode}
             </h2>
             <p className='mt-1 text-[10px] text-slate-500'>
-              Tạo lúc {formatCreatedAt(booking.createdAt)}
+              Tạo lúc {formatCreatedAt(booking.createdAt, locale)}
             </p>
           </div>
 
@@ -217,7 +220,7 @@ export function BookingDetailDialog({
                   </p>
                 </div>
                 <p className='mt-2 text-sm font-extrabold text-[#173F3D]'>
-                  {formatDate(booking.checkInDate)}
+                  {formatDate(booking.checkInDate, locale)}
                 </p>
                 <p className='mt-1 text-[10px] text-slate-500'>Sau 15:00</p>
               </div>
@@ -229,7 +232,7 @@ export function BookingDetailDialog({
                   </p>
                 </div>
                 <p className='mt-2 text-sm font-extrabold text-[#173F3D]'>
-                  {formatDate(booking.checkOutDate)}
+                  {formatDate(booking.checkOutDate, locale)}
                 </p>
                 <p className='mt-1 text-[10px] text-slate-500'>
                   {booking.totalNights} đêm
@@ -306,7 +309,14 @@ export function BookingDetailDialog({
                       className='flex items-start justify-between gap-4 px-5 py-4'>
                       <div>
                         <p className='text-xs font-bold text-slate-700'>
-                          {room?.title ?? 'Phòng đã xóa'}
+                          {room
+                            ? localizeTranslatedText(
+                                room,
+                                'title',
+                                room.title,
+                                locale
+                              )
+                            : 'Phòng đã xóa'}
                         </p>
                         <p className='mt-1 text-[10px] text-slate-500'>
                           {item.quantity} phòng × {booking.totalNights} đêm ×{' '}

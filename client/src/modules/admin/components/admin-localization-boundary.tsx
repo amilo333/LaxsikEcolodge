@@ -27,7 +27,15 @@ const PAIRS: TranslationPair[] = [
   ['Kho phòng', 'Room inventory'],
   ['Xem website', 'View website'],
   ['Đăng xuất', 'Sign out'],
-  ['Admin Dashboard', 'Admin Dashboard'],
+  ['Bảng điều khiển quản trị', 'Admin Dashboard'],
+  ['Bảng điều khiển', 'Dashboard'],
+  ['Đặt phòng', 'Booking'],
+  ['Ẩm thực', 'Dining'],
+  ['Chăm sóc', 'Spa'],
+  ['Chăm sóc & mát-xa', 'Spa & massage'],
+  ['Trải nghiệm', 'Tour'],
+  ['Xem đặt phòng', 'View booking'],
+  ['STT', 'No.'],
 
   ['Hôm nay', 'Today'],
   ['Hôm qua', 'Yesterday'],
@@ -256,6 +264,15 @@ const PAIRS: TranslationPair[] = [
   [
     'Hãy đổi khoảng ngày hoặc từ khóa tìm kiếm.',
     'Try a different date range or search term.',
+  ],
+  ['Kết quả tìm kiếm', 'Search results'],
+  ['Đang tìm trên toàn bộ booking…', 'Searching all bookings…'],
+  ['Xóa tìm kiếm', 'Clear search'],
+  ['Không thể tìm booking', 'Unable to search bookings'],
+  ['Không tìm thấy booking phù hợp', 'No matching bookings found'],
+  [
+    'Có thể tìm theo mã booking, tên khách, email, số điện thoại hoặc tên phòng.',
+    'Search by booking code, guest name, email, phone number or room name.',
   ],
 
   [
@@ -626,6 +643,15 @@ function translateDynamic(value: string, locale: string) {
       .replace(/^Đang tải (.+)…$/u, 'Loading $1…')
       .replace(/^(\d+) khách$/u, '$1 guests')
       .replace(/^(\d+) phòng$/u, '$1 rooms')
+      .replace(/^(\d+) loại phòng$/u, '$1 room types')
+      .replace(/^Tổng (\d+) phòng$/u, '$1 rooms total')
+      .replace(
+        /^(\d+) lượt phòng trong booking$/u,
+        '$1 room selections in bookings'
+      )
+      .replace(/^(\d+) đêm$/u, '$1 nights')
+      .replace(/^(\d+(?:[,.]\d+)?) tr$/u, '$1M')
+      .replace(/^(\d+) kết quả cho “(.+)”$/u, '$1 results for “$2”')
       .replace(/^(\d+) lượt$/u, '$1 uses')
       .replace(/^đến (.+)$/u, 'to $1')
       .replace(
@@ -657,6 +683,15 @@ function translateDynamic(value: string, locale: string) {
     .replace(/^Loading (.+)…$/u, 'Đang tải $1…')
     .replace(/^(\d+) guests$/u, '$1 khách')
     .replace(/^(\d+) rooms$/u, '$1 phòng')
+    .replace(/^(\d+) room types$/u, '$1 loại phòng')
+    .replace(/^(\d+) rooms total$/u, 'Tổng $1 phòng')
+    .replace(
+      /^(\d+) room selections in bookings$/u,
+      '$1 lượt phòng trong đặt phòng'
+    )
+    .replace(/^(\d+) nights$/u, '$1 đêm')
+    .replace(/^(\d+(?:[,.]\d+)?)M$/u, '$1 triệu')
+    .replace(/^(\d+) results for “(.+)”$/u, '$1 kết quả cho “$2”')
     .replace(/^(\d+) uses$/u, '$1 lượt')
     .replace(/^to (.+)$/u, 'đến $1');
 }

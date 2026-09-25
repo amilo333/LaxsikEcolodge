@@ -25,7 +25,7 @@ export default function DatePicker(props: TDatePickerProps) {
       minValue={minValue}
       maxValue={maxValue}
       isDateUnavailable={isDateUnavailable}
-      className='h-24 w-full'
+      className='w-full'
       value={field?.value}
       onChange={field?.onChange}
       name={field?.name}>
@@ -38,7 +38,7 @@ export default function DatePicker(props: TDatePickerProps) {
           <DatePickerHero.Trigger>
             <Image
               src='/images/icon/ic_calendar.png'
-              alt='calendar'
+              alt={label}
               width={20}
               height={20}
             />

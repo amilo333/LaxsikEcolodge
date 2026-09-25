@@ -2,7 +2,7 @@ import '@/styles/global.scss';
 import '@/styles/heroui.css';
 import type { Metadata } from 'next';
 import { NextIntlClientProvider } from 'next-intl';
-import { getLocale, getMessages } from 'next-intl/server';
+import { getLocale, getMessages, getTranslations } from 'next-intl/server';
 import { Montserrat } from 'next/font/google';
 import { Providers } from './provider';
 import { lora } from '../../public/font/font';
@@ -12,11 +12,10 @@ const monserrat = Montserrat({
   subsets: ['latin'],
 });
 
-export const metadata: Metadata = {
-  title: 'Laxsik Ecolodge',
-  description:
-    'A peaceful ecolodge in Lao Chai Valley, surrounded by the mountains and rice terraces of Sa Pa.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('Metadata.root');
+  return { title: t('title'), description: t('description') };
+}
 
 export default async function RootLayout({
   children,

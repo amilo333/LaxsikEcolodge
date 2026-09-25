@@ -1,11 +1,11 @@
 import { ContactModule } from '@/modules/contact';
 import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
 
-export const metadata: Metadata = {
-  title: 'Contact Us | Laxsik Ecolodge',
-  description:
-    'Find Laxsik Ecolodge in Lao Chai, Sa Pa, or contact our team by phone and email.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations('Metadata.contact');
+  return { title: t('title'), description: t('description') };
+}
 
 export default function ContactPage() {
   return <ContactModule />;

@@ -1,17 +1,35 @@
 {
   "Common": {
+    "loading": "Đang tải…",
+    "loadingRooms": "Đang tải phòng…",
+    "loadingBooking": "Đang tải thông tin đặt phòng…",
+    "loadingDashboard": "Đang tải bảng điều khiển…",
     "language": {
       "label": "Chọn ngôn ngữ",
       "en": "Tiếng Anh",
       "vi": "Tiếng Việt"
     }
   },
+  "Metadata": {
+    "root": {
+      "title": "Laxsik Ecolodge",
+      "description": "Khu nghỉ dưỡng sinh thái yên bình tại thung lũng Lao Chải, giữa núi rừng và ruộng bậc thang Sa Pa."
+    },
+    "contact": {
+      "title": "Liên hệ | Laxsik Ecolodge",
+      "description": "Tìm đường đến Laxsik Ecolodge tại Lao Chải, Sa Pa hoặc liên hệ với chúng tôi qua điện thoại và email."
+    },
+    "tours": {
+      "title": "Trải nghiệm bản địa | Laxsik Ecolodge",
+      "description": "Khám phá các cung đường đi bộ, câu chuyện bản làng và truyền thống địa phương quanh thung lũng Mường Hoa và Sa Pa."
+    }
+  },
   "Navigation": {
     "overview": "TỔNG QUAN",
     "rooms": "PHÒNG",
     "dining": "ẨM THỰC",
-    "tours": "TOUR",
-    "spa": "SPA & MASSAGE",
+    "tours": "TRẢI NGHIỆM",
+    "spa": "CHĂM SÓC & MÁT-XA",
     "contact": "LIÊN HỆ",
     "bookNow": "Đặt phòng",
     "openMenu": "Mở menu điều hướng",
@@ -50,6 +68,7 @@
   "Footer": {
     "address": "Lao Chải, Sa Pa, Lào Cai, Việt Nam",
     "hotline": "Đường dây nóng",
+    "emailOr": "hoặc",
     "menus": {
       "careers": "Gia nhập đội ngũ",
       "partner": "Trở thành đối tác",
@@ -189,7 +208,7 @@
     },
     "rooms": {
       "eyebrow": "Nghỉ dưỡng gần thiên nhiên",
-      "title": "Phòng & Suite",
+      "title": "Phòng & hạng phòng",
       "description": "Khám phá các phòng hiện có, hình ảnh và giá mỗi đêm.",
       "loading": "Đang tải phòng…"
     },
@@ -218,14 +237,14 @@
           "linkLabel": "Khám phá ẩm thực"
         },
         "trekking": {
-          "title": "Tour trekking",
+          "title": "Đi bộ khám phá",
           "description": "Đi bộ qua thung lũng Mường Hoa, ruộng bậc thang và các bản làng vùng cao giữa cảnh sắc Sa Pa rộng mở.",
           "linkLabel": "Khám phá Sa Pa"
         },
         "spa": {
-          "title": "Po Mu Spa",
+          "title": "Chăm sóc Po Mu",
           "description": "Thư giãn với các liệu trình phục hồi lấy cảm hứng từ thảo dược người Dao Đỏ và nhịp sống bình yên của núi rừng.",
-          "linkLabel": "Khám phá spa"
+          "linkLabel": "Khám phá chăm sóc"
         },
         "wedding": {
           "title": "Đám cưới trên mây",
@@ -335,7 +354,7 @@
         "parking": "BÃI ĐỖ XE",
         "restaurant": "NHÀ HÀNG",
         "pool": "BỂ BƠI",
-        "spa": "SPA",
+        "spa": "CHĂM SÓC SỨC KHỎE",
         "laundry": "GIẶT LÀ"
       }
     },
@@ -390,14 +409,14 @@
   "Spa": {
     "banner": {
       "imageAlt": "Laxsik Spa giữa thiên nhiên",
-      "title": "LAXSIK SPA",
+      "title": "CHĂM SÓC TẠI LAXSIK",
       "description": "Một chốn bình yên giữa thiên nhiên, nơi liệu pháp chăm sóc sức khỏe truyền thống hòa cùng trải nghiệm thư giãn hiện đại. Mỗi liệu trình massage và phục hồi được thiết kế để giải tỏa căng thẳng, làm mới cơ thể và tìm lại sự an yên."
     },
     "services": {
-      "title": "DỊCH VỤ SPA",
-      "empty": "Hiện chưa có dịch vụ spa đang hoạt động."
+      "title": "DỊCH VỤ CHĂM SÓC",
+      "empty": "Hiện chưa có dịch vụ chăm sóc đang hoạt động."
     },
-    "serviceImageAlt": "Dịch vụ spa"
+    "serviceImageAlt": "Dịch vụ chăm sóc"
   },
   "Contact": {
     "heroEyebrow": "Lao Chải · Sa Pa · Việt Nam",

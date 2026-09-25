@@ -2,7 +2,12 @@
 
 import { Pagination } from '@/components/core';
 import Image from 'next/image';
+import { useLocale } from 'next-intl';
 import { useDeferredValue, useState } from 'react';
+import {
+  localizeExperienceContent,
+  localizeTranslatedText,
+} from '@/utils/localized-content';
 
 import {
   TAdminExperience,
@@ -23,13 +28,17 @@ type TExperienceManagementProps = {
 
 const getParentTitle = (
   kind: TAdminExperienceKind,
-  service: TAdminExperienceService
+  service: TAdminExperienceService,
+  locale: string
 ) => {
   const parent = kind === 'dining' ? service.diningId : service.spaId;
-  return typeof parent === 'string' ? '—' : (parent?.title ?? '—');
+  return typeof parent === 'string' || !parent
+    ? '—'
+    : localizeTranslatedText(parent, 'title', parent.title, locale);
 };
 
 export function ExperienceManagement({ kind }: TExperienceManagementProps) {
+  const locale = useLocale();
   const [activeTab, setActiveTab] = useState<'content' | 'services'>('content');
   const [contentPage, setContentPage] = useState(1);
   const [servicePage, setServicePage] = useState(1);
@@ -66,8 +75,22 @@ export function ExperienceManagement({ kind }: TExperienceManagementProps) {
   const deleteService = useDeleteAdminExperienceServiceApi(kind);
   const items = itemsQuery.data?.data ?? [];
   const services = servicesQuery.data?.data ?? [];
+  const displayItems = items.map((item) => ({
+    source: item,
+    localized: localizeExperienceContent(item, locale),
+  }));
+  const displayServices = services.map((service) => ({
+    source: service,
+    localized: localizeExperienceContent(service, locale),
+  }));
   const parents = parentsQuery.data?.data ?? [];
   const label = kind === 'dining' ? 'Dining' : 'Spa';
+  const selectedDisplayItem = selectedItem
+    ? localizeExperienceContent(selectedItem, locale)
+    : null;
+  const selectedDisplayService = selectedService
+    ? localizeExperienceContent(selectedService, locale)
+    : null;
 
   const handleDeleteItem = (item: TAdminExperience) => {
     if (
@@ -174,7 +197,7 @@ export function ExperienceManagement({ kind }: TExperienceManagementProps) {
               </div>
             ) : (
               <div className='grid gap-4 p-5 sm:p-6 md:grid-cols-2 xl:grid-cols-3'>
-                {items.map((item) => (
+                {displayItems.map(({ source: item, localized }) => (
                   <article
                     key={item._id}
                     onClick={() => setSelectedItem(item)}
@@ -182,7 +205,7 @@ export function ExperienceManagement({ kind }: TExperienceManagementProps) {
                     <div className='relative h-40 w-full'>
                       <Image
                         src={item.thumbnail}
-                        alt={item.title}
+                        alt={localized.title}
                         fill
                         sizes='(max-width: 768px) 100vw, 360px'
                         className='object-cover'
@@ -198,7 +221,7 @@ export function ExperienceManagement({ kind }: TExperienceManagementProps) {
                               setSelectedItem(item);
                             }}
                             className='text-left hover:underline'>
-                            {item.title}
+                            {localized.title}
                           </button>
                         </h3>
                         <span
@@ -211,7 +234,7 @@ export function ExperienceManagement({ kind }: TExperienceManagementProps) {
                         </span>
                       </div>
                       <p className='mt-2 line-clamp-2 min-h-10 text-xs leading-5 text-[#65736F]'>
-                        {item.description}
+                        {localized.description}
                       </p>
                       <div
                         className='mt-4 flex gap-2 border-t border-[#E1E9E6] pt-4'
@@ -294,7 +317,7 @@ export function ExperienceManagement({ kind }: TExperienceManagementProps) {
                     </tr>
                   </thead>
                   <tbody className='divide-y divide-[#E8EEEC] text-xs'>
-                    {services.map((service) => (
+                    {displayServices.map(({ source: service, localized }) => (
                       <tr
                         key={service._id}
                         onClick={() => setSelectedService(service)}
@@ -303,7 +326,7 @@ export function ExperienceManagement({ kind }: TExperienceManagementProps) {
                           <div className='flex items-center gap-3'>
                             <Image
                               src={service.icon}
-                              alt={service.title}
+                              alt={localized.title}
                               width={42}
                               height={42}
                               className='h-10 w-10 rounded-xl object-contain'
@@ -316,16 +339,16 @@ export function ExperienceManagement({ kind }: TExperienceManagementProps) {
                                   setSelectedService(service);
                                 }}
                                 className='block text-left font-bold text-[#263F3C] hover:underline'>
-                                {service.title}
+                                {localized.title}
                               </button>
                               <span className='mt-1 block max-w-[340px] truncate text-[10px] text-[#74817D]'>
-                                {service.description}
+                                {localized.description}
                               </span>
                             </span>
                           </div>
                         </td>
                         <td className='px-4 py-4 text-[#52635F]'>
-                          {getParentTitle(kind, service)}
+                          {getParentTitle(kind, service, locale)}
                         </td>
                         <td className='px-4 py-4'>
                           <span
@@ -402,13 +425,13 @@ export function ExperienceManagement({ kind }: TExperienceManagementProps) {
           onClose={() => setEditingService(undefined)}
         />
       )}
-      {selectedItem && (
+      {selectedItem && selectedDisplayItem && (
         <AdminItemDetailDialog
           category={label}
-          title={selectedItem.title}
+          title={selectedDisplayItem.title}
           image={selectedItem.thumbnail}
           images={selectedItem.images}
-          description={selectedItem.description}
+          description={selectedDisplayItem.description}
           fields={[
             {
               label: 'Trạng thái',
@@ -417,26 +440,30 @@ export function ExperienceManagement({ kind }: TExperienceManagementProps) {
             },
             {
               label: 'Ngày tạo',
-              value: new Date(selectedItem.createdAt).toLocaleString('vi-VN'),
+              value: new Date(selectedItem.createdAt).toLocaleString(
+                locale === 'vi' ? 'vi-VN' : 'en-GB'
+              ),
             },
             {
               label: 'Cập nhật lần cuối',
-              value: new Date(selectedItem.updatedAt).toLocaleString('vi-VN'),
+              value: new Date(selectedItem.updatedAt).toLocaleString(
+                locale === 'vi' ? 'vi-VN' : 'en-GB'
+              ),
             },
           ]}
           onClose={() => setSelectedItem(null)}
         />
       )}
-      {selectedService && (
+      {selectedService && selectedDisplayService && (
         <AdminItemDetailDialog
           category={`dịch vụ ${label}`}
-          title={selectedService.title}
+          title={selectedDisplayService.title}
           image={selectedService.icon}
-          description={selectedService.description}
+          description={selectedDisplayService.description}
           fields={[
             {
               label: `Thuộc ${label}`,
-              value: getParentTitle(kind, selectedService),
+              value: getParentTitle(kind, selectedService, locale),
             },
             {
               label: 'Trạng thái',
@@ -448,13 +475,13 @@ export function ExperienceManagement({ kind }: TExperienceManagementProps) {
             {
               label: 'Ngày tạo',
               value: new Date(selectedService.createdAt).toLocaleString(
-                'vi-VN'
+                locale === 'vi' ? 'vi-VN' : 'en-GB'
               ),
             },
             {
               label: 'Cập nhật lần cuối',
               value: new Date(selectedService.updatedAt).toLocaleString(
-                'vi-VN'
+                locale === 'vi' ? 'vi-VN' : 'en-GB'
               ),
             },
           ]}

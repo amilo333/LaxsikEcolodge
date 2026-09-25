@@ -34,6 +34,7 @@ export const summarizeRoomOccupancy = ({ rooms, bookings, range }) => {
       {
         roomId: room._id,
         title: room.title,
+        translations: room.translations,
         quantity: room.quantity,
         usedByDay: Array(range.days).fill(0),
         bookingIds: new Set(),
@@ -72,6 +73,7 @@ export const summarizeRoomOccupancy = ({ rooms, bookings, range }) => {
       return {
         roomId: room.roomId,
         title: room.title,
+        translations: room.translations,
         quantity: room.quantity,
         bookings: room.bookingIds.size,
         bookedRoomNights,

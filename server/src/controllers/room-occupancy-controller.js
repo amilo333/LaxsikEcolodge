@@ -10,7 +10,9 @@ export const getAdminRoomOccupancy = async (req, res) => {
   try {
     const range = parseOccupancyRange(req.query.dateFrom, req.query.days);
     const [rooms, bookings] = await Promise.all([
-      Room.find({ status: "available" }).select("title quantity").lean(),
+      Room.find({ status: "available" })
+        .select("title translations quantity")
+        .lean(),
       Booking.find({
         bookingStatus: { $in: ["pending", "confirmed", "completed"] },
         checkInDate: { $lt: range.end },

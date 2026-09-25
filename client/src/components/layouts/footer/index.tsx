@@ -7,6 +7,7 @@ import { useTranslations } from 'next-intl';
 export function Footer() {
   const t = useTranslations('Footer');
   const { logo, title, hotline, email, socials } = FOOTER_DATA;
+  const [primaryEmail, secondaryEmail] = email.split(' or ');
   const menus = ['careers', 'partner', 'privacy', 'terms'] as const;
 
   return (
@@ -37,7 +38,9 @@ export function Footer() {
             {t('hotline')}: {hotline}
           </p>
 
-          <p className='mt-1 text-[17px]'>Email: {email}</p>
+          <p className='mt-1 text-center text-[17px]'>
+            Email: {primaryEmail} {t('emailOr')} {secondaryEmail}
+          </p>
         </div>
 
         <div className='mt-5 flex items-center gap-3'>

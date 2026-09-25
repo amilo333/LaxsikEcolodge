@@ -19,7 +19,7 @@ export const getAdminDashboardAnalytics = async (req, res) => {
       .select(
         "_id bookingCode userId customerInfo bookingItems totalNights totalAmount depositAmount paidAmount bookingStatus paymentStatus createdAt",
       )
-      .populate("bookingItems.roomId", "title")
+      .populate("bookingItems.roomId", "title translations")
       .lean();
 
     return res.status(200).json({

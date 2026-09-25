@@ -1,9 +1,27 @@
 {
   "Common": {
+    "loading": "Loading…",
+    "loadingRooms": "Loading rooms…",
+    "loadingBooking": "Loading your booking…",
+    "loadingDashboard": "Loading dashboard…",
     "language": {
       "label": "Choose language",
       "en": "English",
       "vi": "Vietnamese"
+    }
+  },
+  "Metadata": {
+    "root": {
+      "title": "Laxsik Ecolodge",
+      "description": "A peaceful ecolodge in Lao Chai Valley, surrounded by the mountains and rice terraces of Sa Pa."
+    },
+    "contact": {
+      "title": "Contact Us | Laxsik Ecolodge",
+      "description": "Find Laxsik Ecolodge in Lao Chai, Sa Pa, or contact our team by phone and email."
+    },
+    "tours": {
+      "title": "Tours & Local Experiences | Laxsik Ecolodge",
+      "description": "Discover walking routes, village stories and local traditions around Muong Hoa Valley and Sa Pa."
     }
   },
   "Navigation": {
@@ -50,6 +68,7 @@
   "Footer": {
     "address": "Lao Chai, Sa Pa, Lao Cai, Vietnam",
     "hotline": "Hotline",
+    "emailOr": "or",
     "menus": {
       "careers": "Join Our Team",
       "partner": "Become A Partner",

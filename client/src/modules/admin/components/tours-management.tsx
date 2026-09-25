@@ -3,13 +3,16 @@
 import { Pagination } from '@/components/core';
 import { TTour } from '@/modules/tours/types';
 import Image from 'next/image';
+import { useLocale } from 'next-intl';
 import { useDeferredValue, useState } from 'react';
+import { localizeTourContent } from '@/utils/localized-content';
 
 import { useAdminToursApi, useDeleteAdminTourApi } from '../common';
 import { AdminItemDetailDialog } from './admin-item-detail-dialog';
 import { TourFormModal } from './tour-form-modal';
 
 export function ToursManagement() {
+  const locale = useLocale();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const deferredSearch = useDeferredValue(search.trim());
@@ -22,6 +25,13 @@ export function ToursManagement() {
   const [editingTour, setEditingTour] = useState<TTour | null | undefined>();
   const [selectedTour, setSelectedTour] = useState<TTour | null>(null);
   const tours = toursQuery.data?.data ?? [];
+  const displayTours = tours.map((tour) => ({
+    source: tour,
+    localized: localizeTourContent(tour, locale),
+  }));
+  const selectedDisplayTour = selectedTour
+    ? localizeTourContent(selectedTour, locale)
+    : null;
   const pagination = toursQuery.data?.pagination;
 
   const handleDelete = (tour: TTour) => {
@@ -106,7 +116,7 @@ export function ToursManagement() {
                   </tr>
                 </thead>
                 <tbody className='divide-y divide-[#E8EEEC] text-xs'>
-                  {tours.map((tour) => (
+                  {displayTours.map(({ source: tour, localized }) => (
                     <tr
                       key={tour._id}
                       onClick={() => setSelectedTour(tour)}
@@ -115,7 +125,7 @@ export function ToursManagement() {
                         <div className='flex items-center gap-3'>
                           <Image
                             src={tour.thumbnail}
-                            alt={tour.title}
+                            alt={localized.title}
                             width={64}
                             height={48}
                             className='h-12 w-16 rounded-xl object-cover'
@@ -128,18 +138,18 @@ export function ToursManagement() {
                                 setSelectedTour(tour);
                               }}
                               className='block max-w-[300px] truncate text-left font-extrabold text-[#263F3C] hover:underline'>
-                              {tour.title}
+                              {localized.title}
                             </button>
                             <span className='mt-1 block max-w-[300px] truncate text-[10px] text-[#74817D]'>
-                              {tour.eyebrow}
+                              {localized.eyebrow}
                             </span>
                           </span>
                         </div>
                       </td>
                       <td className='px-4 py-4 font-bold text-[#35534F]'>
-                        {tour.duration}
+                        {localized.duration}
                       </td>
-                      <td className='px-4 py-4'>{tour.rhythm}</td>
+                      <td className='px-4 py-4'>{localized.rhythm}</td>
                       <td className='px-4 py-4 font-bold tabular-nums'>
                         {tour.sortOrder}
                       </td>
@@ -208,17 +218,17 @@ export function ToursManagement() {
           onClose={() => setEditingTour(undefined)}
         />
       )}
-      {selectedTour && (
+      {selectedTour && selectedDisplayTour && (
         <AdminItemDetailDialog
           category='tour'
-          title={selectedTour.title}
+          title={selectedDisplayTour.title}
           image={selectedTour.thumbnail}
-          description={selectedTour.description}
-          highlights={selectedTour.highlights}
+          description={selectedDisplayTour.description}
+          highlights={selectedDisplayTour.highlights}
           fields={[
-            { label: 'Nhãn ngắn', value: selectedTour.eyebrow },
-            { label: 'Thời lượng', value: selectedTour.duration },
-            { label: 'Độ khó', value: selectedTour.rhythm },
+            { label: 'Nhãn ngắn', value: selectedDisplayTour.eyebrow },
+            { label: 'Thời lượng', value: selectedDisplayTour.duration },
+            { label: 'Độ khó', value: selectedDisplayTour.rhythm },
             { label: 'Thứ tự hiển thị', value: selectedTour.sortOrder },
             {
               label: 'Trạng thái',
