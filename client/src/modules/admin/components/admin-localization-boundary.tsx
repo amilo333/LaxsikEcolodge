@@ -696,13 +696,58 @@ function translateDynamic(value: string, locale: string) {
     .replace(/^to (.+)$/u, 'đến $1');
 }
 
+function normalizeVietnameseUiTerms(value: string) {
+  return value
+    .replace(/\bBooking\b/gu, 'Đặt phòng')
+    .replace(/\bbooking\b/gu, 'đặt phòng')
+    .replace(/\bCheck-in\b/gu, 'Nhận phòng')
+    .replace(/\bCheck-out\b/gu, 'Trả phòng')
+    .replace(/\bVoucher\b/gu, 'Mã ưu đãi')
+    .replace(/\bvoucher\b/gu, 'mã ưu đãi')
+    .replace(/\bDining\b/gu, 'Ẩm thực')
+    .replace(/\bSpa & Massage\b/gu, 'Chăm sóc & mát-xa')
+    .replace(/\bSpa\b/gu, 'Chăm sóc')
+    .replace(/\bMassage\b/gu, 'Mát-xa')
+    .replace(/\bTour\b/gu, 'Trải nghiệm')
+    .replace(/\btour\b/gu, 'trải nghiệm')
+    .replace(/\bDashboard\b/gu, 'Bảng điều khiển')
+    .replace(/\btimeline\b/gu, 'dòng thời gian')
+    .replace(/\bTop 5 loại phòng\b/gu, '5 loại phòng hàng đầu');
+}
+
+function restoreSourceVietnameseTerms(value: string) {
+  return value
+    .replace(/Đặt phòng/gu, 'Booking')
+    .replace(/đặt phòng/gu, 'booking')
+    .replace(/Nhận phòng/gu, 'Check-in')
+    .replace(/Trả phòng/gu, 'Check-out')
+    .replace(/Mã ưu đãi/gu, 'Voucher')
+    .replace(/mã ưu đãi/gu, 'voucher')
+    .replace(/Ẩm thực/gu, 'Dining')
+    .replace(/Chăm sóc & mát-xa/gu, 'Spa & Massage')
+    .replace(/Chăm sóc/gu, 'Spa')
+    .replace(/Mát-xa/gu, 'Massage')
+    .replace(/Trải nghiệm/gu, 'Tour')
+    .replace(/trải nghiệm/gu, 'tour')
+    .replace(/Bảng điều khiển/gu, 'Dashboard')
+    .replace(/dòng thời gian/gu, 'timeline')
+    .replace(/5 loại phòng hàng đầu/gu, 'Top 5 loại phòng');
+}
+
 function translateValue(source: string, locale: string) {
   const trimmed = source.trim();
   if (!trimmed) return source;
 
   const normalized = trimmed.replace(/\s+/gu, ' ');
-  const exact = locale === 'en' ? BY_VI.get(normalized) : BY_EN.get(normalized);
-  const translated = exact ?? translateDynamic(normalized, locale);
+  const lookupValue =
+    locale === 'en' ? restoreSourceVietnameseTerms(normalized) : normalized;
+  const exact =
+    locale === 'en' ? BY_VI.get(lookupValue) : BY_EN.get(lookupValue);
+  const translatedValue = exact ?? translateDynamic(lookupValue, locale);
+  const translated =
+    locale === 'vi'
+      ? normalizeVietnameseUiTerms(translatedValue)
+      : translatedValue;
   return translated === normalized
     ? source
     : preserveWhitespace(source, translated);

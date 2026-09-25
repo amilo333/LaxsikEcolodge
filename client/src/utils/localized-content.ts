@@ -131,12 +131,29 @@ const VIETNAMESE_TO_ENGLISH = new Map(
   ])
 );
 
+function normalizeVietnameseTerms(value: string) {
+  return value
+    .replace(/\bMaster Suite\b/giu, 'Hạng phòng lớn')
+    .replace(/\bDeluxe\b/giu, 'Cao cấp')
+    .replace(/\bPremium\b/giu, 'Thượng hạng')
+    .replace(/\bTwin\b/giu, 'Hai giường đơn')
+    .replace(/\bDouble\b/giu, 'Giường đôi')
+    .replace(/\bSuite\b/giu, 'Hạng phòng')
+    .replace(/\bBungalow\b/giu, 'Nhà nghỉ riêng')
+    .replace(/\bSignature\b/giu, 'Đặc trưng')
+    .replace(/\bHomestay\b/giu, 'Nhà nghỉ tại gia')
+    .replace(/\bBBQ\b/giu, 'Nướng')
+    .replace(/\bMassage\b/giu, 'Mát-xa')
+    .replace(/\bSpa\b/giu, 'Chăm sóc');
+}
+
 export function localizeContentText(value: string, locale: string) {
   if (!value) return value;
 
   const translations =
     locale === 'vi' ? ENGLISH_TO_VIETNAMESE : VIETNAMESE_TO_ENGLISH;
-  return translations.get(normalizeContent(value)) ?? value;
+  const translated = translations.get(normalizeContent(value)) ?? value;
+  return locale === 'vi' ? normalizeVietnameseTerms(translated) : translated;
 }
 
 type RoomContent = {
@@ -168,9 +185,9 @@ function storedString(
   locale: string
 ) {
   const value = storedValues(item, locale)?.[field];
-  return typeof value === 'string'
-    ? value
-    : localizeContentText(fallback, locale);
+  const translated =
+    typeof value === 'string' ? value : localizeContentText(fallback, locale);
+  return locale === 'vi' ? normalizeVietnameseTerms(translated) : translated;
 }
 
 export function localizeTranslatedText(
@@ -191,7 +208,9 @@ function storedStringArray(
   const value = storedValues(item, locale)?.[field];
   return Array.isArray(value) &&
     value.every((entry) => typeof entry === 'string')
-    ? value
+    ? locale === 'vi'
+      ? value.map(normalizeVietnameseTerms)
+      : value
     : fallback.map((entry) => localizeContentText(entry, locale));
 }
 
