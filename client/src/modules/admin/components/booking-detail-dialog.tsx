@@ -84,6 +84,12 @@ const PAYMENT_STATUS_OPTIONS: Array<TAdminSelectOption<TPaymentStatus>> = [
   },
 ];
 
+const REVERSIBLE_PAYMENT_STATUSES: TPaymentStatus[] = [
+  'unpaid',
+  'pending',
+  'failed',
+];
+
 const BOOKING_STATUS_STYLES: Record<TBookingStatus, string> = {
   pending: 'bg-amber-100 text-amber-700',
   confirmed: 'bg-emerald-100 text-emerald-700',
@@ -149,6 +155,18 @@ export function BookingDetailDialog({
       ?.label ?? booking.bookingStatus;
   const { depositAmount, paidAmount, remainingAmount } =
     getBookingPaymentAmounts(booking);
+  const paymentStatusLocked = ['paid', 'refunded'].includes(
+    booking.paymentStatus
+  );
+  const paymentStatusOptions = REVERSIBLE_PAYMENT_STATUSES.includes(
+    booking.paymentStatus
+  )
+    ? PAYMENT_STATUS_OPTIONS.filter((option) => option.value !== 'refunded')
+    : PAYMENT_STATUS_OPTIONS.filter((option) =>
+        booking.paymentStatus === 'deposit_paid'
+          ? ['deposit_paid', 'paid'].includes(option.value)
+          : option.value === booking.paymentStatus
+      );
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -417,13 +435,23 @@ export function BookingDetailDialog({
                 </p>
                 <AdminSelect
                   value={paymentStatus}
-                  options={PAYMENT_STATUS_OPTIONS}
+                  options={paymentStatusOptions}
                   onChange={setPaymentStatus}
                   ariaLabel='Trạng thái thanh toán'
-                  disabled={isPending}
+                  disabled={isPending || paymentStatusLocked}
                   placement='top'
                   className='mt-1.5'
                 />
+                {paymentStatusLocked && (
+                  <p className='mt-2 text-[10px] leading-4 font-semibold text-emerald-700'>
+                    Đã ghi nhận thanh toán nên trạng thái này đã được khóa.
+                  </p>
+                )}
+                {booking.paymentStatus === 'deposit_paid' && (
+                  <p className='mt-2 text-[10px] leading-4 font-semibold text-teal-700'>
+                    Đã ghi nhận tiền cọc; chỉ có thể chuyển sang đã thanh toán.
+                  </p>
+                )}
               </div>
 
               <button

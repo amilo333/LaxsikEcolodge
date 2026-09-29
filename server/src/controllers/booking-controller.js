@@ -3,6 +3,7 @@ import Room from "../models/Room.js";
 import User from "../models/User.js";
 import Voucher from "../models/Voucher.js";
 import { getDepositAmount } from "../utils/deposit.js";
+import { canAdminChangePaymentStatus } from "../utils/payment-status.js";
 
 const escapeRegExp = (value) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const CANCELLATION_WINDOW_MS = 48 * 60 * 60 * 1000;
@@ -955,6 +956,20 @@ export const updateBookingAdmin = async (req, res) => {
       !paymentStatuses.includes(req.body.paymentStatus)
     ) {
       return res.status(400).json({ message: "Invalid payment status" });
+    }
+
+    if (
+      req.body.paymentStatus &&
+      !canAdminChangePaymentStatus(
+        booking.paymentStatus,
+        req.body.paymentStatus,
+      )
+    ) {
+      return res.status(409).json({
+        code: "PAYMENT_STATUS_LOCKED",
+        message:
+          "A recorded payment cannot be changed back to an unpaid or processing status",
+      });
     }
 
     if (req.body.bookingStatus) {

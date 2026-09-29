@@ -194,3 +194,94 @@ test("admin can record the balance collected at the resort", async () => {
     Booking.findById = originalFindById;
   }
 });
+
+test("admin cannot move a collected deposit back to pending", async () => {
+  const originalFindById = Booking.findById;
+  const booking = {
+    _id: "booking-1",
+    bookingStatus: "confirmed",
+    paymentStatus: "deposit_paid",
+    totalAmount: 1_001,
+    depositAmount: 501,
+    paidAmount: 501,
+    async save() {
+      throw new Error("A locked payment must not be saved");
+    },
+  };
+
+  try {
+    Booking.findById = async () => booking;
+    const response = makeResponse();
+    await updateBookingAdmin(
+      { params: { id: booking._id }, body: { paymentStatus: "pending" } },
+      response,
+    );
+
+    assert.equal(response.statusCode, 409);
+    assert.equal(response.body.code, "PAYMENT_STATUS_LOCKED");
+    assert.equal(booking.paymentStatus, "deposit_paid");
+    assert.equal(booking.paidAmount, 501);
+  } finally {
+    Booking.findById = originalFindById;
+  }
+});
+
+test("admin cannot change a fully paid booking back to pending", async () => {
+  const originalFindById = Booking.findById;
+  const booking = {
+    _id: "booking-1",
+    bookingStatus: "confirmed",
+    paymentStatus: "paid",
+    totalAmount: 1_001,
+    paidAmount: 1_001,
+    async save() {
+      throw new Error("A locked payment must not be saved");
+    },
+  };
+
+  try {
+    Booking.findById = async () => booking;
+    const response = makeResponse();
+    await updateBookingAdmin(
+      { params: { id: booking._id }, body: { paymentStatus: "pending" } },
+      response,
+    );
+
+    assert.equal(response.statusCode, 409);
+    assert.equal(response.body.code, "PAYMENT_STATUS_LOCKED");
+    assert.equal(booking.paymentStatus, "paid");
+    assert.equal(booking.paidAmount, 1_001);
+  } finally {
+    Booking.findById = originalFindById;
+  }
+});
+
+test("admin can still change an unpaid booking to pending", async () => {
+  const originalFindById = Booking.findById;
+  const booking = {
+    _id: "booking-1",
+    bookingStatus: "pending",
+    paymentStatus: "unpaid",
+    totalAmount: 1_001,
+    paidAmount: 0,
+    async save() {},
+    async populate() {
+      return this;
+    },
+  };
+
+  try {
+    Booking.findById = async () => booking;
+    const response = makeResponse();
+    await updateBookingAdmin(
+      { params: { id: booking._id }, body: { paymentStatus: "pending" } },
+      response,
+    );
+
+    assert.equal(response.statusCode, 200);
+    assert.equal(booking.paymentStatus, "pending");
+    assert.equal(booking.paidAmount, 0);
+  } finally {
+    Booking.findById = originalFindById;
+  }
+});

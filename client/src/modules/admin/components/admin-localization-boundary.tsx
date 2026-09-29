@@ -207,6 +207,14 @@ const PAIRS: TranslationPair[] = [
   ['Còn lại theo booking', 'Remaining booking balance'],
   ['Trạng thái booking', 'Booking status'],
   ['Trạng thái thanh toán', 'Payment status'],
+  [
+    'Đã ghi nhận thanh toán nên trạng thái này đã được khóa.',
+    'Payment has been recorded, so this status is locked.',
+  ],
+  [
+    'Đã ghi nhận tiền cọc; chỉ có thể chuyển sang đã thanh toán.',
+    'The deposit has been recorded; it can only be changed to paid.',
+  ],
   ['Lưu trạng thái', 'Save status'],
   ['Đang cập nhật…', 'Updating…'],
   ['Đóng chi tiết booking', 'Close booking details'],
