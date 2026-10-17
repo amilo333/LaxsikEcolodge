@@ -5,6 +5,11 @@ import { VNPay, ignoreLogger } from "vnpay";
 
 import Booking from "../models/Booking.js";
 import Payment from "../models/Payment.js";
+import {
+  expireStaleBookingHolds,
+  getBookingHoldExpiresAt,
+  isBookingHoldExpired,
+} from "../utils/booking-hold.js";
 import { getDepositAmount } from "../utils/deposit.js";
 
 // ======================================
@@ -93,6 +98,7 @@ const applyVnpayResult = async ({
           paymentStatus: isFullPayment ? "paid" : "deposit_paid",
           paidAmount: isFullPayment ? booking.totalAmount : payment.amount,
           paymentMethod: "vnpay",
+          holdExpiresAt: null,
           bookingStatus: ["cancelled", "completed"].includes(booking.bookingStatus)
             ? booking.bookingStatus
             : "confirmed",
@@ -164,6 +170,16 @@ export const createVnpayPayment = async (req, res) => {
       });
     }
 
+    if (isBookingHoldExpired(booking)) {
+      booking.bookingStatus = "cancelled";
+      await booking.save();
+
+      return res.status(400).json({
+        code: "BOOKING_HOLD_EXPIRED",
+        message: "The payment window has expired. Please create a new booking",
+      });
+    }
+
     if (["deposit_paid", "paid"].includes(booking.paymentStatus)) {
       return res.status(400).json({
         message: "Booking deposit has already been paid",
@@ -191,7 +207,14 @@ export const createVnpayPayment = async (req, res) => {
 
     const date = new Date();
 
+    // Mỗi lần bắt đầu thanh toán hợp lệ, khách có trọn một khoảng thời gian
+    // để hoàn tất giao dịch trên cổng VNPay.
+    const holdExpiresAt = getBookingHoldExpiresAt(date);
+
     const createDate = moment(date).utcOffset(7).format("YYYYMMDDHHmmss");
+    const expireDate = moment(holdExpiresAt)
+      .utcOffset(7)
+      .format("YYYYMMDDHHmmss");
 
     // ======================================
     // 4. Tạo mã giao dịch
@@ -263,6 +286,8 @@ export const createVnpayPayment = async (req, res) => {
 
     vnpParams["vnp_CreateDate"] = createDate;
 
+    vnpParams["vnp_ExpireDate"] = expireDate;
+
     // Cho phép chọn ngân hàng cụ thể
     if (bankCode) {
       vnpParams["vnp_BankCode"] = bankCode;
@@ -305,6 +330,7 @@ export const createVnpayPayment = async (req, res) => {
     booking.paymentStatus = "pending";
     booking.paymentMethod = "vnpay";
     booking.depositAmount = amount;
+    booking.holdExpiresAt = holdExpiresAt;
 
     await booking.save();
 
@@ -344,6 +370,8 @@ export const getVnpayPaymentStatus = async (req, res) => {
   try {
     const userId = req.user._id;
     const { bookingId } = req.params;
+
+    await expireStaleBookingHolds({ bookingId, userId });
 
     const booking = await Booking.findOne({
       _id: bookingId,

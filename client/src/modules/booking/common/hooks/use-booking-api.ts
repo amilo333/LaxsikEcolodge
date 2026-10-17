@@ -19,7 +19,10 @@ export const useBookingDetailsApi = (bookingId: string | null) =>
     enabled: Boolean(bookingId),
     retry: false,
     refetchInterval: (query) =>
-      query.state.data?.paymentStatus === 'pending' ? 2500 : false,
+      query.state.data?.paymentStatus === 'pending' &&
+      query.state.data.bookingStatus !== 'cancelled'
+        ? 2500
+        : false,
   });
 
 export const useMyBookingsApi = () =>

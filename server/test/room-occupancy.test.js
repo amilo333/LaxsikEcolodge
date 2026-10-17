@@ -73,8 +73,10 @@ test("an empty booking range leaves every sellable room free", () => {
 test("occupancy endpoint excludes cancelled bookings and only counts sellable rooms", async () => {
   const originalRoomFind = Room.find;
   const originalBookingFind = Booking.find;
+  const originalBookingUpdateMany = Booking.updateMany;
   let roomFilter;
   let bookingFilter;
+  let expirationFilter;
   try {
     Room.find = (filter) => {
       roomFilter = filter;
@@ -89,6 +91,10 @@ test("occupancy endpoint excludes cancelled bookings and only counts sellable ro
       return {
         select: () => ({ lean: async () => [] }),
       };
+    };
+    Booking.updateMany = async (filter) => {
+      expirationFilter = filter;
+      return { modifiedCount: 0 };
     };
     const response = {
       statusCode: 200,
@@ -114,9 +120,16 @@ test("occupancy endpoint excludes cancelled bookings and only counts sellable ro
       "confirmed",
       "completed",
     ]);
+    assert.equal(expirationFilter.bookingStatus, "pending");
+    assert.deepEqual(expirationFilter.paymentStatus.$in, [
+      "unpaid",
+      "pending",
+      "failed",
+    ]);
     assert.equal(response.body.data.freeRoomNights, 4);
   } finally {
     Room.find = originalRoomFind;
     Booking.find = originalBookingFind;
+    Booking.updateMany = originalBookingUpdateMany;
   }
 });

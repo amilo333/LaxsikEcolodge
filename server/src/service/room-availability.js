@@ -1,5 +1,6 @@
 import Booking from "../models/Booking.js";
 import Room from "../models/Room.js";
+import { expireStaleBookingHolds } from "../utils/booking-hold.js";
 import {
   buildRoomAttributeFilter,
   RoomFilterError,
@@ -85,6 +86,8 @@ export const findAvailableRooms = async ({
     }
     throw error;
   }
+
+  await expireStaleBookingHolds();
 
   const overlappingBookings = await Booking.find({
     bookingStatus: { $in: ["pending", "confirmed"] },

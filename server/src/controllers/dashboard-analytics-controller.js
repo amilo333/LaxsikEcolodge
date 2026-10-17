@@ -1,4 +1,5 @@
 import Booking from "../models/Booking.js";
+import { expireStaleBookingHolds } from "../utils/booking-hold.js";
 import {
   parseDashboardAnalyticsParams,
   summarizeBookingAnalytics,
@@ -13,6 +14,8 @@ export const getAdminDashboardAnalytics = async (req, res) => {
   }
 
   try {
+    await expireStaleBookingHolds();
+
     const bookings = await Booking.find({
       createdAt: { $gte: params.dataStart, $lt: params.dataEnd },
     })

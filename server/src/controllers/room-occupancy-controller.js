@@ -1,5 +1,6 @@
 import Booking from "../models/Booking.js";
 import Room from "../models/Room.js";
+import { expireStaleBookingHolds } from "../utils/booking-hold.js";
 import {
   parseOccupancyRange,
   RoomOccupancyError,
@@ -9,6 +10,8 @@ import {
 export const getAdminRoomOccupancy = async (req, res) => {
   try {
     const range = parseOccupancyRange(req.query.dateFrom, req.query.days);
+    await expireStaleBookingHolds();
+
     const [rooms, bookings] = await Promise.all([
       Room.find({ status: "available" })
         .select("title translations quantity")

@@ -81,7 +81,12 @@ test("creates a VNPay transaction for only the booking deposit", async () => {
     assert.equal(createdPayment.amount, 501);
     assert.equal(response.body.data.amount, 501);
     assert.equal(new URL(response.body.data.payUrl).searchParams.get("vnp_Amount"), "50100");
+    assert.match(
+      new URL(response.body.data.payUrl).searchParams.get("vnp_ExpireDate"),
+      /^\d{14}$/,
+    );
     assert.equal(booking.paymentStatus, "pending");
+    assert.ok(booking.holdExpiresAt instanceof Date);
   } finally {
     Booking.findOne = originalFindOne;
     Payment.create = originalCreate;
@@ -147,6 +152,7 @@ for (const scenario of [
       assert.equal(payment.paymentStatus, "success");
       assert.equal(bookingUpdate.update.paymentStatus, scenario.status);
       assert.equal(bookingUpdate.update.paidAmount, scenario.amount);
+      assert.equal(bookingUpdate.update.holdExpiresAt, null);
       assert.equal(bookingUpdate.update.bookingStatus, "confirmed");
       assert.deepEqual(
         bookingUpdate.filter.paymentStatus.$in,

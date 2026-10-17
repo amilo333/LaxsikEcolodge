@@ -32,7 +32,8 @@ export function BookingStepThree({
   const [paymentError, setPaymentError] = useState('');
   const shouldReconcileVnpay =
     bookingQuery.data?.paymentMethod === 'vnpay' &&
-    bookingQuery.data.paymentStatus === 'pending';
+    bookingQuery.data.paymentStatus === 'pending' &&
+    bookingQuery.data.bookingStatus !== 'cancelled';
   const vnpayStatusQuery = useVnpayPaymentStatusApi(
     bookingId,
     shouldReconcileVnpay

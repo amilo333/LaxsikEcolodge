@@ -70,6 +70,7 @@ export type TBooking = {
   totalAmount: number;
   depositAmount?: number;
   paidAmount?: number;
+  holdExpiresAt?: string | null;
   bookingStatus: 'pending' | 'confirmed' | 'cancelled' | 'completed';
   paymentStatus:
     | 'unpaid'

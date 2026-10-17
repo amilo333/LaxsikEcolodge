@@ -2,6 +2,10 @@ import Booking from "../models/Booking.js";
 import Room from "../models/Room.js";
 import User from "../models/User.js";
 import Voucher from "../models/Voucher.js";
+import {
+  expireStaleBookingHolds,
+  getBookingHoldExpiresAt,
+} from "../utils/booking-hold.js";
 import { getDepositAmount } from "../utils/deposit.js";
 import { canAdminChangePaymentStatus } from "../utils/payment-status.js";
 
@@ -94,6 +98,8 @@ export const createBooking = async (req, res) => {
     // ======================================
     // 4. Tìm booking trùng ngày
     // ======================================
+
+    await expireStaleBookingHolds();
 
     const overlappingBookings = await Booking.find({
       bookingStatus: {
@@ -306,6 +312,9 @@ export const createBooking = async (req, res) => {
 
       paidAmount: 0,
 
+      holdExpiresAt:
+        totalAmount === 0 ? null : getBookingHoldExpiresAt(),
+
       bookingStatus: totalAmount === 0 ? "confirmed" : "pending",
 
       paymentStatus: totalAmount === 0 ? "paid" : "unpaid",
@@ -361,6 +370,8 @@ export const getMyBookings = async (req, res) => {
   try {
     const userId = req.user._id;
 
+    await expireStaleBookingHolds({ userId });
+
     const bookings = await Booking.find({
       userId,
     })
@@ -391,6 +402,11 @@ export const getMyBookings = async (req, res) => {
 export const getBookingById = async (req, res) => {
   try {
     const userId = req.user._id;
+
+    await expireStaleBookingHolds({
+      bookingId: req.params.id,
+      userId,
+    });
 
     const booking = await Booking.findOne({
       _id: req.params.id,
@@ -488,6 +504,8 @@ export const cancelBooking = async (req, res) => {
 
 export const getAllBookingsAdmin = async (req, res) => {
   try {
+    await expireStaleBookingHolds();
+
     const page = Number(req.query.page) > 0 ? Number(req.query.page) : 1;
     const limit = Math.min(
       Number(req.query.limit) > 0 ? Number(req.query.limit) : 10,
@@ -580,6 +598,8 @@ export const getAllBookingsAdmin = async (req, res) => {
 
 export const getAdminDashboardSummary = async (_req, res) => {
   try {
+    await expireStaleBookingHolds();
+
     // Dữ liệu cũ chưa có paidAmount: booking đã trả đủ vẫn được tính doanh thu.
     const collectedAmount = {
       $ifNull: [
@@ -981,9 +1001,11 @@ export const updateBookingAdmin = async (req, res) => {
 
       if (req.body.paymentStatus === "paid") {
         booking.paidAmount = booking.totalAmount;
+        booking.holdExpiresAt = null;
       } else if (req.body.paymentStatus === "deposit_paid") {
         booking.depositAmount ??= getDepositAmount(booking.totalAmount);
         booking.paidAmount = booking.depositAmount;
+        booking.holdExpiresAt = null;
       } else {
         booking.paidAmount = 0;
       }

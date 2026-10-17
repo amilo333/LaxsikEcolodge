@@ -111,6 +111,12 @@ const bookingSchema = new mongoose.Schema(
       min: 0,
     },
 
+    // Booking chưa thanh toán chỉ giữ phòng đến thời điểm này.
+    holdExpiresAt: {
+      type: Date,
+      default: null,
+    },
+
     bookingStatus: {
       type: String,
       enum: ["pending", "confirmed", "cancelled", "completed"],
@@ -159,6 +165,8 @@ const bookingSchema = new mongoose.Schema(
     timestamps: true,
   },
 );
+
+bookingSchema.index({ bookingStatus: 1, paymentStatus: 1, holdExpiresAt: 1 });
 
 const Booking = mongoose.model("Booking", bookingSchema);
 
